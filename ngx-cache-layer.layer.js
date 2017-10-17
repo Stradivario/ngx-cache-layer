@@ -39,7 +39,7 @@ var CacheLayer = (function () {
      * @param {?} key
      * @return {?}
      */
-    CacheLayer.prototype.get = function (key) {
+    CacheLayer.prototype.getItem = function (key) {
         var /** @type {?} */ item = this.items.getValue().filter(function (i) { return i['key'] === key; });
         if (this.config.localStorage) {
             var /** @type {?} */ layer = (JSON.parse(localStorage.getItem(this.layer)));
@@ -58,7 +58,7 @@ var CacheLayer = (function () {
      * @param {?} layerItem
      * @return {?}
      */
-    CacheLayer.prototype.put = function (layerItem) {
+    CacheLayer.prototype.putItem = function (layerItem) {
         if (this.config.localStorage) {
             var /** @type {?} */ layer = (JSON.parse(localStorage.getItem(this.layer)));
             if (layer) {
@@ -75,8 +75,9 @@ var CacheLayer = (function () {
      * @return {?}
      */
     CacheLayer.prototype.onExpire = function (key) {
+        var /** @type {?} */ self = this;
         setTimeout(function () {
-            this.removeItem(key);
+            self.removeItem(key);
         }, this.config.maxAge);
     };
     /**

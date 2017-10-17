@@ -7,8 +7,8 @@ export declare class CacheLayer<T> {
     static createCacheParams(config: any): any;
     constructor(i: CacheLayerInterface);
     private instanceHook(layerItem);
-    get(key: string): T;
-    put(layerItem: T): T;
+    getItem(key: string): T;
+    putItem(layerItem: T): T;
     private onExpire(key);
     removeItem(key: string): void;
 }

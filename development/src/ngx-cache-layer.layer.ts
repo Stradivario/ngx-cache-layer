@@ -32,7 +32,7 @@ export class CacheLayer<T> {
     this.onExpire(layerItem['key']);
   }
 
-  public get(key: string): T {
+  public getItem(key: string): T {
     let item = this.items.getValue().filter(i => i['key'] === key);
     if (this.config.localStorage) {
       const layer = <CacheLayerInterface>JSON.parse(localStorage.getItem(this.layer));
@@ -47,7 +47,7 @@ export class CacheLayer<T> {
     }
   }
 
-  public put(layerItem: T): T {
+  public putItem(layerItem: T): T {
     if (this.config.localStorage) {
       const layer = <CacheLayerInterface>JSON.parse(localStorage.getItem(this.layer));
       if (layer) {

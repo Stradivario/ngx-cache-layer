@@ -94,10 +94,10 @@ export class ExampleProvider {
             }
         };
 
-        this.exampleLayer.put(data);
+        this.exampleLayer.putItem(data);
 
         // Get cached data from added item above will return {exampleData:'example-string'}
-        const exampleItem = this.exampleLayer.get('example-key');
+        const exampleItem = this.exampleLayer.getItem('example-key');
 
         // Remove item from current layer
         this.exampleLayer.removeItem('example-key');
@@ -118,7 +118,7 @@ import {EXAMPLE_CACHE_LAYER_NAME, Item} from './example.provider';
 export class YourClass {
     cacheLayer: CacheLayer<CacheLayerItem<Item>>;
     constructor(private:cacheService:CacheService){
-      this.cacheLayer = cacheService.get<Item>(EXAMPLE_CACHE_LAYER_NAME);
+      this.cacheLayer = cacheService.getLayer<Item>(EXAMPLE_CACHE_LAYER_NAME);
       // Now work with this collection the same as example above;
     }
 }
@@ -166,7 +166,7 @@ export class CartProvider {
   }
 
   addToCart(product: Product) {
-    this.cartCacheLayer.put({
+    this.cartCacheLayer.putItem({
       key:product.id,
       data: product
     });
@@ -204,7 +204,7 @@ export class CartComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.cacheLayer = this.cache.get<Product>(CART_CACHE_LAYER_NAME);
+    this.cacheLayer = this.cache.getLayer<Product>(CART_CACHE_LAYER_NAME);
     this.cartItems = this.cacheLayer.items;
   }
 
@@ -269,7 +269,7 @@ CacheService.create<any>({layer: 'layer-name'})
 
 Get layer from cache
 ```typescript
-CacheService.get<any>('layer-name');
+CacheService.getLayer<any>('layer-name');
 ```
 
 Remove layer from cache
@@ -280,9 +280,9 @@ CacheService.removeLayer('layer-name');
 Create Cache with parameters static public method 
 ```typescript
 const data = {key:'testKey', params:{test1:'1', test2:'2'}};
-const cache = CacheService.get<any>('layer-name');
-cache.put(CacheService.createCacheParams(data), data);
-let cachedDataWithParams = cache.get(cacheParams);
+const cache = CacheService.getLayer<any>('layer-name');
+cache.putItem(CacheService.createCacheParams(data), data);
+let cachedDataWithParams = cache.getItem(cacheParams);
 // This will give you cached data;
 ```
 
@@ -291,21 +291,21 @@ let cachedDataWithParams = cache.get(cacheParams);
 Put item to cache
 
 ```typescript
-const cache = CacheService.get<any>('layer-name');
-cache.put({key:'example-key', data:{exampleData:''}});
+const cache = CacheService.getLayer<any>('layer-name');
+cache.putItem({key:'example-key', data:{exampleData:''}});
 ```
 
 Get item from cache
 
 ```typescript
-const cache = CacheService.get<any>('layer-name');
-cache.get('example-key');
+const cache = CacheService.getLayer<any>('layer-name');
+cache.getItem('example-key');
 ```
 
 Remove item from cache
 
 ```typescript
-const cache = CacheService.get<any>('layer-name');
+const cache = CacheService.getLayer<any>('layer-name');
 cache.removeItem('example-key');
 ```
 

@@ -44,7 +44,7 @@ export class CacheService {
     }
   }
 
-  public get<T>(name: string): CacheLayer<CacheLayerItem<T>> {
+  public getLayer<T>(name: string): CacheLayer<CacheLayerItem<T>> {
     let result = this.cachedLayers.getValue().filter(item => item.layer === name);
     if (this.config.localStorage) {
       const layer = <CacheLayerInterface>JSON.parse(localStorage.getItem(name));
@@ -59,7 +59,7 @@ export class CacheService {
     }
   }
 
-  public create<T>(settings: CacheLayerInterface): CacheLayer<CacheLayerItem<T>> {
+  public createLayer<T>(settings: CacheLayerInterface): CacheLayer<CacheLayerItem<T>> {
     const exists = this.cachedLayers.getValue().filter(result => result.layer === settings.layer);
     if (exists.length) {
       return exists[0];

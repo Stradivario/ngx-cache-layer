@@ -1,9 +1,9 @@
 {
   "name": "ngx-cache-layer",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "repository": {
     "type": "git",
-    "url": "http://gitlab.youvolio.com/open-source/ngx-cache-layer.git"
+    "url": "https://github.com/Stradivario/ngx-cache-layer.git"
   },
   "author": {
     "name": "Kristian Tachev(Stradivario)",
@@ -17,7 +17,7 @@
     "url": "http://gitlab.youvolio.com/open-source/ngx-cache-layer/issues"
   },
   "module": "ngx-cache-layer.js",
-  "typings": "ngx-cache-layer.d.ts",
+  "typingss": "ngx-cache-layer.d.ts",
   "peerDependencies": {
     "@angular/core": "^4.0.0",
     "rxjs": "^5.1.0",

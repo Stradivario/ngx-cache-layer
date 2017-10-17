@@ -57,7 +57,7 @@ var CacheService = (function () {
      * @param {?} name
      * @return {?}
      */
-    CacheService.prototype.get = function (name) {
+    CacheService.prototype.getLayer = function (name) {
         var /** @type {?} */ result = this.cachedLayers.getValue().filter(function (item) { return item.layer === name; });
         if (this.config.localStorage) {
             var /** @type {?} */ layer = (JSON.parse(localStorage.getItem(name)));
@@ -77,7 +77,7 @@ var CacheService = (function () {
      * @param {?} settings
      * @return {?}
      */
-    CacheService.prototype.create = function (settings) {
+    CacheService.prototype.createLayer = function (settings) {
         var /** @type {?} */ exists = this.cachedLayers.getValue().filter(function (result) { return result.layer === settings.layer; });
         if (exists.length) {
             return exists[0];
@@ -96,13 +96,14 @@ var CacheService = (function () {
             }
         }
         this.cachedLayers.next(this.cachedLayers.getValue().concat([cacheLayer]));
+        this.instanceHook(settings);
         return cacheLayer;
     };
     /**
      * @param {?} layer
      * @return {?}
      */
-    CacheService.prototype.remove = function (layer) {
+    CacheService.prototype.removeLayer = function (layer) {
         if (this.config.localStorage) {
             localStorage.removeItem(layer);
             localStorage.setItem('cache_layers', JSON.stringify(CacheService.getLayersFromLS().filter(function (l) { return l !== layer; })));
@@ -114,6 +115,23 @@ var CacheService = (function () {
      */
     CacheService.getLayersFromLS = function () {
         return (JSON.parse(localStorage.getItem('cache_layers')));
+    };
+    /**
+     * @param {?} settings
+     * @return {?}
+     */
+    CacheService.prototype.instanceHook = function (settings) {
+        this.onExpire(settings['layer']);
+    };
+    /**
+     * @param {?} layer
+     * @return {?}
+     */
+    CacheService.prototype.onExpire = function (layer) {
+        var /** @type {?} */ self = this;
+        setTimeout(function () {
+            self.removeLayer(layer);
+        }, this.config.cacheFlushInterval);
     };
     return CacheService;
 }());

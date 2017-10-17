@@ -354,22 +354,28 @@
                             <td class="col-md-4">
                                 <ul class="index-list">
                                     <li>
-                                        <span class="modifier">Public</span> <a href="#create">create</a>
-                                    </li>
-                                    <li>
                                         <span class="modifier">Private</span> <a href="#createCacheInstance">createCacheInstance</a>
                                     </li>
                                     <li>
-                                        <span class="modifier">Public</span> <a href="#get">get</a>
+                                        <span class="modifier">Public</span> <a href="#createLayer">createLayer</a>
+                                    </li>
+                                    <li>
+                                        <span class="modifier">Public</span> <a href="#getLayer">getLayer</a>
                                     </li>
                                     <li>
                                         <span class="modifier">Public</span> <a href="#getLayersFromLS">getLayersFromLS</a>
                                     </li>
                                     <li>
+                                        <span class="modifier">Private</span> <a href="#instanceHook">instanceHook</a>
+                                    </li>
+                                    <li>
                                         <span class="modifier">Public</span> <a href="#isLocalStorageEnabled">isLocalStorageEnabled</a>
                                     </li>
                                     <li>
-                                        <span class="modifier">Public</span> <a href="#remove">remove</a>
+                                        <span class="modifier">Private</span> <a href="#onExpire">onExpire</a>
+                                    </li>
+                                    <li>
+                                        <span class="modifier">Public</span> <a href="#removeLayer">removeLayer</a>
                                     </li>
                                 </ul>
                             </td>
@@ -430,68 +436,6 @@
                     <h3 id="methods">
                         Methods
                     </h3>
-                    <table class="table table-sm table-bordered">
-                        <tbody>
-                            <tr>
-                                <td class="col-md-4">
-                                    <a name="create"></a>
-                                    <span class="name"><b><span class="modifier">Public</span> create</b><a href="#create"><span class="fa fa-link"></span></a></span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="col-md-4">
-                                        <span class="modifier-icon fa fa-reset"></span>
-                                    <code>create(settings: <a href="../interfaces/CacheLayerInterface.html">CacheLayerInterface</a>)</code>
-                                </td>
-                            </tr>
-            
-            
-                                    <tr>
-                                        <td class="col-md-4">
-                                            <div class="io-line">Defined in <a href="" data-line="62" class="link-to-prism">src/ngx-cache-layer.service.ts:62</a></div>
-                                        </td>
-                                    </tr>
-            
-                            <tr>
-                                <td class="col-md-4">
-            
-                                        <div class="io-description">
-                                                <b>Parameters :</b>
-                                                <table class="params">
-                                                    <thead>
-                                                        <tr>
-                                                            <td>Name</td>
-                                                            <td>Type</td>
-                                                            <td>Optional</td>
-                                                            <td>Description</td>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                            <tr>
-                                                              <td>settings</td>
-                                                              <td>
-                                                                      <code><a href="../interfaces/CacheLayerInterface.html" target="_self" >CacheLayerInterface</a></code>
-                                                              </td>
-                                                              <td>
-                                                              </td>
-                                                              <td></td>
-                                                            </tr>
-                                                    </tbody>
-                                                </table>
-                                        </div>
-                                        <div>
-                                        </div>
-                                        <div class="io-description">
-                                            <b>Returns : </b>    <code><a href="../classes/CacheLayer.html" target="_self" >CacheLayer&lt;&gt;</a></code>
-            
-                                        </div>
-                                            <div class="io-description">
-                                                
-                                            </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
                     <table class="table table-sm table-bordered">
                         <tbody>
                             <tr>
@@ -557,14 +501,76 @@
                         <tbody>
                             <tr>
                                 <td class="col-md-4">
-                                    <a name="get"></a>
-                                    <span class="name"><b><span class="modifier">Public</span> get</b><a href="#get"><span class="fa fa-link"></span></a></span>
+                                    <a name="createLayer"></a>
+                                    <span class="name"><b><span class="modifier">Public</span> createLayer</b><a href="#createLayer"><span class="fa fa-link"></span></a></span>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="col-md-4">
                                         <span class="modifier-icon fa fa-reset"></span>
-                                    <code>get(name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                                    <code>createLayer(settings: <a href="../interfaces/CacheLayerInterface.html">CacheLayerInterface</a>)</code>
+                                </td>
+                            </tr>
+            
+            
+                                    <tr>
+                                        <td class="col-md-4">
+                                            <div class="io-line">Defined in <a href="" data-line="62" class="link-to-prism">src/ngx-cache-layer.service.ts:62</a></div>
+                                        </td>
+                                    </tr>
+            
+                            <tr>
+                                <td class="col-md-4">
+            
+                                        <div class="io-description">
+                                                <b>Parameters :</b>
+                                                <table class="params">
+                                                    <thead>
+                                                        <tr>
+                                                            <td>Name</td>
+                                                            <td>Type</td>
+                                                            <td>Optional</td>
+                                                            <td>Description</td>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                            <tr>
+                                                              <td>settings</td>
+                                                              <td>
+                                                                      <code><a href="../interfaces/CacheLayerInterface.html" target="_self" >CacheLayerInterface</a></code>
+                                                              </td>
+                                                              <td>
+                                                              </td>
+                                                              <td></td>
+                                                            </tr>
+                                                    </tbody>
+                                                </table>
+                                        </div>
+                                        <div>
+                                        </div>
+                                        <div class="io-description">
+                                            <b>Returns : </b>    <code><a href="../classes/CacheLayer.html" target="_self" >CacheLayer&lt;&gt;</a></code>
+            
+                                        </div>
+                                            <div class="io-description">
+                                                
+                                            </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class="table table-sm table-bordered">
+                        <tbody>
+                            <tr>
+                                <td class="col-md-4">
+                                    <a name="getLayer"></a>
+                                    <span class="name"><b><span class="modifier">Public</span> getLayer</b><a href="#getLayer"><span class="fa fa-link"></span></a></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col-md-4">
+                                        <span class="modifier-icon fa fa-reset"></span>
+                                    <code>getLayer(name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
                                 </td>
                             </tr>
             
@@ -633,7 +639,7 @@
             
                                     <tr>
                                         <td class="col-md-4">
-                                            <div class="io-line">Defined in <a href="" data-line="91" class="link-to-prism">src/ngx-cache-layer.service.ts:91</a></div>
+                                            <div class="io-line">Defined in <a href="" data-line="92" class="link-to-prism">src/ngx-cache-layer.service.ts:92</a></div>
                                         </td>
                                     </tr>
             
@@ -644,6 +650,68 @@
                                             <b>Returns : </b>    <code>Array&lt;string&gt;</code>
             
                                         </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class="table table-sm table-bordered">
+                        <tbody>
+                            <tr>
+                                <td class="col-md-4">
+                                    <a name="instanceHook"></a>
+                                    <span class="name"><b><span class="modifier">Private</span> instanceHook</b><a href="#instanceHook"><span class="fa fa-link"></span></a></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col-md-4">
+                                        <span class="modifier-icon fa fa-lock"></span>
+                                    <code>instanceHook(settings: <a href="../interfaces/CacheLayerInterface.html">CacheLayerInterface</a>)</code>
+                                </td>
+                            </tr>
+            
+            
+                                    <tr>
+                                        <td class="col-md-4">
+                                            <div class="io-line">Defined in <a href="" data-line="96" class="link-to-prism">src/ngx-cache-layer.service.ts:96</a></div>
+                                        </td>
+                                    </tr>
+            
+                            <tr>
+                                <td class="col-md-4">
+            
+                                        <div class="io-description">
+                                                <b>Parameters :</b>
+                                                <table class="params">
+                                                    <thead>
+                                                        <tr>
+                                                            <td>Name</td>
+                                                            <td>Type</td>
+                                                            <td>Optional</td>
+                                                            <td>Description</td>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                            <tr>
+                                                              <td>settings</td>
+                                                              <td>
+                                                                      <code><a href="../interfaces/CacheLayerInterface.html" target="_self" >CacheLayerInterface</a></code>
+                                                              </td>
+                                                              <td>
+                                                              </td>
+                                                              <td></td>
+                                                            </tr>
+                                                    </tbody>
+                                                </table>
+                                        </div>
+                                        <div>
+                                        </div>
+                                        <div class="io-description">
+                                            <b>Returns : </b>    <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+            
+                                        </div>
+                                            <div class="io-description">
+                                                
+                                            </div>
                                 </td>
                             </tr>
                         </tbody>
@@ -685,21 +753,83 @@
                         <tbody>
                             <tr>
                                 <td class="col-md-4">
-                                    <a name="remove"></a>
-                                    <span class="name"><b><span class="modifier">Public</span> remove</b><a href="#remove"><span class="fa fa-link"></span></a></span>
+                                    <a name="onExpire"></a>
+                                    <span class="name"><b><span class="modifier">Private</span> onExpire</b><a href="#onExpire"><span class="fa fa-link"></span></a></span>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="col-md-4">
-                                        <span class="modifier-icon fa fa-reset"></span>
-                                    <code>remove(layer: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                                        <span class="modifier-icon fa fa-lock"></span>
+                                    <code>onExpire(layer: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
                                 </td>
                             </tr>
             
             
                                     <tr>
                                         <td class="col-md-4">
-                                            <div class="io-line">Defined in <a href="" data-line="83" class="link-to-prism">src/ngx-cache-layer.service.ts:83</a></div>
+                                            <div class="io-line">Defined in <a href="" data-line="100" class="link-to-prism">src/ngx-cache-layer.service.ts:100</a></div>
+                                        </td>
+                                    </tr>
+            
+                            <tr>
+                                <td class="col-md-4">
+            
+                                        <div class="io-description">
+                                                <b>Parameters :</b>
+                                                <table class="params">
+                                                    <thead>
+                                                        <tr>
+                                                            <td>Name</td>
+                                                            <td>Type</td>
+                                                            <td>Optional</td>
+                                                            <td>Description</td>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                            <tr>
+                                                              <td>layer</td>
+                                                              <td>
+                                                                      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                                              </td>
+                                                              <td>
+                                                              </td>
+                                                              <td></td>
+                                                            </tr>
+                                                    </tbody>
+                                                </table>
+                                        </div>
+                                        <div>
+                                        </div>
+                                        <div class="io-description">
+                                            <b>Returns : </b>    <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+            
+                                        </div>
+                                            <div class="io-description">
+                                                
+                                            </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class="table table-sm table-bordered">
+                        <tbody>
+                            <tr>
+                                <td class="col-md-4">
+                                    <a name="removeLayer"></a>
+                                    <span class="name"><b><span class="modifier">Public</span> removeLayer</b><a href="#removeLayer"><span class="fa fa-link"></span></a></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col-md-4">
+                                        <span class="modifier-icon fa fa-reset"></span>
+                                    <code>removeLayer(layer: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                                </td>
+                            </tr>
+            
+            
+                                    <tr>
+                                        <td class="col-md-4">
+                                            <div class="io-line">Defined in <a href="" data-line="84" class="link-to-prism">src/ngx-cache-layer.service.ts:84</a></div>
                                         </td>
                                     </tr>
             
@@ -830,7 +960,7 @@ export class CacheService {
     }
   }
 
-  public get&lt;T&gt;(name: string): CacheLayer&lt;CacheLayerItem&lt;T&gt;&gt; {
+  public getLayer&lt;T&gt;(name: string): CacheLayer&lt;CacheLayerItem&lt;T&gt;&gt; {
     let result &#x3D; this.cachedLayers.getValue().filter(item &#x3D;&gt; item.layer &#x3D;&#x3D;&#x3D; name);
     if (this.config.localStorage) {
       const layer &#x3D; &lt;CacheLayerInterface&gt;JSON.parse(localStorage.getItem(name));
@@ -845,7 +975,7 @@ export class CacheService {
     }
   }
 
-  public create&lt;T&gt;(settings: CacheLayerInterface): CacheLayer&lt;CacheLayerItem&lt;T&gt;&gt; {
+  public createLayer&lt;T&gt;(settings: CacheLayerInterface): CacheLayer&lt;CacheLayerItem&lt;T&gt;&gt; {
     const exists &#x3D; this.cachedLayers.getValue().filter(result &#x3D;&gt; result.layer &#x3D;&#x3D;&#x3D; settings.layer);
     if (exists.length) {
       return exists[0];
@@ -863,10 +993,11 @@ export class CacheService {
         }
     }
     this.cachedLayers.next([...this.cachedLayers.getValue(), cacheLayer]);
+    this.instanceHook(settings);
     return cacheLayer;
   }
 
-  public remove(layer: string): void {
+  public removeLayer(layer: string): void {
     if (this.config.localStorage) {
       localStorage.removeItem(layer);
       localStorage.setItem(&#x27;cache_layers&#x27;, JSON.stringify(CacheService.getLayersFromLS().filter(l &#x3D;&gt; l !&#x3D;&#x3D; layer)));
@@ -876,6 +1007,17 @@ export class CacheService {
 
   public static getLayersFromLS(): Array&lt;string&gt; {
     return &lt;Array&lt;string&gt;&gt;JSON.parse(localStorage.getItem(&#x27;cache_layers&#x27;));
+  }
+
+  private instanceHook(settings: CacheLayerInterface): void {
+    this.onExpire(settings[&#x27;layer&#x27;]);
+  }
+
+  private onExpire(layer: string): void {
+    const self &#x3D; this;
+    setTimeout(function(){
+      self.removeLayer(layer);
+    }, this.config.cacheFlushInterval);
   }
 
 }

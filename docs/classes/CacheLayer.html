@@ -367,7 +367,7 @@
                                         <span class="modifier">Static</span> <a href="#createCacheParams">createCacheParams</a>
                                     </li>
                                     <li>
-                                        <span class="modifier">Public</span> <a href="#get">get</a>
+                                        <span class="modifier">Public</span> <a href="#getItem">getItem</a>
                                     </li>
                                     <li>
                                         <span class="modifier">Private</span> <a href="#instanceHook">instanceHook</a>
@@ -376,7 +376,7 @@
                                         <span class="modifier">Private</span> <a href="#onExpire">onExpire</a>
                                     </li>
                                     <li>
-                                        <span class="modifier">Public</span> <a href="#put">put</a>
+                                        <span class="modifier">Public</span> <a href="#putItem">putItem</a>
                                     </li>
                                     <li>
                                         <span class="modifier">Public</span> <a href="#removeItem">removeItem</a>
@@ -505,14 +505,14 @@
                         <tbody>
                             <tr>
                                 <td class="col-md-4">
-                                    <a name="get"></a>
-                                    <span class="name"><b><span class="modifier">Public</span> get</b><a href="#get"><span class="fa fa-link"></span></a></span>
+                                    <a name="getItem"></a>
+                                    <span class="name"><b><span class="modifier">Public</span> getItem</b><a href="#getItem"><span class="fa fa-link"></span></a></span>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="col-md-4">
                                         <span class="modifier-icon fa fa-reset"></span>
-                                    <code>get(key: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                                    <code>getItem(key: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
                                 </td>
                             </tr>
             
@@ -690,14 +690,14 @@
                         <tbody>
                             <tr>
                                 <td class="col-md-4">
-                                    <a name="put"></a>
-                                    <span class="name"><b><span class="modifier">Public</span> put</b><a href="#put"><span class="fa fa-link"></span></a></span>
+                                    <a name="putItem"></a>
+                                    <span class="name"><b><span class="modifier">Public</span> putItem</b><a href="#putItem"><span class="fa fa-link"></span></a></span>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="col-md-4">
                                         <span class="modifier-icon fa fa-reset"></span>
-                                    <code>put(layerItem: T)</code>
+                                    <code>putItem(layerItem: T)</code>
                                 </td>
                             </tr>
             
@@ -766,7 +766,7 @@
             
                                     <tr>
                                         <td class="col-md-4">
-                                            <div class="io-line">Defined in <a href="" data-line="69" class="link-to-prism">src/ngx-cache-layer.layer.ts:69</a></div>
+                                            <div class="io-line">Defined in <a href="" data-line="70" class="link-to-prism">src/ngx-cache-layer.layer.ts:70</a></div>
                                         </td>
                                     </tr>
             
@@ -944,7 +944,7 @@ export class CacheLayer&lt;T&gt; {
     this.onExpire(layerItem[&#x27;key&#x27;]);
   }
 
-  public get(key: string): T {
+  public getItem(key: string): T {
     let item &#x3D; this.items.getValue().filter(i &#x3D;&gt; i[&#x27;key&#x27;] &#x3D;&#x3D;&#x3D; key);
     if (this.config.localStorage) {
       const layer &#x3D; &lt;CacheLayerInterface&gt;JSON.parse(localStorage.getItem(this.layer));
@@ -959,7 +959,7 @@ export class CacheLayer&lt;T&gt; {
     }
   }
 
-  public put(layerItem: T): T {
+  public putItem(layerItem: T): T {
     if (this.config.localStorage) {
       const layer &#x3D; &lt;CacheLayerInterface&gt;JSON.parse(localStorage.getItem(this.layer));
       if (layer) {
@@ -973,8 +973,9 @@ export class CacheLayer&lt;T&gt; {
   }
 
   private onExpire(key: string): void {
+    const self &#x3D; this;
     setTimeout(function(){
-      this.removeItem(key);
+      self.removeItem(key);
     }, this.config.maxAge);
   }
 

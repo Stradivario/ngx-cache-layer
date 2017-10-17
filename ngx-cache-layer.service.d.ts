@@ -7,8 +7,10 @@ export declare class CacheService {
     private static createCacheInstance<T>(layer);
     static isLocalStorageEnabled(): boolean;
     constructor(config: CacheServiceConfigInterface);
-    get<T>(name: string): CacheLayer<CacheLayerItem<T>>;
-    create<T>(settings: CacheLayerInterface): CacheLayer<CacheLayerItem<T>>;
-    remove(layer: string): void;
+    getLayer<T>(name: string): CacheLayer<CacheLayerItem<T>>;
+    createLayer<T>(settings: CacheLayerInterface): CacheLayer<CacheLayerItem<T>>;
+    removeLayer(layer: string): void;
     static getLayersFromLS(): Array<string>;
+    private instanceHook(settings);
+    private onExpire(layer);
 }
