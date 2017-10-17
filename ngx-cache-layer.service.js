@@ -59,12 +59,6 @@ var CacheService = (function () {
      */
     CacheService.prototype.getLayer = function (name) {
         var /** @type {?} */ result = this.cachedLayers.getValue().filter(function (layer) { return layer.name === name; });
-        if (this.config.localStorage) {
-            var /** @type {?} */ layer = (JSON.parse(localStorage.getItem(name)));
-            if (layer) {
-                result = [CacheService.createCacheInstance(layer)];
-            }
-        }
         if (!result.length) {
             throw new Error('Missing cache name: ' + name);
         }
@@ -106,7 +100,7 @@ var CacheService = (function () {
     CacheService.prototype.removeLayer = function (name) {
         if (this.config.localStorage) {
             localStorage.removeItem(name);
-            localStorage.setItem('cache_layers', JSON.stringify(CacheService.getLayersFromLS().filter(function (l) { return l !== name; })));
+            localStorage.setItem('cache_layers', JSON.stringify(CacheService.getLayersFromLS().filter(function (layer) { return layer !== name; })));
         }
         this.cachedLayers.next(this.cachedLayers.getValue().filter(function (result) { return result.name !== name; }));
     };
@@ -121,7 +115,7 @@ var CacheService = (function () {
      * @return {?}
      */
     CacheService.prototype.instanceHook = function (settings) {
-        this.onExpire(settings['name']);
+        this.onExpire(settings.name);
     };
     /**
      * @param {?} name
@@ -133,7 +127,7 @@ var CacheService = (function () {
             .create(function (observer) { return observer.next(); })
             .timeoutWith(this.config.cacheFlushInterval, Observable.of(1))
             .skip(1)
-            .subscribe(function (o) { return _this.removeLayer(name); });
+            .subscribe(function (observer) { return _this.removeLayer(name); });
     };
     return CacheService;
 }());

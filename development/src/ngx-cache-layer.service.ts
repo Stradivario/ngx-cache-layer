@@ -46,12 +46,6 @@ export class CacheService {
 
   public getLayer<T>(name: string): CacheLayer<CacheLayerItem<T>> {
     let result = this.cachedLayers.getValue().filter(layer => layer.name === name);
-    if (this.config.localStorage) {
-      const layer = <CacheLayerInterface>JSON.parse(localStorage.getItem(name));
-      if (layer) {
-        result = [CacheService.createCacheInstance<T>(layer)];
-      }
-    }
     if (!result.length) {
       throw new Error('Missing cache name: ' + name);
     } else {
@@ -84,7 +78,7 @@ export class CacheService {
   public removeLayer(name: string): void {
     if (this.config.localStorage) {
       localStorage.removeItem(name);
-      localStorage.setItem('cache_layers', JSON.stringify(CacheService.getLayersFromLS().filter(l => l !== name)));
+      localStorage.setItem('cache_layers', JSON.stringify(CacheService.getLayersFromLS().filter(layer => layer !== name)));
     }
     this.cachedLayers.next(this.cachedLayers.getValue().filter(result => result.name !== name));
   }
@@ -94,7 +88,7 @@ export class CacheService {
   }
 
   private instanceHook(settings: CacheLayerInterface): void {
-    this.onExpire(settings['name']);
+    this.onExpire(settings.name);
   }
 
   private onExpire(name: string): void {
@@ -102,7 +96,7 @@ export class CacheService {
       .create(observer => observer.next())
       .timeoutWith(this.config.cacheFlushInterval, Observable.of(1))
       .skip(1)
-      .subscribe(o => this.removeLayer(name));
+      .subscribe(observer => this.removeLayer(name));
   }
 
 }

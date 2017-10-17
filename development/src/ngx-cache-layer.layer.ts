@@ -33,13 +33,7 @@ export class CacheLayer<T> {
   }
 
   public getItem(key: string): T {
-    let item = this.items.getValue().filter(i => i['key'] === key);
-    if (this.config.localStorage) {
-      const layer = <CacheLayerInterface>JSON.parse(localStorage.getItem(this.name));
-      if (layer) {
-        item = layer.items.filter(i => i['key'] === key);
-      }
-    }
+    let item = this.items.getValue().filter(item => item['key'] === key);
     if (!item.length) {
       throw new Error('Missing item with key: ' + key);
     } else {

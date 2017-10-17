@@ -33,20 +33,14 @@ var CacheLayer = (function () {
      * @return {?}
      */
     CacheLayer.prototype.instanceHook = function (layerItem) {
-        this.onExpire(layerItem['key']);
+        this.onExpire(layerItem.key);
     };
     /**
      * @param {?} key
      * @return {?}
      */
     CacheLayer.prototype.getItem = function (key) {
-        var /** @type {?} */ item = this.items.getValue().filter(function (i) { return i['key'] === key; });
-        if (this.config.localStorage) {
-            var /** @type {?} */ layer = (JSON.parse(localStorage.getItem(this.name)));
-            if (layer) {
-                item = layer.items.filter(function (i) { return i['key'] === key; });
-            }
-        }
+        var /** @type {?} */ item = this.items.getValue().filter(function (item) { return item['key'] === key; });
         if (!item.length) {
             throw new Error('Missing item with key: ' + key);
         }
