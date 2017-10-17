@@ -46,7 +46,7 @@ export class AppModule { }
 
 ##### Once you import the library you need to inject CacheService inside your component, provider etc. and create cache Layer
 
-###### ***NOTE Every cacheLayer created by this cacheService is treathed like a LAYER from cache, so you need to specfy layer name like example above
+###### ***NOTE Every cache created by this cacheService is treated like a LAYER from cache, so you need to specify layer name like example above
 
 
 ```typescript
