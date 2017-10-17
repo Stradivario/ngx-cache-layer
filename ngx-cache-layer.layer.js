@@ -1,14 +1,14 @@
-import { BehaviorSubject } from 'rxjs/Rx';
+import { BehaviorSubject, Observable } from 'rxjs/Rx';
 var CacheLayer = (function () {
     /**
-     * @param {?} i
+     * @param {?} settings
      */
-    function CacheLayer(i) {
+    function CacheLayer(settings) {
         this.items = new BehaviorSubject([]);
-        this.layer = i.layer;
-        this.config = i.config;
+        this.name = settings.name;
+        this.config = settings.config;
         if (this.config.localStorage) {
-            this.items.next(this.items.getValue().concat(i.items));
+            this.items.next(this.items.getValue().concat(settings.items));
         }
     }
     /**
@@ -42,7 +42,7 @@ var CacheLayer = (function () {
     CacheLayer.prototype.getItem = function (key) {
         var /** @type {?} */ item = this.items.getValue().filter(function (i) { return i['key'] === key; });
         if (this.config.localStorage) {
-            var /** @type {?} */ layer = (JSON.parse(localStorage.getItem(this.layer)));
+            var /** @type {?} */ layer = (JSON.parse(localStorage.getItem(this.name)));
             if (layer) {
                 item = layer.items.filter(function (i) { return i['key'] === key; });
             }
@@ -60,10 +60,10 @@ var CacheLayer = (function () {
      */
     CacheLayer.prototype.putItem = function (layerItem) {
         if (this.config.localStorage) {
-            var /** @type {?} */ layer = (JSON.parse(localStorage.getItem(this.layer)));
+            var /** @type {?} */ layer = (JSON.parse(localStorage.getItem(this.name)));
             if (layer) {
                 layer.items = this.items.getValue().concat([layerItem]);
-                localStorage.setItem(this.layer, JSON.stringify(layer));
+                localStorage.setItem(this.name, JSON.stringify(layer));
             }
         }
         this.items.next(this.items.getValue().concat([layerItem]));
@@ -75,10 +75,12 @@ var CacheLayer = (function () {
      * @return {?}
      */
     CacheLayer.prototype.onExpire = function (key) {
-        var /** @type {?} */ self = this;
-        setTimeout(function () {
-            self.removeItem(key);
-        }, this.config.maxAge);
+        var _this = this;
+        Observable
+            .create(function (observer) { return observer.next(); })
+            .timeoutWith(this.config.maxAge, Observable.of(1))
+            .skip(1)
+            .subscribe(function (observer) { return _this.removeItem(key); });
     };
     /**
      * @param {?} key
@@ -87,14 +89,14 @@ var CacheLayer = (function () {
     CacheLayer.prototype.removeItem = function (key) {
         var /** @type {?} */ newLayerItems = this.items.getValue().filter(function (item) { return item['key'] !== key; });
         if (this.config.localStorage) {
-            var /** @type {?} */ oldLayer = (JSON.parse(localStorage.getItem(this.layer)));
+            var /** @type {?} */ oldLayer = (JSON.parse(localStorage.getItem(this.name)));
             if (oldLayer) {
                 var /** @type {?} */ newLayer = ({
                     config: this.config,
-                    layer: this.layer,
+                    name: this.name,
                     items: newLayerItems
                 });
-                localStorage.setItem(this.layer, JSON.stringify(newLayer));
+                localStorage.setItem(this.name, JSON.stringify(newLayer));
             }
         }
         this.items.next(newLayerItems);
@@ -106,7 +108,7 @@ function CacheLayer_tsickle_Closure_declarations() {
     /** @type {?} */
     CacheLayer.prototype.items;
     /** @type {?} */
-    CacheLayer.prototype.layer;
+    CacheLayer.prototype.name;
     /** @type {?} */
     CacheLayer.prototype.config;
 }

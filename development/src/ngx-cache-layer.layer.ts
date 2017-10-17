@@ -1,10 +1,10 @@
-import {BehaviorSubject} from 'rxjs/Rx';
+import {BehaviorSubject, Observable} from 'rxjs/Rx';
 import {CacheLayerInterface, CacheServiceConfigInterface} from './ngx-cache-layer.interfaces';
 
 export class CacheLayer<T> {
 
   public items: BehaviorSubject<Array<T>> = new BehaviorSubject([]);
-  public layer: string;
+  public name: string;
   public config: CacheServiceConfigInterface;
 
   static createCacheParams(config) {
@@ -20,11 +20,11 @@ export class CacheLayer<T> {
     return data;
   }
 
-  constructor(i: CacheLayerInterface) {
-    this.layer = i.layer;
-    this.config = i.config;
+  constructor(settings: CacheLayerInterface) {
+    this.name = settings.name;
+    this.config = settings.config;
     if (this.config.localStorage) {
-      this.items.next([...this.items.getValue(), ...i.items]);
+      this.items.next([...this.items.getValue(), ...settings.items]);
     }
   }
 
@@ -35,7 +35,7 @@ export class CacheLayer<T> {
   public getItem(key: string): T {
     let item = this.items.getValue().filter(i => i['key'] === key);
     if (this.config.localStorage) {
-      const layer = <CacheLayerInterface>JSON.parse(localStorage.getItem(this.layer));
+      const layer = <CacheLayerInterface>JSON.parse(localStorage.getItem(this.name));
       if (layer) {
         item = layer.items.filter(i => i['key'] === key);
       }
@@ -49,10 +49,10 @@ export class CacheLayer<T> {
 
   public putItem(layerItem: T): T {
     if (this.config.localStorage) {
-      const layer = <CacheLayerInterface>JSON.parse(localStorage.getItem(this.layer));
+      const layer = <CacheLayerInterface>JSON.parse(localStorage.getItem(this.name));
       if (layer) {
         layer.items = [...this.items.getValue(), layerItem];
-        localStorage.setItem(this.layer, JSON.stringify(layer));
+        localStorage.setItem(this.name, JSON.stringify(layer));
       }
     }
     this.items.next([...this.items.getValue(), layerItem]);
@@ -61,23 +61,24 @@ export class CacheLayer<T> {
   }
 
   private onExpire(key: string): void {
-    const self = this;
-    setTimeout(function(){
-      self.removeItem(key);
-    }, this.config.maxAge);
+    Observable
+      .create(observer => observer.next())
+      .timeoutWith(this.config.maxAge, Observable.of(1))
+      .skip(1)
+      .subscribe(observer => this.removeItem(key));
   }
 
   public removeItem(key: string): void {
     let newLayerItems = this.items.getValue().filter(item => item['key'] !== key);
     if (this.config.localStorage) {
-      const oldLayer = <CacheLayerInterface>JSON.parse(localStorage.getItem(this.layer));
+      const oldLayer = <CacheLayerInterface>JSON.parse(localStorage.getItem(this.name));
       if (oldLayer) {
         const newLayer = <CacheLayerInterface>{
           config: this.config,
-          layer: this.layer,
+          name: this.name,
           items: newLayerItems
         };
-        localStorage.setItem(this.layer, JSON.stringify(newLayer));
+        localStorage.setItem(this.name, JSON.stringify(newLayer));
       }
     }
     this.items.next(newLayerItems);

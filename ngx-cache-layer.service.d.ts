@@ -4,13 +4,13 @@ import { CacheLayerInterface, CacheServiceConfigInterface, CacheLayerItem } from
 export declare class CacheService {
     private config;
     cachedLayers: BehaviorSubject<Array<CacheLayer<CacheLayerItem<any>>>>;
-    private static createCacheInstance<T>(layer);
+    private static createCacheInstance<T>(name);
     static isLocalStorageEnabled(): boolean;
     constructor(config: CacheServiceConfigInterface);
     getLayer<T>(name: string): CacheLayer<CacheLayerItem<T>>;
     createLayer<T>(settings: CacheLayerInterface): CacheLayer<CacheLayerItem<T>>;
-    removeLayer(layer: string): void;
+    removeLayer(name: string): void;
     static getLayersFromLS(): Array<string>;
     private instanceHook(settings);
-    private onExpire(layer);
+    private onExpire(name);
 }

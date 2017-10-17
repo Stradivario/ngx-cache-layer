@@ -9,7 +9,7 @@ export declare class CacheServiceConfigInterface {
     localStorage: boolean;
 }
 export interface CacheLayerInterface {
-    layer: string;
+    name: string;
     config?: CacheServiceConfigInterface;
     items?: any;
 }

@@ -11,7 +11,7 @@ export class CacheServiceConfigInterface {
 }
 
 export interface CacheLayerInterface {
-  layer: string;
+  name: string;
   config?: CacheServiceConfigInterface;
   items?: any;
 }

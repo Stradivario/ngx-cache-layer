@@ -447,7 +447,7 @@
                             <tr>
                                 <td class="col-md-4">
                                         <span class="modifier-icon fa fa-lock"></span>
-                                    <code>createCacheInstance(layer: )</code>
+                                    <code>createCacheInstance(name: )</code>
                                 </td>
                             </tr>
             
@@ -474,7 +474,7 @@
                                                     </thead>
                                                     <tbody>
                                                             <tr>
-                                                              <td>layer</td>
+                                                              <td>name</td>
                                                               <td>
                                                               </td>
                                                               <td>
@@ -760,7 +760,7 @@
                             <tr>
                                 <td class="col-md-4">
                                         <span class="modifier-icon fa fa-lock"></span>
-                                    <code>onExpire(layer: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                                    <code>onExpire(name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
                                 </td>
                             </tr>
             
@@ -787,7 +787,7 @@
                                                     </thead>
                                                     <tbody>
                                                             <tr>
-                                                              <td>layer</td>
+                                                              <td>name</td>
                                                               <td>
                                                                       <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
                                                               </td>
@@ -822,7 +822,7 @@
                             <tr>
                                 <td class="col-md-4">
                                         <span class="modifier-icon fa fa-reset"></span>
-                                    <code>removeLayer(layer: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                                    <code>removeLayer(name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
                                 </td>
                             </tr>
             
@@ -849,7 +849,7 @@
                                                     </thead>
                                                     <tbody>
                                                             <tr>
-                                                              <td>layer</td>
+                                                              <td>name</td>
                                                               <td>
                                                                       <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
                                                               </td>
@@ -915,7 +915,7 @@
 
     <div class="tab-pane fade tab-source-code" id="source">
         <pre class="line-numbers"><code class="language-typescript">import {CacheLayer} from &#x27;./ngx-cache-layer.layer&#x27;;
-import {BehaviorSubject} from &#x27;rxjs/Rx&#x27;;
+import {BehaviorSubject, Observable} from &#x27;rxjs/Rx&#x27;;
 import {CacheLayerInterface, CacheServiceConfigInterface, CacheLayerItem} from &#x27;./ngx-cache-layer.interfaces&#x27;;
 import {Injectable, Inject} from &#x27;@angular/core&#x27;;
 import {CACHE_MODULE_CONFIG, CACHE_MODULE_DI_CONFIG} from &#x27;./index&#x27;;
@@ -929,8 +929,8 @@ export class CacheService {
 
   public cachedLayers: BehaviorSubject&lt;Array&lt;CacheLayer&lt;CacheLayerItem&lt;any&gt;&gt;&gt;&gt; &#x3D; new BehaviorSubject([]);
 
-  private static createCacheInstance&lt;T&gt;(layer): CacheLayer&lt;CacheLayerItem&lt;T&gt;&gt; {
-    return new CacheLayer&lt;CacheLayerItem&lt;T&gt;&gt;(layer);
+  private static createCacheInstance&lt;T&gt;(name): CacheLayer&lt;CacheLayerItem&lt;T&gt;&gt; {
+    return new CacheLayer&lt;CacheLayerItem&lt;T&gt;&gt;(name);
   }
   public static isLocalStorageEnabled(): boolean {
     let error &#x3D; [];
@@ -961,7 +961,7 @@ export class CacheService {
   }
 
   public getLayer&lt;T&gt;(name: string): CacheLayer&lt;CacheLayerItem&lt;T&gt;&gt; {
-    let result &#x3D; this.cachedLayers.getValue().filter(item &#x3D;&gt; item.layer &#x3D;&#x3D;&#x3D; name);
+    let result &#x3D; this.cachedLayers.getValue().filter(layer &#x3D;&gt; layer.name &#x3D;&#x3D;&#x3D; name);
     if (this.config.localStorage) {
       const layer &#x3D; &lt;CacheLayerInterface&gt;JSON.parse(localStorage.getItem(name));
       if (layer) {
@@ -976,7 +976,7 @@ export class CacheService {
   }
 
   public createLayer&lt;T&gt;(settings: CacheLayerInterface): CacheLayer&lt;CacheLayerItem&lt;T&gt;&gt; {
-    const exists &#x3D; this.cachedLayers.getValue().filter(result &#x3D;&gt; result.layer &#x3D;&#x3D;&#x3D; settings.layer);
+    const exists &#x3D; this.cachedLayers.getValue().filter(result &#x3D;&gt; result.name &#x3D;&#x3D;&#x3D; settings.name);
     if (exists.length) {
       return exists[0];
     }
@@ -984,12 +984,12 @@ export class CacheService {
     settings.items &#x3D; settings.items || [];
     let cacheLayer &#x3D; CacheService.createCacheInstance&lt;T&gt;(settings);
     if (settings.config.localStorage &amp;&amp; CacheService.isLocalStorageEnabled()) {
-        const layer &#x3D; JSON.parse(localStorage.getItem(settings.layer));
+        const layer &#x3D; JSON.parse(localStorage.getItem(settings.name));
         if (layer) {
           cacheLayer &#x3D; CacheService.createCacheInstance&lt;T&gt;(layer);
         } else {
-          localStorage.setItem(&#x27;cache_layers&#x27;, JSON.stringify([...CacheService.getLayersFromLS(), settings.layer]));
-          localStorage.setItem(settings.layer, JSON.stringify(settings));
+          localStorage.setItem(&#x27;cache_layers&#x27;, JSON.stringify([...CacheService.getLayersFromLS(), settings.name]));
+          localStorage.setItem(settings.name, JSON.stringify(settings));
         }
     }
     this.cachedLayers.next([...this.cachedLayers.getValue(), cacheLayer]);
@@ -997,12 +997,12 @@ export class CacheService {
     return cacheLayer;
   }
 
-  public removeLayer(layer: string): void {
+  public removeLayer(name: string): void {
     if (this.config.localStorage) {
-      localStorage.removeItem(layer);
-      localStorage.setItem(&#x27;cache_layers&#x27;, JSON.stringify(CacheService.getLayersFromLS().filter(l &#x3D;&gt; l !&#x3D;&#x3D; layer)));
+      localStorage.removeItem(name);
+      localStorage.setItem(&#x27;cache_layers&#x27;, JSON.stringify(CacheService.getLayersFromLS().filter(l &#x3D;&gt; l !&#x3D;&#x3D; name)));
     }
-    this.cachedLayers.next(this.cachedLayers.getValue().filter(result &#x3D;&gt; result.layer !&#x3D;&#x3D; layer));
+    this.cachedLayers.next(this.cachedLayers.getValue().filter(result &#x3D;&gt; result.name !&#x3D;&#x3D; name));
   }
 
   public static getLayersFromLS(): Array&lt;string&gt; {
@@ -1010,14 +1010,15 @@ export class CacheService {
   }
 
   private instanceHook(settings: CacheLayerInterface): void {
-    this.onExpire(settings[&#x27;layer&#x27;]);
+    this.onExpire(settings[&#x27;name&#x27;]);
   }
 
-  private onExpire(layer: string): void {
-    const self &#x3D; this;
-    setTimeout(function(){
-      self.removeLayer(layer);
-    }, this.config.cacheFlushInterval);
+  private onExpire(name: string): void {
+    Observable
+      .create(observer &#x3D;&gt; observer.next())
+      .timeoutWith(this.config.cacheFlushInterval, Observable.of(1))
+      .skip(1)
+      .subscribe(o &#x3D;&gt; this.removeLayer(name));
   }
 
 }

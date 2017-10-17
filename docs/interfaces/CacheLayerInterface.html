@@ -349,7 +349,7 @@
                                         <a href="#items">items</a>
                                 </li>
                                 <li>
-                                        <a href="#layer">layer</a>
+                                        <a href="#name">name</a>
                                 </li>
                             </ul>
                         </td>
@@ -432,13 +432,13 @@
                         <tbody>
                                 <tr>
                                     <td class="col-md-4">
-                                        <a name="layer"></a>
-                                        <span class="name"><b>layer</b><a href="#layer"><span class="fa fa-link"></span></a></span>
+                                        <a name="name"></a>
+                                        <span class="name"><b>name</b><a href="#name"><span class="fa fa-link"></span></a></span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="col-md-4">
-                                        <code>layer:     <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                        <code>name:     <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
 </code>
                                     </td>
                                 </tr>
@@ -479,7 +479,7 @@ export class CacheServiceConfigInterface {
 }
 
 export interface CacheLayerInterface {
-  layer: string;
+  name: string;
   config?: CacheServiceConfigInterface;
   items?: any;
 }

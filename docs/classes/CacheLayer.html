@@ -350,7 +350,7 @@
                                         <span class="modifier">Public</span> <a href="#items">items</a>
                                     </li>
                                     <li>
-                                        <span class="modifier">Public</span> <a href="#layer">layer</a>
+                                        <span class="modifier">Public</span> <a href="#name">name</a>
                                     </li>
                                 </ul>
                             </td>
@@ -394,7 +394,7 @@
                         <tbody>
                             <tr>
                                 <td class="col-md-4">
-                                    <code>constructor(i: <a href="../interfaces/CacheLayerInterface.html">CacheLayerInterface</a>)</code>
+                                    <code>constructor(settings: <a href="../interfaces/CacheLayerInterface.html">CacheLayerInterface</a>)</code>
                                 </td>
                             </tr>
                                     <tr>
@@ -418,7 +418,7 @@
                                                     </thead>
                                                     <tbody>
                                                             <tr>
-                                                              <td>i</td>
+                                                              <td>settings</td>
                                                               <td>
                                                                         <code><a href="../interfaces/CacheLayerInterface.html" target="_self" >CacheLayerInterface</a></code>
                                                               </td>
@@ -766,7 +766,7 @@
             
                                     <tr>
                                         <td class="col-md-4">
-                                            <div class="io-line">Defined in <a href="" data-line="70" class="link-to-prism">src/ngx-cache-layer.layer.ts:70</a></div>
+                                            <div class="io-line">Defined in <a href="" data-line="71" class="link-to-prism">src/ngx-cache-layer.layer.ts:71</a></div>
                                         </td>
                                     </tr>
             
@@ -880,13 +880,13 @@
                         <tbody>
                             <tr>
                                 <td class="col-md-4">
-                                    <a name="layer"></a>
-                                    <span class="name"><b><span class="modifier">Public</span> layer</b><a href="#layer"><span class="fa fa-link"></span></a></span>
+                                    <a name="name"></a>
+                                    <span class="name"><b><span class="modifier">Public</span> name</b><a href="#name"><span class="fa fa-link"></span></a></span>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="col-md-4">
-                                    <span class="modifier-icon fa fa-reset"></span><code>layer:     <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    <span class="modifier-icon fa fa-reset"></span><code>name:     <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
             </code>
                                 </td>
                             </tr>
@@ -910,13 +910,13 @@
 
 
     <div class="tab-pane fade tab-source-code" id="source">
-        <pre class="line-numbers"><code class="language-typescript">import {BehaviorSubject} from &#x27;rxjs/Rx&#x27;;
+        <pre class="line-numbers"><code class="language-typescript">import {BehaviorSubject, Observable} from &#x27;rxjs/Rx&#x27;;
 import {CacheLayerInterface, CacheServiceConfigInterface} from &#x27;./ngx-cache-layer.interfaces&#x27;;
 
 export class CacheLayer&lt;T&gt; {
 
   public items: BehaviorSubject&lt;Array&lt;T&gt;&gt; &#x3D; new BehaviorSubject([]);
-  public layer: string;
+  public name: string;
   public config: CacheServiceConfigInterface;
 
   static createCacheParams(config) {
@@ -932,11 +932,11 @@ export class CacheLayer&lt;T&gt; {
     return data;
   }
 
-  constructor(i: CacheLayerInterface) {
-    this.layer &#x3D; i.layer;
-    this.config &#x3D; i.config;
+  constructor(settings: CacheLayerInterface) {
+    this.name &#x3D; settings.name;
+    this.config &#x3D; settings.config;
     if (this.config.localStorage) {
-      this.items.next([...this.items.getValue(), ...i.items]);
+      this.items.next([...this.items.getValue(), ...settings.items]);
     }
   }
 
@@ -947,7 +947,7 @@ export class CacheLayer&lt;T&gt; {
   public getItem(key: string): T {
     let item &#x3D; this.items.getValue().filter(i &#x3D;&gt; i[&#x27;key&#x27;] &#x3D;&#x3D;&#x3D; key);
     if (this.config.localStorage) {
-      const layer &#x3D; &lt;CacheLayerInterface&gt;JSON.parse(localStorage.getItem(this.layer));
+      const layer &#x3D; &lt;CacheLayerInterface&gt;JSON.parse(localStorage.getItem(this.name));
       if (layer) {
         item &#x3D; layer.items.filter(i &#x3D;&gt; i[&#x27;key&#x27;] &#x3D;&#x3D;&#x3D; key);
       }
@@ -961,10 +961,10 @@ export class CacheLayer&lt;T&gt; {
 
   public putItem(layerItem: T): T {
     if (this.config.localStorage) {
-      const layer &#x3D; &lt;CacheLayerInterface&gt;JSON.parse(localStorage.getItem(this.layer));
+      const layer &#x3D; &lt;CacheLayerInterface&gt;JSON.parse(localStorage.getItem(this.name));
       if (layer) {
         layer.items &#x3D; [...this.items.getValue(), layerItem];
-        localStorage.setItem(this.layer, JSON.stringify(layer));
+        localStorage.setItem(this.name, JSON.stringify(layer));
       }
     }
     this.items.next([...this.items.getValue(), layerItem]);
@@ -973,23 +973,24 @@ export class CacheLayer&lt;T&gt; {
   }
 
   private onExpire(key: string): void {
-    const self &#x3D; this;
-    setTimeout(function(){
-      self.removeItem(key);
-    }, this.config.maxAge);
+    Observable
+      .create(observer &#x3D;&gt; observer.next())
+      .timeoutWith(this.config.maxAge, Observable.of(1))
+      .skip(1)
+      .subscribe(observer &#x3D;&gt; this.removeItem(key));
   }
 
   public removeItem(key: string): void {
     let newLayerItems &#x3D; this.items.getValue().filter(item &#x3D;&gt; item[&#x27;key&#x27;] !&#x3D;&#x3D; key);
     if (this.config.localStorage) {
-      const oldLayer &#x3D; &lt;CacheLayerInterface&gt;JSON.parse(localStorage.getItem(this.layer));
+      const oldLayer &#x3D; &lt;CacheLayerInterface&gt;JSON.parse(localStorage.getItem(this.name));
       if (oldLayer) {
         const newLayer &#x3D; &lt;CacheLayerInterface&gt;{
           config: this.config,
-          layer: this.layer,
+          name: this.name,
           items: newLayerItems
         };
-        localStorage.setItem(this.layer, JSON.stringify(newLayer));
+        localStorage.setItem(this.name, JSON.stringify(newLayer));
       }
     }
     this.items.next(newLayerItems);

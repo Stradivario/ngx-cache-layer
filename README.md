@@ -71,8 +71,8 @@ export class ExampleProvider {
     constructor(private cacheService: CacheService) {
 
         // here we define our cache layer name, this method returns cache layer of created cache layer;
-        this.exampleLayer = this.cacheService.create<Item>({
-            layer: EXAMPLE_CACHE_LAYER_NAME
+        this.exampleLayer = this.cacheService.createLayer<Item>({
+            name: EXAMPLE_CACHE_LAYER_NAME
         });
 
         // inside this.exampleCache you can find object named items returns BehaviorSubject<CacheLayerItem<Item>[]> object type
@@ -160,8 +160,8 @@ export class CartProvider {
   cartCacheLayer: CacheLayer<CacheLayerItem<Product>>;
 
   constructor(private cacheService: CacheService) {
-    this.cartCacheLayer = this.cacheService.create<Product>({
-      layer: CART_CACHE_LAYER_NAME
+    this.cartCacheLayer = this.cacheService.createLayer<Product>({
+      name: CART_CACHE_LAYER_NAME
     });
   }
 
@@ -264,7 +264,7 @@ export class AppModule { }
 
 Create cache layer
 ```typescript
-CacheService.create<any>({layer: 'layer-name'})
+CacheService.createLayer<any>({name: 'layer-name'})
 ```
 
 Get layer from cache

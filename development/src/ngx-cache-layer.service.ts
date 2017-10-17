@@ -1,5 +1,5 @@
 import {CacheLayer} from './ngx-cache-layer.layer';
-import {BehaviorSubject} from 'rxjs/Rx';
+import {BehaviorSubject, Observable} from 'rxjs/Rx';
 import {CacheLayerInterface, CacheServiceConfigInterface, CacheLayerItem} from './ngx-cache-layer.interfaces';
 import {Injectable, Inject} from '@angular/core';
 import {CACHE_MODULE_CONFIG, CACHE_MODULE_DI_CONFIG} from './index';
@@ -13,8 +13,8 @@ export class CacheService {
 
   public cachedLayers: BehaviorSubject<Array<CacheLayer<CacheLayerItem<any>>>> = new BehaviorSubject([]);
 
-  private static createCacheInstance<T>(layer): CacheLayer<CacheLayerItem<T>> {
-    return new CacheLayer<CacheLayerItem<T>>(layer);
+  private static createCacheInstance<T>(name): CacheLayer<CacheLayerItem<T>> {
+    return new CacheLayer<CacheLayerItem<T>>(name);
   }
   public static isLocalStorageEnabled(): boolean {
     let error = [];
@@ -45,7 +45,7 @@ export class CacheService {
   }
 
   public getLayer<T>(name: string): CacheLayer<CacheLayerItem<T>> {
-    let result = this.cachedLayers.getValue().filter(item => item.layer === name);
+    let result = this.cachedLayers.getValue().filter(layer => layer.name === name);
     if (this.config.localStorage) {
       const layer = <CacheLayerInterface>JSON.parse(localStorage.getItem(name));
       if (layer) {
@@ -60,7 +60,7 @@ export class CacheService {
   }
 
   public createLayer<T>(settings: CacheLayerInterface): CacheLayer<CacheLayerItem<T>> {
-    const exists = this.cachedLayers.getValue().filter(result => result.layer === settings.layer);
+    const exists = this.cachedLayers.getValue().filter(result => result.name === settings.name);
     if (exists.length) {
       return exists[0];
     }
@@ -68,12 +68,12 @@ export class CacheService {
     settings.items = settings.items || [];
     let cacheLayer = CacheService.createCacheInstance<T>(settings);
     if (settings.config.localStorage && CacheService.isLocalStorageEnabled()) {
-        const layer = JSON.parse(localStorage.getItem(settings.layer));
+        const layer = JSON.parse(localStorage.getItem(settings.name));
         if (layer) {
           cacheLayer = CacheService.createCacheInstance<T>(layer);
         } else {
-          localStorage.setItem('cache_layers', JSON.stringify([...CacheService.getLayersFromLS(), settings.layer]));
-          localStorage.setItem(settings.layer, JSON.stringify(settings));
+          localStorage.setItem('cache_layers', JSON.stringify([...CacheService.getLayersFromLS(), settings.name]));
+          localStorage.setItem(settings.name, JSON.stringify(settings));
         }
     }
     this.cachedLayers.next([...this.cachedLayers.getValue(), cacheLayer]);
@@ -81,12 +81,12 @@ export class CacheService {
     return cacheLayer;
   }
 
-  public removeLayer(layer: string): void {
+  public removeLayer(name: string): void {
     if (this.config.localStorage) {
-      localStorage.removeItem(layer);
-      localStorage.setItem('cache_layers', JSON.stringify(CacheService.getLayersFromLS().filter(l => l !== layer)));
+      localStorage.removeItem(name);
+      localStorage.setItem('cache_layers', JSON.stringify(CacheService.getLayersFromLS().filter(l => l !== name)));
     }
-    this.cachedLayers.next(this.cachedLayers.getValue().filter(result => result.layer !== layer));
+    this.cachedLayers.next(this.cachedLayers.getValue().filter(result => result.name !== name));
   }
 
   public static getLayersFromLS(): Array<string> {
@@ -94,14 +94,15 @@ export class CacheService {
   }
 
   private instanceHook(settings: CacheLayerInterface): void {
-    this.onExpire(settings['layer']);
+    this.onExpire(settings['name']);
   }
 
-  private onExpire(layer: string): void {
-    const self = this;
-    setTimeout(function(){
-      self.removeLayer(layer);
-    }, this.config.cacheFlushInterval);
+  private onExpire(name: string): void {
+    Observable
+      .create(observer => observer.next())
+      .timeoutWith(this.config.cacheFlushInterval, Observable.of(1))
+      .skip(1)
+      .subscribe(o => this.removeLayer(name));
   }
 
 }
