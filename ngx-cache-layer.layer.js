@@ -33,7 +33,7 @@ var CacheLayer = (function () {
      * @return {?}
      */
     CacheLayer.prototype.instanceHook = function (layerItem) {
-        this.onExpire(layerItem.key);
+        this.onExpire(layerItem['key']);
     };
     /**
      * @param {?} key
