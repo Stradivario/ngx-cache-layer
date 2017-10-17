@@ -1,12 +1,12 @@
 # @ngx-cache-layer
 
-![alt tag](http://gitlab.youvolio.com/open-source/ngx-cache-layer/badges/branch/build.svg)
+![Build Status](http://gitlab.youvolio.com/open-source/ngx-cache-layer/badges/branch/build.svg)
 
 #### StrongTyped, EasyAPI, Angular (v4, v5) compatible
 
 ##### More detailed documentation you can find [here](https://stradivario.github.io/ngx-cache-layer/)
 
-##### For questions/issues you can write ticket here http://gitlab.youvolio.com/open-source/ngx-cache-layer/issues
+##### For questions/issues you can write ticket [here](http://gitlab.youvolio.com/open-source/ngx-cache-layer/issues)
 
 ## Installation and basic examples:
 
@@ -21,13 +21,12 @@ $ npm install ngx-cache-layer --save
 ##### In your Angular `AppModule`:
 
 ```typescript
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-
-import { AppComponent } from './app.component';
+import {BrowserModule} from '@angular/platform-browser';
+import {NgModule} from '@angular/core';
+import {AppComponent} from './app.component';
 
 // Import @ngx-cache-layer library
-import { CacheModule } from 'ngx-cache-layer';
+import {CacheModule} from 'ngx-cache-layer';
 
 @NgModule({
   declarations: [
@@ -111,7 +110,7 @@ export class ExampleProvider {
 ##### Get our new created cache from component which is somewhere else inside application
 ```typescript
 
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {CacheService, CacheLayer} from 'ngx-cache-layer';
 import {EXAMPLE_CACHE_LAYER_NAME, Item} from './example.provider';
 
@@ -137,7 +136,7 @@ import {EXAMPLE_CACHE_LAYER_NAME} from './example.provider';
 @Injectable()
 export class YourClass {
     constructor(private:cacheService:CacheService){
-          cacheService.remove(EXAMPLE_CACHE_LAYER_NAME);
+          cacheService.removeLayer(EXAMPLE_CACHE_LAYER_NAME);
     }
 }
 ```
@@ -161,7 +160,7 @@ export class CartProvider {
   cartCacheLayer: CacheLayer<CacheLayerItem<Product>>;
 
   constructor(private cacheService: CacheService) {
-    this.cartCacheLayer = this.cacheService.put<Product>({
+    this.cartCacheLayer = this.cacheService.create<Product>({
       layer: CART_CACHE_LAYER_NAME
     });
   }
@@ -217,7 +216,8 @@ export class CartComponent implements OnInit {
 
 ```html
 <div *ngFor="let item of cartItems | async">
-    {{item.id}}
+	{{item.key}} // is cache identity
+    {{item.data.id}} // Cached data from layer
 </div>
 <button (click)="cacheLayer.removeItem('removeItemKey in my case item.id is unique so i should remove item id')">Remove item</button>
 ```
@@ -225,12 +225,12 @@ export class CartComponent implements OnInit {
 ### How to define GlobalConfiguration
 
 ```typescript
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-import { AppComponent } from './app.component';
+import {BrowserModule} from '@angular/platform-browser';
+import {NgModule} from '@angular/core';
+import {AppComponent} from './app.component';
 
 // Import ngx-cache-layer
-import { CacheModule, CacheConfigInterface } from 'ngx-cache-layer';
+import {CacheModule, CacheConfigInterface} from 'ngx-cache-layer';
 
 // Define global configuration
 // You can set localStorage to true it will cache every layers like a localStorage item
@@ -274,7 +274,7 @@ CacheService.get<any>('layer-name');
 
 Remove layer from cache
 ```typescript
-CacheService.remove('layer-name');
+CacheService.removeLayer('layer-name');
 ```
 
 Create Cache with parameters static public method 

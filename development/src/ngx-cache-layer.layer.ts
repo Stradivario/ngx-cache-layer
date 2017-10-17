@@ -61,8 +61,9 @@ export class CacheLayer<T> {
   }
 
   private onExpire(key: string): void {
+    const self = this;
     setTimeout(function(){
-      this.removeItem(key);
+      self.removeItem(key);
     }, this.config.maxAge);
   }
 

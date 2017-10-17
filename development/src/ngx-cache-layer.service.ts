@@ -77,10 +77,11 @@ export class CacheService {
         }
     }
     this.cachedLayers.next([...this.cachedLayers.getValue(), cacheLayer]);
+    this.instanceHook(settings);
     return cacheLayer;
   }
 
-  public remove(layer: string): void {
+  public removeLayer(layer: string): void {
     if (this.config.localStorage) {
       localStorage.removeItem(layer);
       localStorage.setItem('cache_layers', JSON.stringify(CacheService.getLayersFromLS().filter(l => l !== layer)));
@@ -90,6 +91,17 @@ export class CacheService {
 
   public static getLayersFromLS(): Array<string> {
     return <Array<string>>JSON.parse(localStorage.getItem('cache_layers'));
+  }
+
+  private instanceHook(settings: CacheLayerInterface): void {
+    this.onExpire(settings['layer']);
+  }
+
+  private onExpire(layer: string): void {
+    const self = this;
+    setTimeout(function(){
+      self.removeLayer(layer);
+    }, this.config.cacheFlushInterval);
   }
 
 }
