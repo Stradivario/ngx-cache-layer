@@ -1,8 +1,14 @@
 # @ngx-cache-layer
 
-# @StrongTyped @Easy API @
+![alt tag](http://gitlab.youvolio.com/open-source/ngx-cache-layer/badges/branch/build.svg)
 
-## Installation
+#### StrongTyped, EasyAPI, Angular (v4, v5) compatible
+
+##### More detailed documentation you can find [here](https://stradivario.github.io/ngx-cache-layer/)
+
+##### For questions/issues you can write ticket here http://gitlab.youvolio.com/open-source/ngx-cache-layer/issues
+
+## Installation and basic examples:
 
 ##### To install this library, run:
 
