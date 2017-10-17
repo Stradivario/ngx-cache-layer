@@ -274,7 +274,7 @@ CacheService.remove('layer-name');
 Create Cache with parameters static public method 
 ```typescript
 const data = {key:'testKey', params:{test1:'1', test2:'2'}};
-const cache = CacheService.get('layer-name');
+const cache = CacheService.get<any>('layer-name');
 cache.put(CacheService.createCacheParams(data), data);
 let cachedDataWithParams = cache.get(cacheParams);
 // This will give you cached data;
@@ -285,21 +285,21 @@ let cachedDataWithParams = cache.get(cacheParams);
 Put item to cache
 
 ```typescript
-const cache = CacheService.get('layer-name');
+const cache = CacheService.get<any>('layer-name');
 cache.put({key:'example-key', data:{exampleData:''}});
 ```
 
 Get item from cache
 
 ```typescript
-const cache = CacheService.get('layer-name');
+const cache = CacheService.get<any>('layer-name');
 cache.get('example-key');
 ```
 
 Remove item from cache
 
 ```typescript
-const cache = CacheService.get('layer-name');
+const cache = CacheService.get<any>('layer-name');
 cache.removeItem('example-key');
 ```
 
