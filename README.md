@@ -1,8 +1,7 @@
 # @ngx-cache-layer
 
 ![Build Status](http://gitlab.youvolio.com/open-source/ngx-cache-layer/badges/branch/build.svg)
-<br>
-<br>
+
 #### @StrongTyped @EasyAPI Created on Angular@5.0.0-rc.2 and tested on @Angular4+
 
 ##### More detailed documentation you can find [here](https://stradivario.github.io/ngx-cache-layer/)
@@ -64,12 +63,12 @@ export const EXAMPLE_CACHE_LAYER_NAME = 'example-layer';
 @Injectable()
 export class ExampleProvider {
 
-    exampleLayer:CacheLayer<CacheLayerItem<Item>>;
+    exampleLayer: CacheLayer<CacheLayerItem<Item>>;
     exampleLayerItems: BehaviorSubject<CacheLayerItem<Item>[]>;
 
 	constructor(private cacheService: CacheService) {
 
-		// here we define our cache layer name, this method returns cache layer of created cache layer;
+		// Here we define our cache layer name, this method returns instance of class CacheLayer<CacheLayerItem<Item>>
 		this.exampleLayer = this.cacheService.createLayer<Item>({
 		  name: EXAMPLE_CACHE_LAYER_NAME
 		});
@@ -146,12 +145,11 @@ import {EXAMPLE_CACHE_LAYER_NAME} from './example.provider';
 
 @Injectable()
 export class YourClass {
-    constructor(private:cacheService:CacheService){
-          cacheService.removeLayer(EXAMPLE_CACHE_LAYER_NAME);
+    constructor(private:cacheService:CacheService) {
+      cacheService.removeLayer(EXAMPLE_CACHE_LAYER_NAME);
     }
 }
 ```
-
 
 ### COMPLETE  ADD TO CARD EXAMPLE:
 
@@ -161,7 +159,6 @@ export class YourClass {
 import {Injectable} from "@angular/core";
 import {CacheService, CacheLayer, CacheLayerItem} from "ngx-cache-layer";
 import {Product} from "../core/config/queries/product/product.interface";
-import {SnackbarProvider} from "../core/modules/material/components/snackbar/snackbar.provider";
 
 export const CART_CACHE_LAYER_NAME = 'cart';
 
@@ -226,16 +223,17 @@ export class CartComponent implements OnInit {
 ##### How to consume items inside html
 
 ```html
-<div *ngFor="let item of cartItems | async">
+<div *ngFor="let item of (cartItems | async)">
 	{{item.key}} // is cache identity
-    {{item.data.id}} // Cached data from layer
+    {{item.data.id}} // Cached data from current item from card layer Observable
+    <-- removeItemKey in my case item.id is unique so i should remove item id -->
+    <button (click)="cacheLayer.removeItem(item.id)">Remove item</button>
 </div>
-<button (click)="cacheLayer.removeItem('removeItemKey in my case item.id is unique so i should remove item id')">Remove item</button>
+
 ```
 
-
-
 <br>
+
 ### How to define GlobalConfiguration
 
 ```typescript
@@ -263,8 +261,7 @@ export const CACHE_DI_CONFIG = <CacheConfigInterface>{
   imports: [
     BrowserModule,
     // Import CacheModule with CACHE_DI_CONFIG;
-    CacheModule.forRoot(CACHE_DI_CONFIG),
-    LibraryModule
+    CacheModule.forRoot(CACHE_DI_CONFIG)
   ],
   providers: [],
   bootstrap: [AppComponent]
@@ -272,29 +269,33 @@ export const CACHE_DI_CONFIG = <CacheConfigInterface>{
 export class AppModule { }
 ```
 
-
 <br>
+
 ### Service methods
 
 ##### Create cache layer
 `Optional you can define custom settings for every layer that you create just insert CacheLayerInterface from ngx-cache-layer like example for global config above`
+
 ```typescript
 CacheService.createLayer<any>({name: 'layer-name', settings?: CacheLayerInterface})
 ```
 
 ##### Get layer from cache
+
 ```typescript
 CacheService.getLayer<any>('layer-name');
 ```
 
 ##### Remove layer from cache
+
 ```typescript
 CacheService.removeLayer('layer-name');
 ```
 
-##### Create Cache with parameters static public method
+##### Create Cache with parameters static public method of CacheLayer Class
 ###### Usage: when you have api endpoints with custom parameters and you need to cache result returned from response
 Complete cache for endpoint with 8 rows more code without it :)
+
 ```typescript
 const endpointCache = this.cacheService.getLayer('endpoint-cache');
 
@@ -306,7 +307,6 @@ function getUserById(id: number) {
     };
     const cacheAddress = CacheLayer.createCacheParams({ key: ENDPOINT, params: PARAMS });
     if (endpointCache.getItem(cacheAddress)) {
-
       observer.next(endpointCache.getItem(cacheAddress));
     } else {
     // endpointCache.putItem method like getItem returns instance of cached item so we can safely return to the observer above
@@ -322,6 +322,7 @@ function getUserById(id: number) {
 ```
 
 <br>
+
 ### Cache Layer methods
 
 ##### Put item to cache
@@ -348,11 +349,12 @@ cache.removeItem('example-key');
 
 <br>
 # NOTES:
+
 <br>
-> # !!! FIRST IMPORTANT !!!
-> `### To avoid memory leaks it is really important to subscribe ONLY ONCE when you initialize items from cache.
-> ### The example below is correct implementation how it will work without any problems!
-> ### Inside html when you use ( cartItems | async ) async pipe the view handles this automatically.`
+# 1. FIRST
+#### To avoid memory leaks it is really important to subscribe ONLY ONCE when you initialize items from cache.
+#### The example below is correct implementation how it will work without any problems!
+#### Inside html when you use ( cartItems | async ) async pipe the view handles this automatically.`
 
 ```typescript
 
@@ -373,21 +375,16 @@ cache.removeItem('example-key');
 
 ```
 <br>
-> # !!! SECOND IMPORTANT !!!
-> Don't call unsubscribe on collection because you will loose reactive binding to collection and you will lead to following error
-> If you subscribe once, like example above you will have no problems at all!
-`
-"object unsubscribed" name: "ObjectUnsubscribedError" ngDebugContext:DebugContext_ {view: {…}, nodeIndex: 27, nodeDef: {…}, elDef: {…}, elView: {…}}ngErrorLogger:ƒ ()stack:"ObjectUnsubscribedError: object unsubscribed↵
-`
+# 2. SECOND
+#### Don't call unsubscribe on collection because you will loose reactive binding to collection and you will lead to following error
+#### If you subscribe once, like example above you will have no problems at all!
+`"object unsubscribed" name: "ObjectUnsubscribedError" ngDebugContext:DebugContext_ {view: {…}, nodeIndex: 27, nodeDef: {…}, elDef: {…}, elView: {…}}ngErrorLogger:ƒ ()stack:"ObjectUnsubscribedError: object unsubscribed`
 
 <br>
-> # !!! THIRD IMPORTANT !!!
-> Caching purpose is to initialize any cached result from any source(example: LocalStorage, SessionStorage) when application loads,
-> because angular has his own way of dependency injection it is important to call CacheModule only once inside app.module.ts.
+# 3. THIRD
+#### Caching purpose is to initialize any cached result from any source(example: LocalStorage, SessionStorage) when application loads because angular has his own way of dependency injection it is important to call CacheModule only once inside app.module.ts.
 
-
-
-
+<br>
 
 ## License
 
