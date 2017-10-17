@@ -3,6 +3,7 @@ import { BehaviorSubject, Observable } from 'rxjs/Rx';
 import { CacheServiceConfigInterface } from './ngx-cache-layer.interfaces';
 import { Injectable, Inject } from '@angular/core';
 import { CACHE_MODULE_CONFIG, CACHE_MODULE_DI_CONFIG } from './index';
+var /** @type {?} */ INTERNAL_PROCEDURE_CACHE_NAME = 'cache_layers';
 var /** @type {?} */ FRIENDLY_ERROR_MESSAGES = {
     LOCAL_STORAGE_DISABLED: 'LocalStorage is disabled please relate issue if you think it is enabled and there is a problem with library.'
 };
@@ -15,17 +16,17 @@ var CacheService = (function () {
         this.config = config;
         this.cachedLayers = new BehaviorSubject([]);
         if (this.config.localStorage && CacheService.isLocalStorageEnabled()) {
-            var layers = JSON.parse(localStorage.getItem('cache_layers'));
+            var layers = JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
             if (layers) {
                 layers.forEach(function (layer) {
                     var cachedLayer = JSON.parse(localStorage.getItem(layer));
                     if (cachedLayer) {
-                        _this.cachedLayers.next(_this.cachedLayers.getValue().concat([new CacheLayer(cachedLayer)]));
+                        _this.cachedLayers.next(_this.cachedLayers.getValue().concat([CacheService.createCacheInstance(cachedLayer)]));
                     }
                 });
             }
             else {
-                localStorage.setItem('cache_layers', JSON.stringify([]));
+                localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify([]));
             }
         }
     }
@@ -60,11 +61,9 @@ var CacheService = (function () {
     CacheService.prototype.getLayer = function (name) {
         var /** @type {?} */ result = this.cachedLayers.getValue().filter(function (layer) { return layer.name === name; });
         if (!result.length) {
-            throw new Error('Missing cache name: ' + name);
+            result = [this.createLayer({ name: name })];
         }
-        else {
-            return result[0];
-        }
+        return result[0];
     };
     /**
      * @template T
@@ -85,7 +84,7 @@ var CacheService = (function () {
                 cacheLayer = CacheService.createCacheInstance(layer);
             }
             else {
-                localStorage.setItem('cache_layers', JSON.stringify(CacheService.getLayersFromLS().concat([settings.name])));
+                localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getLayersFromLS().concat([settings.name])));
                 localStorage.setItem(settings.name, JSON.stringify(settings));
             }
         }
@@ -100,7 +99,7 @@ var CacheService = (function () {
     CacheService.prototype.removeLayer = function (name) {
         if (this.config.localStorage) {
             localStorage.removeItem(name);
-            localStorage.setItem('cache_layers', JSON.stringify(CacheService.getLayersFromLS().filter(function (layer) { return layer !== name; })));
+            localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getLayersFromLS().filter(function (layer) { return layer !== name; })));
         }
         this.cachedLayers.next(this.cachedLayers.getValue().filter(function (result) { return result.name !== name; }));
     };
@@ -108,7 +107,7 @@ var CacheService = (function () {
      * @return {?}
      */
     CacheService.getLayersFromLS = function () {
-        return (JSON.parse(localStorage.getItem('cache_layers')));
+        return (JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME)));
     };
     /**
      * @param {?} settings

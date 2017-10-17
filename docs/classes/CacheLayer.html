@@ -642,7 +642,7 @@
             
                                     <tr>
                                         <td class="col-md-4">
-                                            <div class="io-line">Defined in <a href="" data-line="63" class="link-to-prism">src/ngx-cache-layer.layer.ts:63</a></div>
+                                            <div class="io-line">Defined in <a href="" data-line="57" class="link-to-prism">src/ngx-cache-layer.layer.ts:57</a></div>
                                         </td>
                                     </tr>
             
@@ -704,7 +704,7 @@
             
                                     <tr>
                                         <td class="col-md-4">
-                                            <div class="io-line">Defined in <a href="" data-line="50" class="link-to-prism">src/ngx-cache-layer.layer.ts:50</a></div>
+                                            <div class="io-line">Defined in <a href="" data-line="44" class="link-to-prism">src/ngx-cache-layer.layer.ts:44</a></div>
                                         </td>
                                     </tr>
             
@@ -766,7 +766,7 @@
             
                                     <tr>
                                         <td class="col-md-4">
-                                            <div class="io-line">Defined in <a href="" data-line="71" class="link-to-prism">src/ngx-cache-layer.layer.ts:71</a></div>
+                                            <div class="io-line">Defined in <a href="" data-line="65" class="link-to-prism">src/ngx-cache-layer.layer.ts:65</a></div>
                                         </td>
                                     </tr>
             
@@ -945,13 +945,7 @@ export class CacheLayer&lt;T&gt; {
   }
 
   public getItem(key: string): T {
-    let item &#x3D; this.items.getValue().filter(i &#x3D;&gt; i[&#x27;key&#x27;] &#x3D;&#x3D;&#x3D; key);
-    if (this.config.localStorage) {
-      const layer &#x3D; &lt;CacheLayerInterface&gt;JSON.parse(localStorage.getItem(this.name));
-      if (layer) {
-        item &#x3D; layer.items.filter(i &#x3D;&gt; i[&#x27;key&#x27;] &#x3D;&#x3D;&#x3D; key);
-      }
-    }
+    let item &#x3D; this.items.getValue().filter(item &#x3D;&gt; item[&#x27;key&#x27;] &#x3D;&#x3D;&#x3D; key);
     if (!item.length) {
       throw new Error(&#x27;Missing item with key: &#x27; + key);
     } else {

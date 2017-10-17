@@ -395,7 +395,7 @@
                             </tr>
                                     <tr>
                                         <td class="col-md-4">
-                                            <div class="io-line">Defined in <a href="" data-line="29" class="link-to-prism">src/ngx-cache-layer.service.ts:29</a></div>
+                                            <div class="io-line">Defined in <a href="" data-line="31" class="link-to-prism">src/ngx-cache-layer.service.ts:31</a></div>
                                         </td>
                                     </tr>
             
@@ -454,7 +454,7 @@
             
                                     <tr>
                                         <td class="col-md-4">
-                                            <div class="io-line">Defined in <a href="" data-line="16" class="link-to-prism">src/ngx-cache-layer.service.ts:16</a></div>
+                                            <div class="io-line">Defined in <a href="" data-line="18" class="link-to-prism">src/ngx-cache-layer.service.ts:18</a></div>
                                         </td>
                                     </tr>
             
@@ -515,7 +515,7 @@
             
                                     <tr>
                                         <td class="col-md-4">
-                                            <div class="io-line">Defined in <a href="" data-line="62" class="link-to-prism">src/ngx-cache-layer.service.ts:62</a></div>
+                                            <div class="io-line">Defined in <a href="" data-line="57" class="link-to-prism">src/ngx-cache-layer.service.ts:57</a></div>
                                         </td>
                                     </tr>
             
@@ -577,7 +577,7 @@
             
                                     <tr>
                                         <td class="col-md-4">
-                                            <div class="io-line">Defined in <a href="" data-line="47" class="link-to-prism">src/ngx-cache-layer.service.ts:47</a></div>
+                                            <div class="io-line">Defined in <a href="" data-line="49" class="link-to-prism">src/ngx-cache-layer.service.ts:49</a></div>
                                         </td>
                                     </tr>
             
@@ -639,7 +639,7 @@
             
                                     <tr>
                                         <td class="col-md-4">
-                                            <div class="io-line">Defined in <a href="" data-line="92" class="link-to-prism">src/ngx-cache-layer.service.ts:92</a></div>
+                                            <div class="io-line">Defined in <a href="" data-line="87" class="link-to-prism">src/ngx-cache-layer.service.ts:87</a></div>
                                         </td>
                                     </tr>
             
@@ -672,7 +672,7 @@
             
                                     <tr>
                                         <td class="col-md-4">
-                                            <div class="io-line">Defined in <a href="" data-line="96" class="link-to-prism">src/ngx-cache-layer.service.ts:96</a></div>
+                                            <div class="io-line">Defined in <a href="" data-line="91" class="link-to-prism">src/ngx-cache-layer.service.ts:91</a></div>
                                         </td>
                                     </tr>
             
@@ -734,7 +734,7 @@
             
                                     <tr>
                                         <td class="col-md-4">
-                                            <div class="io-line">Defined in <a href="" data-line="19" class="link-to-prism">src/ngx-cache-layer.service.ts:19</a></div>
+                                            <div class="io-line">Defined in <a href="" data-line="21" class="link-to-prism">src/ngx-cache-layer.service.ts:21</a></div>
                                         </td>
                                     </tr>
             
@@ -767,7 +767,7 @@
             
                                     <tr>
                                         <td class="col-md-4">
-                                            <div class="io-line">Defined in <a href="" data-line="100" class="link-to-prism">src/ngx-cache-layer.service.ts:100</a></div>
+                                            <div class="io-line">Defined in <a href="" data-line="95" class="link-to-prism">src/ngx-cache-layer.service.ts:95</a></div>
                                         </td>
                                     </tr>
             
@@ -829,7 +829,7 @@
             
                                     <tr>
                                         <td class="col-md-4">
-                                            <div class="io-line">Defined in <a href="" data-line="84" class="link-to-prism">src/ngx-cache-layer.service.ts:84</a></div>
+                                            <div class="io-line">Defined in <a href="" data-line="79" class="link-to-prism">src/ngx-cache-layer.service.ts:79</a></div>
                                         </td>
                                     </tr>
             
@@ -902,7 +902,7 @@
                                 </tr>
                                     <tr>
                                         <td class="col-md-4">
-                                            <div class="io-line">Defined in <a href="" data-line="14" class="link-to-prism">src/ngx-cache-layer.service.ts:14</a></div>
+                                            <div class="io-line">Defined in <a href="" data-line="16" class="link-to-prism">src/ngx-cache-layer.service.ts:16</a></div>
                                         </td>
                                     </tr>
             
@@ -919,6 +919,8 @@ import {BehaviorSubject, Observable} from &#x27;rxjs/Rx&#x27;;
 import {CacheLayerInterface, CacheServiceConfigInterface, CacheLayerItem} from &#x27;./ngx-cache-layer.interfaces&#x27;;
 import {Injectable, Inject} from &#x27;@angular/core&#x27;;
 import {CACHE_MODULE_CONFIG, CACHE_MODULE_DI_CONFIG} from &#x27;./index&#x27;;
+
+const INTERNAL_PROCEDURE_CACHE_NAME &#x3D; &#x27;cache_layers&#x27;;
 
 const FRIENDLY_ERROR_MESSAGES &#x3D; {
   LOCAL_STORAGE_DISABLED: &#x27;LocalStorage is disabled please relate issue if you think it is enabled and there is a problem with library.&#x27;
@@ -946,33 +948,26 @@ export class CacheService {
 
   constructor(@Inject( CACHE_MODULE_CONFIG ) private config: CacheServiceConfigInterface) {
     if (this.config.localStorage &amp;&amp; CacheService.isLocalStorageEnabled()) {
-      const layers &#x3D; &lt;Array&lt;string&gt;&gt;JSON.parse(localStorage.getItem(&#x27;cache_layers&#x27;));
+      const layers &#x3D; &lt;Array&lt;string&gt;&gt;JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
       if (layers) {
         layers.forEach(layer &#x3D;&gt; {
             const cachedLayer &#x3D; JSON.parse(localStorage.getItem(layer));
             if (cachedLayer) {
-              this.cachedLayers.next([...this.cachedLayers.getValue(), new CacheLayer&lt;CacheLayerItem&lt;any&gt;&gt;(cachedLayer)]);
+              this.cachedLayers.next([...this.cachedLayers.getValue(), CacheService.createCacheInstance&lt;any&gt;(cachedLayer)]);
             }
         });
       } else {
-        localStorage.setItem(&#x27;cache_layers&#x27;, JSON.stringify([]));
+        localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify([]));
       }
     }
   }
 
   public getLayer&lt;T&gt;(name: string): CacheLayer&lt;CacheLayerItem&lt;T&gt;&gt; {
     let result &#x3D; this.cachedLayers.getValue().filter(layer &#x3D;&gt; layer.name &#x3D;&#x3D;&#x3D; name);
-    if (this.config.localStorage) {
-      const layer &#x3D; &lt;CacheLayerInterface&gt;JSON.parse(localStorage.getItem(name));
-      if (layer) {
-        result &#x3D; [CacheService.createCacheInstance&lt;T&gt;(layer)];
-      }
-    }
     if (!result.length) {
-      throw new Error(&#x27;Missing cache name: &#x27; + name);
-    } else {
-      return result[0];
+      result &#x3D; [this.createLayer({name: name})]
     }
+    return result[0];
   }
 
   public createLayer&lt;T&gt;(settings: CacheLayerInterface): CacheLayer&lt;CacheLayerItem&lt;T&gt;&gt; {
@@ -988,7 +983,7 @@ export class CacheService {
         if (layer) {
           cacheLayer &#x3D; CacheService.createCacheInstance&lt;T&gt;(layer);
         } else {
-          localStorage.setItem(&#x27;cache_layers&#x27;, JSON.stringify([...CacheService.getLayersFromLS(), settings.name]));
+          localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify([...CacheService.getLayersFromLS(), settings.name]));
           localStorage.setItem(settings.name, JSON.stringify(settings));
         }
     }
@@ -1000,17 +995,17 @@ export class CacheService {
   public removeLayer(name: string): void {
     if (this.config.localStorage) {
       localStorage.removeItem(name);
-      localStorage.setItem(&#x27;cache_layers&#x27;, JSON.stringify(CacheService.getLayersFromLS().filter(l &#x3D;&gt; l !&#x3D;&#x3D; name)));
+      localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getLayersFromLS().filter(layer &#x3D;&gt; layer !&#x3D;&#x3D; name)));
     }
     this.cachedLayers.next(this.cachedLayers.getValue().filter(result &#x3D;&gt; result.name !&#x3D;&#x3D; name));
   }
 
   public static getLayersFromLS(): Array&lt;string&gt; {
-    return &lt;Array&lt;string&gt;&gt;JSON.parse(localStorage.getItem(&#x27;cache_layers&#x27;));
+    return &lt;Array&lt;string&gt;&gt;JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
   }
 
   private instanceHook(settings: CacheLayerInterface): void {
-    this.onExpire(settings[&#x27;name&#x27;]);
+    this.onExpire(settings.name);
   }
 
   private onExpire(name: string): void {
@@ -1018,7 +1013,7 @@ export class CacheService {
       .create(observer &#x3D;&gt; observer.next())
       .timeoutWith(this.config.cacheFlushInterval, Observable.of(1))
       .skip(1)
-      .subscribe(o &#x3D;&gt; this.removeLayer(name));
+      .subscribe(observer &#x3D;&gt; this.removeLayer(name));
   }
 
 }

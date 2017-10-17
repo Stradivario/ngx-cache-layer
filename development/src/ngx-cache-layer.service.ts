@@ -4,6 +4,8 @@ import {CacheLayerInterface, CacheServiceConfigInterface, CacheLayerItem} from '
 import {Injectable, Inject} from '@angular/core';
 import {CACHE_MODULE_CONFIG, CACHE_MODULE_DI_CONFIG} from './index';
 
+const INTERNAL_PROCEDURE_CACHE_NAME = 'cache_layers';
+
 const FRIENDLY_ERROR_MESSAGES = {
   LOCAL_STORAGE_DISABLED: 'LocalStorage is disabled please relate issue if you think it is enabled and there is a problem with library.'
 };
@@ -30,16 +32,16 @@ export class CacheService {
 
   constructor(@Inject( CACHE_MODULE_CONFIG ) private config: CacheServiceConfigInterface) {
     if (this.config.localStorage && CacheService.isLocalStorageEnabled()) {
-      const layers = <Array<string>>JSON.parse(localStorage.getItem('cache_layers'));
+      const layers = <Array<string>>JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
       if (layers) {
         layers.forEach(layer => {
             const cachedLayer = JSON.parse(localStorage.getItem(layer));
             if (cachedLayer) {
-              this.cachedLayers.next([...this.cachedLayers.getValue(), new CacheLayer<CacheLayerItem<any>>(cachedLayer)]);
+              this.cachedLayers.next([...this.cachedLayers.getValue(), CacheService.createCacheInstance<any>(cachedLayer)]);
             }
         });
       } else {
-        localStorage.setItem('cache_layers', JSON.stringify([]));
+        localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify([]));
       }
     }
   }
@@ -47,10 +49,9 @@ export class CacheService {
   public getLayer<T>(name: string): CacheLayer<CacheLayerItem<T>> {
     let result = this.cachedLayers.getValue().filter(layer => layer.name === name);
     if (!result.length) {
-      throw new Error('Missing cache name: ' + name);
-    } else {
-      return result[0];
+      result = [this.createLayer({name: name})]
     }
+    return result[0];
   }
 
   public createLayer<T>(settings: CacheLayerInterface): CacheLayer<CacheLayerItem<T>> {
@@ -66,7 +67,7 @@ export class CacheService {
         if (layer) {
           cacheLayer = CacheService.createCacheInstance<T>(layer);
         } else {
-          localStorage.setItem('cache_layers', JSON.stringify([...CacheService.getLayersFromLS(), settings.name]));
+          localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify([...CacheService.getLayersFromLS(), settings.name]));
           localStorage.setItem(settings.name, JSON.stringify(settings));
         }
     }
@@ -78,13 +79,13 @@ export class CacheService {
   public removeLayer(name: string): void {
     if (this.config.localStorage) {
       localStorage.removeItem(name);
-      localStorage.setItem('cache_layers', JSON.stringify(CacheService.getLayersFromLS().filter(layer => layer !== name)));
+      localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getLayersFromLS().filter(layer => layer !== name)));
     }
     this.cachedLayers.next(this.cachedLayers.getValue().filter(result => result.name !== name));
   }
 
   public static getLayersFromLS(): Array<string> {
-    return <Array<string>>JSON.parse(localStorage.getItem('cache_layers'));
+    return <Array<string>>JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
   }
 
   private instanceHook(settings: CacheLayerInterface): void {

@@ -212,6 +212,55 @@ export class CartComponent implements OnInit {
 
 ```
 
+# !!! FIRST IMPORTANT !!!
+```typescript
+To avoid memory leaks it is really important to subscribe ONLY ONCE when you initialize items from cache the following example is
+correct implementation how it will work without any problems.
+
+  ngOnInit() {
+    this.cacheLayer = this.cache.getLayer<Product>(CART_CACHE_LAYER_NAME);
+    this.cartItems = this.cacheLayer.items;
+
+    // CORRECT EXAMPLE
+    this.cartItems.take(1).subscribe(collection => {
+        // Do something with collection here and initialize only once inside component
+    });
+
+    // WRONG EXAMPLE
+    this.cartItems.subscribe(collection => {
+    // don't do anything with collection this way or you will lead subscribing many times to the same collection
+    });
+  }
+
+```
+# !!! SECOND IMPORTANT !!!
+Don't call unsubscribe on collection because you will loose reactive binding to collection and you will lead to following error
+If you load only once observable like example above you will have no problems at all!
+```typescript
+"object unsubscribed"
+name
+:
+"ObjectUnsubscribedError"
+ngDebugContext
+:
+DebugContext_ {view: {…}, nodeIndex: 27, nodeDef: {…}, elDef: {…}, elView: {…}}
+ngErrorLogger
+:
+ƒ ()
+stack
+:
+"ObjectUnsubscribedError: object unsubscribed↵
+```
+
+# !!! THIRD IMPORTANT !!!
+Caching purpose is to initialize any cached result from any source(example: LocalStorage, SessionStorage) when application loads,
+because angular has his own way of dependency injection it is important to call CacheService only once and all cached layers needs to be loaded when we first initialize CacheModule with services
+Working proposal: initialize all serviceProviders inside app component because if we have lazy loaded component and user first go to there even if we initialize our cache service
+ISSUE: When you cache something cache it inside Service Provider and init provider inside app.module.ts, again this is due issue when you are on Lazy loaded route and current Cache is not initialized because we don't depend on this provider there inside constructor
+```typescript
+
+```
+
 ##### How to consume items insde html
 
 ```html
