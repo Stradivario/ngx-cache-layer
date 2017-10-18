@@ -1,9 +1,9 @@
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { CacheLayer } from './ngx-cache-layer.layer';
-import { BehaviorSubject } from 'rxjs/Rx';
 import { CacheLayerInterface, CacheServiceConfigInterface, CacheLayerItem } from './ngx-cache-layer.interfaces';
 export declare class CacheService {
     private config;
-    cachedLayers: BehaviorSubject<Array<CacheLayer<CacheLayerItem<any>>>>;
+    cachedLayers: BehaviorSubject<CacheLayer<CacheLayerItem<any>>[]>;
     private static createCacheInstance<T>(name);
     static isLocalStorageEnabled(): boolean;
     constructor(config: CacheServiceConfigInterface);

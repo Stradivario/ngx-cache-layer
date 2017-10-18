@@ -48,11 +48,9 @@ export class AppModule { }
 ##### `***NOTE Every cache created by cacheService is treated like a LAYER , so you need to specify layer name like example above`
 
 ```typescript
-import {Injectable} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
-import {CacheService} from "../src/ngx-cache-layer.service";
-import {CacheLayerItem} from "../src/ngx-cache-layer.interfaces";
-import {CacheLayer} from "../src/ngx-cache-layer.layer";
+import {CacheService, CacheLayer, CacheLayerItem} from 'ngx-cache-layer';
 
 export interface Item {
     name: string;
@@ -60,14 +58,21 @@ export interface Item {
 
 export const EXAMPLE_CACHE_LAYER_NAME = 'example-layer';
 
-@Injectable()
-export class ExampleProvider {
+@Component({
+  selector: 'app-example',
+  templateUrl: './example.component.html',
+  styleUrls: ['./example.component.scss']
+})
+export class ExampleComponent implements OnInit {
 
     exampleLayer: CacheLayer<CacheLayerItem<Item>>;
     exampleLayerItems: BehaviorSubject<CacheLayerItem<Item>[]>;
 
-	constructor(private cacheService: CacheService) {
+	constructor(
+		private cacheService: CacheService
+	) {}
 
+	ngOnInit() {
 		// Here we define our cache layer name, this method returns instance of class CacheLayer<CacheLayerItem<Item>>
 		this.exampleLayer = this.cacheService.createLayer<Item>({
 		  name: EXAMPLE_CACHE_LAYER_NAME
@@ -204,7 +209,6 @@ import {CART_CACHE_LAYER_NAME} from './cart.provider';
 })
 export class CartComponent implements OnInit {
   
-  step = 0;
   cartItems: BehaviorSubject<CacheLayerItem<Product>[]>;
   cacheLayer: CacheLayer<CacheLayerItem<Product>>;
   constructor(
@@ -229,7 +233,6 @@ export class CartComponent implements OnInit {
     <-- removeItemKey in my case item.id is unique so i should remove item id -->
     <button (click)="cacheLayer.removeItem(item.id)">Remove item</button>
 </div>
-
 ```
 
 <br>
@@ -307,16 +310,14 @@ function getUserById(id: number) {
     };
     const cacheAddress = CacheLayer.createCacheParams({ key: ENDPOINT, params: PARAMS });
     if (endpointCache.getItem(cacheAddress)) {
-      observer.next(endpointCache.getItem(cacheAddress));
-    } else {
-    // endpointCache.putItem method like getItem returns instance of cached item so we can safely return to the observer above
-      this.http.post(ENDPOINT, PARAMS)
-        .subscribe(
-          user => observer.next(
-            endpointCache.putItem({ key: cacheAddress, data: user })
-          )
-        )
+      return observer.next(endpointCache.getItem(cacheAddress));
     }
+    // endpointCache.putItem method like getItem returns instance of cached item so we can safely return to the observer above
+	this.http.post(ENDPOINT, PARAMS)
+	.map(user =>
+		observer.next(endpointCache.putItem({ key: cacheAddress, data: user.json() }))
+	)
+	.subscribe()
   });
 }
 ```
@@ -346,12 +347,14 @@ const cache = CacheService.getLayer<any>('layer-name');
 cache.removeItem('example-key');
 ```
 
-
 <br>
+
 # NOTES:
 
 <br>
-# 1. FIRST
+
+# FIRST
+
 #### To avoid memory leaks it is really important to subscribe ONLY ONCE when you initialize items from cache.
 #### The example below is correct implementation how it will work without any problems!
 #### Inside html when you use ( cartItems | async ) async pipe the view handles this automatically.`
@@ -375,13 +378,17 @@ cache.removeItem('example-key');
 
 ```
 <br>
-# 2. SECOND
+
+# SECOND
+
 #### Don't call unsubscribe on collection because you will loose reactive binding to collection and you will lead to following error
 #### If you subscribe once, like example above you will have no problems at all!
 `"object unsubscribed" name: "ObjectUnsubscribedError" ngDebugContext:DebugContext_ {view: {…}, nodeIndex: 27, nodeDef: {…}, elDef: {…}, elView: {…}}ngErrorLogger:ƒ ()stack:"ObjectUnsubscribedError: object unsubscribed`
 
 <br>
-# 3. THIRD
+
+# THIRD
+
 #### Caching purpose is to initialize any cached result from any source(example: LocalStorage, SessionStorage) when application loads because angular has his own way of dependency injection it is important to call CacheModule only once inside app.module.ts.
 
 <br>

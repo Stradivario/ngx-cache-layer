@@ -1,5 +1,6 @@
-import {BehaviorSubject, Observable} from 'rxjs/Rx';
 import {CacheLayerInterface, CacheServiceConfigInterface} from './ngx-cache-layer.interfaces';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import {Observable} from 'rxjs/Rx';
 
 export class CacheLayer<T> {
 
@@ -9,14 +10,15 @@ export class CacheLayer<T> {
 
   static createCacheParams(config) {
     let arrayParams = [], data;
-    if (config) {
-      config.forEach(param => {
-        arrayParams.push(config.params[param]);
-        data = config.key + '/' + arrayParams.toString().replace(/[ ]*,[ ]*|[ ]+/g, '/');
-      });
-    } else {
-      data = config.key;
-    }
+
+      if(config.constructor === Array) {
+        config.forEach(param => arrayParams.push(config.params[param]));
+      } else if (config.constructor === String) {
+        data = config;
+      }
+      data = config.key + '/' + arrayParams.toString().replace(/[ ]*,[ ]*|[ ]+/g, '/');
+
+    data = config.key;
     return data;
   }
 
@@ -35,7 +37,7 @@ export class CacheLayer<T> {
   public getItem(key: string): T {
     let item = this.items.getValue().filter(item => item['key'] === key);
     if (!item.length) {
-      throw new Error('Missing item with key: ' + key);
+      return null;
     } else {
       return item[0];
     }
@@ -43,11 +45,11 @@ export class CacheLayer<T> {
 
   public putItem(layerItem: T): T {
     if (this.config.localStorage) {
-      const layer = <CacheLayerInterface>JSON.parse(localStorage.getItem(this.name));
-      if (layer) {
-        layer.items = [...this.items.getValue(), layerItem];
-        localStorage.setItem(this.name, JSON.stringify(layer));
-      }
+      localStorage.setItem(this.name, JSON.stringify(<CacheLayerInterface>{
+        config: this.config,
+        name: this.name,
+        items: [...this.items.getValue(), layerItem]
+      }));
     }
     this.items.next([...this.items.getValue(), layerItem]);
     this.instanceHook(layerItem);
@@ -65,15 +67,12 @@ export class CacheLayer<T> {
   public removeItem(key: string): void {
     let newLayerItems = this.items.getValue().filter(item => item['key'] !== key);
     if (this.config.localStorage) {
-      const oldLayer = <CacheLayerInterface>JSON.parse(localStorage.getItem(this.name));
-      if (oldLayer) {
-        const newLayer = <CacheLayerInterface>{
-          config: this.config,
-          name: this.name,
-          items: newLayerItems
-        };
-        localStorage.setItem(this.name, JSON.stringify(newLayer));
-      }
+      const newLayer = <CacheLayerInterface>{
+        config: this.config,
+        name: this.name,
+        items: newLayerItems
+      };
+      localStorage.setItem(this.name, JSON.stringify(newLayer));
     }
     this.items.next(newLayerItems);
   }

@@ -1,23 +1,27 @@
-import {CacheLayer} from './ngx-cache-layer.layer';
-import {BehaviorSubject, Observable} from 'rxjs/Rx';
-import {CacheLayerInterface, CacheServiceConfigInterface, CacheLayerItem} from './ngx-cache-layer.interfaces';
 import {Injectable, Inject} from '@angular/core';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import {Observable} from 'rxjs/Observable';
+
+import {CacheLayer} from './ngx-cache-layer.layer';
+import {CacheLayerInterface, CacheServiceConfigInterface, CacheLayerItem} from './ngx-cache-layer.interfaces';
+
 import {CACHE_MODULE_CONFIG, CACHE_MODULE_DI_CONFIG} from './index';
 
 const INTERNAL_PROCEDURE_CACHE_NAME = 'cache_layers';
 
 const FRIENDLY_ERROR_MESSAGES = {
-  LOCAL_STORAGE_DISABLED: 'LocalStorage is disabled please relate issue if you think it is enabled and there is a problem with library.'
+  LOCAL_STORAGE_DISABLED: 'LocalStorage is disabled switching to regular in-memory storage.Please relate issue if you think it is enabled and there is a problem with the library itself.'
 };
 
 @Injectable()
 export class CacheService {
 
-  public cachedLayers: BehaviorSubject<Array<CacheLayer<CacheLayerItem<any>>>> = new BehaviorSubject([]);
+  public cachedLayers: BehaviorSubject<CacheLayer<CacheLayerItem<any>>[]> = new BehaviorSubject([]);
 
   private static createCacheInstance<T>(name): CacheLayer<CacheLayerItem<T>> {
     return new CacheLayer<CacheLayerItem<T>>(name);
   }
+
   public static isLocalStorageEnabled(): boolean {
     let error = [];
     try {

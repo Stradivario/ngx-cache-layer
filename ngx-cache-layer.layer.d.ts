@@ -1,5 +1,5 @@
-import { BehaviorSubject } from 'rxjs/Rx';
 import { CacheLayerInterface, CacheServiceConfigInterface } from './ngx-cache-layer.interfaces';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 export declare class CacheLayer<T> {
     items: BehaviorSubject<Array<T>>;
     name: string;

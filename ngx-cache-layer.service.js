@@ -1,11 +1,12 @@
-import { CacheLayer } from './ngx-cache-layer.layer';
-import { BehaviorSubject, Observable } from 'rxjs/Rx';
-import { CacheServiceConfigInterface } from './ngx-cache-layer.interfaces';
 import { Injectable, Inject } from '@angular/core';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable } from 'rxjs/Observable';
+import { CacheLayer } from './ngx-cache-layer.layer';
+import { CacheServiceConfigInterface } from './ngx-cache-layer.interfaces';
 import { CACHE_MODULE_CONFIG, CACHE_MODULE_DI_CONFIG } from './index';
 var /** @type {?} */ INTERNAL_PROCEDURE_CACHE_NAME = 'cache_layers';
 var /** @type {?} */ FRIENDLY_ERROR_MESSAGES = {
-    LOCAL_STORAGE_DISABLED: 'LocalStorage is disabled please relate issue if you think it is enabled and there is a problem with library.'
+    LOCAL_STORAGE_DISABLED: 'LocalStorage is disabled switching to regular in-memory storage.Please relate issue if you think it is enabled and there is a problem with the library itself.'
 };
 var CacheService = (function () {
     /**

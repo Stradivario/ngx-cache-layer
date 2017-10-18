@@ -1,4 +1,5 @@
-import { BehaviorSubject, Observable } from 'rxjs/Rx';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable } from 'rxjs/Rx';
 var CacheLayer = (function () {
     /**
      * @param {?} settings
@@ -17,15 +18,14 @@ var CacheLayer = (function () {
      */
     CacheLayer.createCacheParams = function (config) {
         var /** @type {?} */ arrayParams = [], /** @type {?} */ data;
-        if (config) {
-            config.forEach(function (param) {
-                arrayParams.push(config.params[param]);
-                data = config.key + '/' + arrayParams.toString().replace(/[ ]*,[ ]*|[ ]+/g, '/');
-            });
+        if (config.constructor === Array) {
+            config.forEach(function (param) { return arrayParams.push(config.params[param]); });
         }
-        else {
-            data = config.key;
+        else if (config.constructor === String) {
+            data = config;
         }
+        data = config.key + '/' + arrayParams.toString().replace(/[ ]*,[ ]*|[ ]+/g, '/');
+        data = config.key;
         return data;
     };
     /**
@@ -42,7 +42,7 @@ var CacheLayer = (function () {
     CacheLayer.prototype.getItem = function (key) {
         var /** @type {?} */ item = this.items.getValue().filter(function (item) { return item['key'] === key; });
         if (!item.length) {
-            throw new Error('Missing item with key: ' + key);
+            return null;
         }
         else {
             return item[0];
@@ -54,11 +54,11 @@ var CacheLayer = (function () {
      */
     CacheLayer.prototype.putItem = function (layerItem) {
         if (this.config.localStorage) {
-            var /** @type {?} */ layer = (JSON.parse(localStorage.getItem(this.name)));
-            if (layer) {
-                layer.items = this.items.getValue().concat([layerItem]);
-                localStorage.setItem(this.name, JSON.stringify(layer));
-            }
+            localStorage.setItem(this.name, JSON.stringify(/** @type {?} */ ({
+                config: this.config,
+                name: this.name,
+                items: this.items.getValue().concat([layerItem])
+            })));
         }
         this.items.next(this.items.getValue().concat([layerItem]));
         this.instanceHook(layerItem);
@@ -83,15 +83,12 @@ var CacheLayer = (function () {
     CacheLayer.prototype.removeItem = function (key) {
         var /** @type {?} */ newLayerItems = this.items.getValue().filter(function (item) { return item['key'] !== key; });
         if (this.config.localStorage) {
-            var /** @type {?} */ oldLayer = (JSON.parse(localStorage.getItem(this.name)));
-            if (oldLayer) {
-                var /** @type {?} */ newLayer = ({
-                    config: this.config,
-                    name: this.name,
-                    items: newLayerItems
-                });
-                localStorage.setItem(this.name, JSON.stringify(newLayer));
-            }
+            var /** @type {?} */ newLayer = ({
+                config: this.config,
+                name: this.name,
+                items: newLayerItems
+            });
+            localStorage.setItem(this.name, JSON.stringify(newLayer));
         }
         this.items.next(newLayerItems);
     };
