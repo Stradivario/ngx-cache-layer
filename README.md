@@ -1,4 +1,4 @@
-````# @ngx-cache-layer
+# @ngx-cache-layer
 
 ![Build Status](http://gitlab.youvolio.com/open-source/ngx-cache-layer/badges/branch/build.svg)
 
@@ -120,6 +120,7 @@ export class ExampleComponent implements OnInit {
 
     // Remove item from current layer
     this.removeItem('example-key');
+
   }
 
   createItem(data: any) {
@@ -160,9 +161,9 @@ export class YourClass {
 
 ```typescript
 
-import { Injectable } from '@angular/core';
-import { CacheService } from 'ngx-cache-layer';
-import {EXAMPLE_CACHE_LAYER_NAME} from './example.provider';
+import {Injectable} from '@angular/core';
+import {CacheService} from 'ngx-cache-layer';
+import {EXAMPLE_CACHE_LAYER_NzAME} from './example.provider';
 
 @Injectable()
 export class YourClass {
@@ -293,22 +294,31 @@ export class AppModule { }
 ### Service methods
 
 ##### Create cache layer
-`Optional you can define custom settings for every layer that you create just insert CacheLayerInterface from ngx-cache-layer like example for global config above`
 
 ```typescript
 CacheService.createLayer<any>({name: 'layer-name', settings?: CacheLayerInterface})
 ```
+`Optional you can define custom settings for every layer that you create just insert CacheLayerInterface from ngx-cache-layer like example for global config above`
+
+Returns: `Instance of CacheLayer class`
+Optional: `settings interface CacheLayerInterface`
 
 ##### Get layer from cache
 
 ```typescript
 CacheService.getLayer<any>('layer-name');
 ```
+Returns: `Instance of CacheLayer class`
 
 ##### Remove layer from cache
 
 ```typescript
 CacheService.removeLayer('layer-name');
+```
+Returns: `void`
+
+```typescript
+CacheLayer.createCacheParams({key: 'endpoint-key', params: {exampleParam: 'test'}});
 ```
 
 ##### Create Cache with parameters static public method of CacheLayer Class
@@ -382,22 +392,27 @@ cache.removeItem('example-key');
     this.cartItems = this.cacheLayer.items;
 
 
-	// CORRECT EXAMPLE
+	// CORRECT EXAMPLE(BestWay) you need to unsubscribe when you leave component!
+
 	this.subscription = this.cartItems.asObservable()
 	  .subscribe(items => {
-
+		// Do something
 	  });
 
 	// ANOTHER CORRECT EXAMPLE (this method will subscribe only once and you cannot get new results if there are any new)
 	this.cartItems.take(1).subscribe(collection => {
 	  // Do something with collection here and initialize only once inside component
 	});
+
     // WRONG EXAMPLE
     this.cartItems.subscribe(collection => {
     // don't do anything with collection this way or you will lead subscribing many times to the same collection
     });
   }
 
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
 ```
 <br>
 
