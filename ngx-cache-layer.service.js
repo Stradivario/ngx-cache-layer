@@ -76,8 +76,9 @@ var CacheService = (function () {
         if (exists.length) {
             return exists[0];
         }
-        settings.config = settings.config || this.config || CACHE_MODULE_DI_CONFIG;
+        this.config = settings.config || this.config || CACHE_MODULE_DI_CONFIG;
         settings.items = settings.items || [];
+        settings.config = this.config;
         var /** @type {?} */ cacheLayer = CacheService.createCacheInstance(settings);
         if (settings.config.localStorage && CacheService.isLocalStorageEnabled()) {
             localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getLayersFromLS().concat([settings.name])));

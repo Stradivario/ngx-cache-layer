@@ -2,7 +2,7 @@
 
 ![Build Status](http://gitlab.youvolio.com/open-source/ngx-cache-layer/badges/branch/build.svg)
 
-#### @StrongTyped @EasyAPI Created on Angular@5.0.0-rc.2 and tested on @Angular4+
+#### @StrongTyped @EasyAPI Created on Angular@5.0.0-rc.2 and tested on @Angular4+ cache layer with capability to write in LocalStorage
 
 ##### More detailed documentation you can find [here](https://stradivario.github.io/ngx-cache-layer/)
 
@@ -176,48 +176,66 @@ export class YourClass {
 ### COMPLETE  ADD TO CARD EXAMPLE:
 
 ##### Create CartProvider which will help us to reduce logic inside component
+##### IMPORTANT When you use provider and define custom settings you need to use provider cache layer instance!
+##### If you use CacheService.getLayer() with the same cache name it may lead to not initialize current defined config when we createLayer with specific config not global
+##### Without provider you can use it as usual with getLayer() and createLayer() it will be safe but it will take Global Configuration instead.
 
 ```typescript
+
 import {Injectable} from "@angular/core";
-import {CacheService, CacheLayer, CacheLayerItem} from "ngx-cache-layer";
+import {CacheService, CacheLayer, CacheLayerItem, CacheServiceConfigInterface} from "ngx-cache-layer";
 import {Product} from "../core/config/queries/product/product.interface";
 
 export const CART_CACHE_LAYER_NAME = 'cart';
 
+export interface Product {
+  id: string;
+  name: string;
+  title: string;
+  price: string;
+  quantity: number;
+  completed: boolean;
+  categoryId: number;
+}
+
 @Injectable()
 export class CartProvider {
 
-  cartCacheLayer: CacheLayer<CacheLayerItem<Product>>;
+  cacheLayer: CacheLayer<CacheLayerItem<Product>>;
+  items: BehaviorSubject<CacheLayerItem<Product>[]>;
 
   constructor(private cacheService: CacheService) {
-    this.cartCacheLayer = this.cacheService.createLayer<Product>({
-      name: CART_CACHE_LAYER_NAME
+    this.cacheLayer = this.cacheService.createLayer(<CacheLayerInterface>{
+      name: CART_CACHE_LAYER_NAME,
+      config: <CacheServiceConfigInterface>{
+        localStorage: true,
+        maxAge: 10000,
+        cacheFlushInterval: 10000,
+        deleteOnExpire: 'aggressive'
+      }
     });
+    this.items = this.cacheLayer.items;
   }
 
-  addToCart(product: Product) {
-    this.cartCacheLayer.putItem({
+  putToCart(product: Product) {
+    this.cacheLayer.putItem({
       key:product.id,
       data: product
     });
   }
 
-  removeFromCard(product: Product) {
-    this.cartCacheLayer.removeItem(product.id);
+  removeFromCart(product: Product) {
+    this.cacheLayer.removeItem(product.id);
   }
 
 }
 
 ```
 
-##### Now lets define our component and inject CacheService from ngx-cache-layer
+##### Now lets define our component and inject CartProvider
 ```typescript
+
 import {Component, OnInit} from '@angular/core';
-import {CacheService} from 'ngx-cache-layer';
-import {CacheLayerItem, CacheLayer} from 'ngx-cache-layer';
-import {BehaviorSubject} from 'rxjs';
-import {Product} from '../core/config/queries/product/product.interface';
-import {CART_CACHE_LAYER_NAME} from './cart.provider';
 
 @Component({
   selector: 'app-cart',
@@ -228,29 +246,33 @@ export class CartComponent implements OnInit {
 
   cartItems: BehaviorSubject<CacheLayerItem<Product>[]>;
   cacheLayer: CacheLayer<CacheLayerItem<Product>>;
-  constructor(
-    private cache: CacheService
-  ) {}
 
-  ngOnInit() {
-    this.cacheLayer = this.cache.getLayer<Product>(CART_CACHE_LAYER_NAME);
-    this.cartItems = this.cacheLayer.items;
+  constructor(private cartProvider: CartProvider) {}
+
+  ngOnInit() {}
+
+  removeItem(product: Product) {
+    this.cartProvider.removeFromCard(product)
+  }
+
+  updateItem(product: Product) {
+    this.cartProvider.putToCart(product);
   }
 
 }
-
 ```
 
 ##### How to consume items inside html
 
 ```html
-<div *ngFor="let item of (cartItems | async)">
+<div *ngFor="let product of (cartProvider.items | async)">
 	{{item.key}} // is cache identity
     {{item.data.id}} // Cached data from current item from card layer Observable
     <-- removeItemKey in my case item.id is unique so i should remove item id -->
-    <button (click)="cacheLayer.removeItem(item.id)">Remove item</button>
+    <button (click)="removeItem(product)">Remove item</button>
 </div>
 ```
+
 
 <br>
 
@@ -381,7 +403,9 @@ cache.removeItem('example-key');
 
 # FIRST
 
-#### To avoid memory leaks it is really important to subscribe ONLY ONCE when you initialize items from cache.
+#### To avoid memory leaks it is really important to subscribe ONLY ONCE when you initialize items from cache,
+#### or use examples bellow to iterate over items from collection and correct unsubscribe from them.
+
 #### The example below is correct implementation how it will work without any problems!
 #### Inside html when you use ( cartItems | async ) async pipe the view handles this automatically.`
 
