@@ -41,7 +41,7 @@ export class CacheService {
         layers.forEach(layer => {
             const cachedLayer = JSON.parse(localStorage.getItem(layer));
             if (cachedLayer) {
-              this.cachedLayers.next([...this.cachedLayers.getValue(), CacheService.createCacheInstance<any>(cachedLayer)]);
+              this.cachedLayers.next([...this.cachedLayers.getValue(), CacheService.createCacheInstance(cachedLayer)]);
             }
         });
       } else {
@@ -67,16 +67,11 @@ export class CacheService {
     settings.items = settings.items || [];
     let cacheLayer = CacheService.createCacheInstance<T>(settings);
     if (settings.config.localStorage && CacheService.isLocalStorageEnabled()) {
-        const layer = JSON.parse(localStorage.getItem(settings.name));
-        if (layer) {
-          cacheLayer = CacheService.createCacheInstance<T>(layer);
-        } else {
-          localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify([...CacheService.getLayersFromLS(), settings.name]));
-          localStorage.setItem(settings.name, JSON.stringify(settings));
-        }
+        localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify([...CacheService.getLayersFromLS(), settings.name]));
+        localStorage.setItem(settings.name, JSON.stringify(settings));
     }
     this.cachedLayers.next([...this.cachedLayers.getValue(), cacheLayer]);
-    this.instanceHook(settings);
+    this.instanceHook(cacheLayer);
     return cacheLayer;
   }
 

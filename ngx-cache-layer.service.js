@@ -80,17 +80,11 @@ var CacheService = (function () {
         settings.items = settings.items || [];
         var /** @type {?} */ cacheLayer = CacheService.createCacheInstance(settings);
         if (settings.config.localStorage && CacheService.isLocalStorageEnabled()) {
-            var /** @type {?} */ layer = JSON.parse(localStorage.getItem(settings.name));
-            if (layer) {
-                cacheLayer = CacheService.createCacheInstance(layer);
-            }
-            else {
-                localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getLayersFromLS().concat([settings.name])));
-                localStorage.setItem(settings.name, JSON.stringify(settings));
-            }
+            localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getLayersFromLS().concat([settings.name])));
+            localStorage.setItem(settings.name, JSON.stringify(settings));
         }
         this.cachedLayers.next(this.cachedLayers.getValue().concat([cacheLayer]));
-        this.instanceHook(settings);
+        this.instanceHook(cacheLayer);
         return cacheLayer;
     };
     /**

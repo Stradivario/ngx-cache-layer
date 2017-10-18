@@ -1,4 +1,4 @@
-# @ngx-cache-layer
+````# @ngx-cache-layer
 
 ![Build Status](http://gitlab.youvolio.com/open-source/ngx-cache-layer/badges/branch/build.svg)
 
@@ -53,7 +53,7 @@ import {BehaviorSubject, Subscription} from 'rxjs';
 import {CacheService, CacheLayer, CacheLayerItem} from 'ngx-cache-layer';
 
 export interface Item {
-    name: string;
+  name: string;
 }
 
 export const EXAMPLE_CACHE_LAYER_NAME = 'example-layer';
@@ -65,72 +65,75 @@ export const EXAMPLE_CACHE_LAYER_NAME = 'example-layer';
 })
 export class ExampleComponent implements OnInit {
 
-    exampleLayer: CacheLayer<CacheLayerItem<Item>>;
-    exampleLayerItems: BehaviorSubject<CacheLayerItem<Item>[]>;
-	subscription: Subscription;
-	constructor(
-		private cacheService: CacheService
-	) {}
+  exampleLayer: CacheLayer<CacheLayerItem<Item>>;
+  exampleLayerItems: BehaviorSubject<CacheLayerItem<Item>[]>;
+  subscription: Subscription;
 
-	ngOnInit() {
-		// Here we define our cache layer name, this method returns instance of class CacheLayer<CacheLayerItem<Item>>
-		this.exampleLayer = this.cacheService.createLayer<Item>({
-		  name: EXAMPLE_CACHE_LAYER_NAME
-		});
+  constructor(
+    private cacheService: CacheService
+  ) {}
 
-		// inside this.exampleCache you can find object named items returns BehaviorSubject<CacheLayerItem<Item>[]> object type
-		this.exampleLayerItems = this.exampleLayer.items
+  ngOnInit() {
+    // Here we define our cache layer name, this method returns instance of class CacheLayer<CacheLayerItem<Item>>
+    this.exampleLayer = this.cacheService.createLayer<Item>({
+      name: EXAMPLE_CACHE_LAYER_NAME
+    });
 
+    // inside this.exampleCache you can find object named items returns BehaviorSubject<CacheLayerItem<Item>[]> object type
+    this.exampleLayerItems = this.exampleLayer.items
 
-	    // Correct implementation of subscribing to collection of layer items and work inside component with it:
-	    // Recommended way to work with cacheLayer collection items is to create another observable asObservable and use items this way
-	    // Anyway it is better to let angular view model to handle subscription itself ( cartItems | async)
-	    // To work with collection this way you can use collection Instance returned from getLayer above (this.cacheLayer) (Examples Below)
+    // Correct implementation of subscribing to collection of layer items and work inside component with it:
+    // Recommended way to work with cacheLayer collection items is to create another observable asObservable and use items this way
+    // Anyway it is better to let angular view model to handle subscription itself ( cartItems | async)
+    // To work with collection this way you can use collection Instance returned from getLayer above (this.cacheLayer) (Examples Below)
 
-	    this.subscription = this.exampleLayerItems.asObservable()
-	      .subscribe(items => {
+    this.subscription = this.exampleLayerItems.asObservable()
+      .subscribe(items => {
 
-	      });
+      });
 
-	    // If you try to unsubscribe from this.cacheItems when you leave component state ngOnDestroy(),
-	    // you will loose observable stream from the cache layer and the result will be error ***Check NOTES below***
-		// Another method is to take values single time only per component initialization
-		this.exampleLayerItems
-		  .take(1)
-		  .subscribe(itemCollection => itemCollection
-		    .forEach(item => {
-		      // Because we define interface for this items we have the following autosuggestion from the IDE
-		      const itemName = item.data.name;
-		    })
-		  );
+    // If you try to unsubscribe from this.cacheItems when you leave component state ngOnDestroy(),
+    // you will loose observable stream from the cache layer and the result will be error ***Check NOTES below***
+    // Another method is to take values single time only per component initialization
 
-		// Put item to current cache defined above
-		// When there is a new item added to collection cache automatically emits new results to this.exampleLayerItems BehaviorSubject object type
-		this.createItem({
-		  key:'example-key',
-		  data:{
-		    name:'pesho'
-		  }
-		});
+    this.exampleLayerItems
+      .take(1)
+      .subscribe(itemCollection => itemCollection
+        .forEach(item => {
+          // Because we define interface for this items we have the following autosuggestion from the IDE
+          const itemName = item.data.name;
+        })
+      );
 
-		// Get cached data from added item above will return {exampleData:'example-string'}
-		const exampleData = this.getItem('example-key');
+    // Put item to current cache defined above
+    // When there is a new item added to collection cache automatically emits new results to this.exampleLayerItems BehaviorSubject object type
 
-		// Remove item from current layer
-		this.removeItem('example-key');
-	}
+    this.createItem({
+      key:'example-key',
+      data:{
+        name:'pesho'
+      }
+    });
 
-	createItem(data: any) {
-		this.exampleLayer.putItem(data);
-	}
+    // Get cached data from added item above will return {exampleData:'example-string'}
+    const exampleData = this.getItem('example-key');
 
-	getItem(key: string) {
-		this.exampleLayer.getItem(key);
-	}
+    // Remove item from current layer
+    this.removeItem('example-key');
+  }
 
-	removeItem(key: string) {
-		this.exampleLayer.removeItem(key);
-	}
+  createItem(data: any) {
+    this.exampleLayer.putItem(data);
+  }
+
+  getItem(key: string) {
+    this.exampleLayer.getItem(key);
+  }
+
+  removeItem(key: string) {
+    this.exampleLayer.removeItem(key);
+  }
+
 }
 
 ```
@@ -221,7 +224,7 @@ import {CART_CACHE_LAYER_NAME} from './cart.provider';
   styleUrls: ['./cart.component.scss']
 })
 export class CartComponent implements OnInit {
-  
+
   cartItems: BehaviorSubject<CacheLayerItem<Product>[]>;
   cacheLayer: CacheLayer<CacheLayerItem<Product>>;
   constructor(
@@ -416,3 +419,4 @@ cache.removeItem('example-key');
 
 MIT © [Kristian Tachev(Stradivario)](mailto:kristiqn.tachev@gmail.com)
 
+````

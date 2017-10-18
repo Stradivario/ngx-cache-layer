@@ -9,17 +9,15 @@ export class CacheLayer<T> {
   public config: CacheServiceConfigInterface;
 
   static createCacheParams(config) {
-    let arrayParams = [], data;
-
-      if(config.constructor === Array) {
-        config.forEach(param => arrayParams.push(config.params[param]));
+      if(config.params.constructor === Object) {
+        return // Todo
       } else if (config.constructor === String) {
-        data = config;
+        return // Todo
+      } else if (config.params.constructor === Number) {
+        return // Todo
+      } else if (config.params.constructor === Array) {
+        return // Todo
       }
-      data = config.key + '/' + arrayParams.toString().replace(/[ ]*,[ ]*|[ ]+/g, '/');
-
-    data = config.key;
-    return data;
   }
 
   constructor(settings: CacheLayerInterface) {

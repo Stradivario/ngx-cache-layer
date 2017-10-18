@@ -17,16 +17,18 @@ var CacheLayer = (function () {
      * @return {?}
      */
     CacheLayer.createCacheParams = function (config) {
-        var /** @type {?} */ arrayParams = [], /** @type {?} */ data;
-        if (config.constructor === Array) {
-            config.forEach(function (param) { return arrayParams.push(config.params[param]); });
+        if (config.params.constructor === Object) {
+            return; // Todo
         }
         else if (config.constructor === String) {
-            data = config;
+            return; // Todo
         }
-        data = config.key + '/' + arrayParams.toString().replace(/[ ]*,[ ]*|[ ]+/g, '/');
-        data = config.key;
-        return data;
+        else if (config.params.constructor === Number) {
+            return; // Todo
+        }
+        else if (config.params.constructor === Array) {
+            return; // Todo
+        }
     };
     /**
      * @param {?} layerItem

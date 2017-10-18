@@ -4,7 +4,7 @@ export declare class CacheLayer<T> {
     items: BehaviorSubject<Array<T>>;
     name: string;
     config: CacheServiceConfigInterface;
-    static createCacheParams(config: any): any;
+    static createCacheParams(config: any): void;
     constructor(settings: CacheLayerInterface);
     private instanceHook(layerItem);
     getItem(key: string): T;
