@@ -5,8 +5,10 @@ export declare class CacheLayer<T> {
     name: string;
     config: CacheServiceConfigInterface;
     static createCacheParams(config: any): void;
-    constructor(settings: CacheLayerInterface);
-    private instanceHook(layerItem);
+    constructor(layer: CacheLayerInterface);
+    private initHook(layer);
+    private onExpireAll(layer);
+    private putItemHook(layerItem);
     getItem(key: string): T;
     putItem(layerItem: T): T;
     private onExpire(key);

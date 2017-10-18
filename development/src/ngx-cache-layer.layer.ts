@@ -20,15 +20,24 @@ export class CacheLayer<T> {
       }
   }
 
-  constructor(settings: CacheLayerInterface) {
-    this.name = settings.name;
-    this.config = settings.config;
+  constructor(layer: CacheLayerInterface) {
+    this.name = layer.name;
+    this.config = layer.config;
     if (this.config.localStorage) {
-      this.items.next([...this.items.getValue(), ...settings.items]);
+      this.items.next([...this.items.getValue(), ...layer.items]);
     }
+    this.initHook(layer);
   }
 
-  private instanceHook(layerItem): void {
+  private initHook(layer) {
+    this.onExpireAll(layer)
+  }
+
+  private onExpireAll(layer) {
+    layer.items.forEach(item => this.onExpire(item['key']))
+  }
+
+  private putItemHook(layerItem): void {
     this.onExpire(layerItem['key']);
   }
 
@@ -50,7 +59,7 @@ export class CacheLayer<T> {
       }));
     }
     this.items.next([...this.items.getValue(), layerItem]);
-    this.instanceHook(layerItem);
+    this.putItemHook(layerItem);
     return layerItem;
   }
 

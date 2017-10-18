@@ -14,4 +14,5 @@ export interface CacheLayerInterface {
   name: string;
   config?: CacheServiceConfigInterface;
   items?: any;
+  customConfigSet?: boolean;
 }

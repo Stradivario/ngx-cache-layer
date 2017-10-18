@@ -206,7 +206,7 @@ export class CartProvider {
   items: BehaviorSubject<CacheLayerItem<Product>[]>;
 
   constructor(private cacheService: CacheService) {
-    this.cacheLayer = this.cacheService.createLayer(<CacheLayerInterface>{
+    this.cacheLayer = this.cacheService.createLayer<Product>(<CacheLayerInterface>{
       name: CART_CACHE_LAYER_NAME,
       config: <CacheServiceConfigInterface>{
         localStorage: true,
@@ -444,17 +444,9 @@ cache.removeItem('example-key');
 
 # SECOND
 
-#### Don't call unsubscribe on collection because you will loose reactive binding to collection and you will lead to following error
+#### Don't call unsubscribe directly on collection because you will loose reactive binding to collection and you will lead to following error
 #### If you subscribe once, like example above you will have no problems at all!
 `"object unsubscribed" name: "ObjectUnsubscribedError" ngDebugContext:DebugContext_ {view: {…}, nodeIndex: 27, nodeDef: {…}, elDef: {…}, elView: {…}}ngErrorLogger:ƒ ()stack:"ObjectUnsubscribedError: object unsubscribed`
-
-<br>
-
-# THIRD
-
-#### Caching purpose is to initialize any cached result from any source(example: LocalStorage, SessionStorage) when application loads because angular has his own way of dependency injection it is important to call CacheModule only once inside app.module.ts.
-
-<br>
 
 ## License
 

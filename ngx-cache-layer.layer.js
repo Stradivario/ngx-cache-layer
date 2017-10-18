@@ -2,15 +2,16 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Rx';
 var CacheLayer = (function () {
     /**
-     * @param {?} settings
+     * @param {?} layer
      */
-    function CacheLayer(settings) {
+    function CacheLayer(layer) {
         this.items = new BehaviorSubject([]);
-        this.name = settings.name;
-        this.config = settings.config;
+        this.name = layer.name;
+        this.config = layer.config;
         if (this.config.localStorage) {
-            this.items.next(this.items.getValue().concat(settings.items));
+            this.items.next(this.items.getValue().concat(layer.items));
         }
+        this.initHook(layer);
     }
     /**
      * @param {?} config
@@ -31,10 +32,25 @@ var CacheLayer = (function () {
         }
     };
     /**
+     * @param {?} layer
+     * @return {?}
+     */
+    CacheLayer.prototype.initHook = function (layer) {
+        this.onExpireAll(layer);
+    };
+    /**
+     * @param {?} layer
+     * @return {?}
+     */
+    CacheLayer.prototype.onExpireAll = function (layer) {
+        var _this = this;
+        layer.items.forEach(function (item) { return _this.onExpire(item['key']); });
+    };
+    /**
      * @param {?} layerItem
      * @return {?}
      */
-    CacheLayer.prototype.instanceHook = function (layerItem) {
+    CacheLayer.prototype.putItemHook = function (layerItem) {
         this.onExpire(layerItem['key']);
     };
     /**
@@ -63,7 +79,7 @@ var CacheLayer = (function () {
             })));
         }
         this.items.next(this.items.getValue().concat([layerItem]));
-        this.instanceHook(layerItem);
+        this.putItemHook(layerItem);
         return layerItem;
     };
     /**

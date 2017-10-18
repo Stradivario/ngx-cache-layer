@@ -6,6 +6,7 @@ import { CacheServiceConfigInterface } from './ngx-cache-layer.interfaces';
 import { CACHE_MODULE_CONFIG, CACHE_MODULE_DI_CONFIG } from './index';
 var /** @type {?} */ INTERNAL_PROCEDURE_CACHE_NAME = 'cache_layers';
 var /** @type {?} */ FRIENDLY_ERROR_MESSAGES = {
+    TRY_TO_UNSUBSCRIBE: 'Someone try to unsubscribe from collection directly... agghhh.. read docs! Blame: ',
     LOCAL_STORAGE_DISABLED: 'LocalStorage is disabled switching to regular in-memory storage.Please relate issue if you think it is enabled and there is a problem with the library itself.'
 };
 var CacheService = (function () {
@@ -16,7 +17,7 @@ var CacheService = (function () {
         var _this = this;
         this.config = config;
         this.cachedLayers = new BehaviorSubject([]);
-        if (this.config.localStorage && CacheService.isLocalStorageEnabled()) {
+        if (this.config.localStorage && CacheService.isLocalStorageUsable()) {
             var layers = JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
             if (layers) {
                 layers.forEach(function (layer) {
@@ -42,7 +43,7 @@ var CacheService = (function () {
     /**
      * @return {?}
      */
-    CacheService.isLocalStorageEnabled = function () {
+    CacheService.isLocalStorageUsable = function () {
         var /** @type {?} */ error = [];
         try {
             localStorage.setItem('test-key', JSON.stringify({ key: 'test-object' }));
@@ -53,6 +54,15 @@ var CacheService = (function () {
             console.log(FRIENDLY_ERROR_MESSAGES.LOCAL_STORAGE_DISABLED);
         }
         return error.length ? false : true;
+    };
+    /**
+     * @template T
+     * @param {?} layerInstance
+     * @return {?}
+     */
+    CacheService.prototype.createLayerHook = function (layerInstance) {
+        this.protectLayerFromInvaders(layerInstance);
+        this.onExpire(layerInstance.name);
     };
     /**
      * @template T
@@ -68,24 +78,23 @@ var CacheService = (function () {
     };
     /**
      * @template T
-     * @param {?} settings
+     * @param {?} layer
      * @return {?}
      */
-    CacheService.prototype.createLayer = function (settings) {
-        var /** @type {?} */ exists = this.cachedLayers.getValue().filter(function (result) { return result.name === settings.name; });
+    CacheService.prototype.createLayer = function (layer) {
+        var /** @type {?} */ exists = this.cachedLayers.getValue().filter(function (result) { return result.name === layer.name; });
         if (exists.length) {
             return exists[0];
         }
-        this.config = settings.config || this.config || CACHE_MODULE_DI_CONFIG;
-        settings.items = settings.items || [];
-        settings.config = this.config;
-        var /** @type {?} */ cacheLayer = CacheService.createCacheInstance(settings);
-        if (settings.config.localStorage && CacheService.isLocalStorageEnabled()) {
-            localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getLayersFromLS().concat([settings.name])));
-            localStorage.setItem(settings.name, JSON.stringify(settings));
+        layer.items = layer.items || [];
+        layer.config = layer.config || this.config || CACHE_MODULE_DI_CONFIG;
+        var /** @type {?} */ cacheLayer = CacheService.createCacheInstance(layer);
+        if (layer.config.localStorage && CacheService.isLocalStorageUsable()) {
+            localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getLayersFromLS().concat([cacheLayer.name])));
+            localStorage.setItem(cacheLayer.name, JSON.stringify(layer));
         }
         this.cachedLayers.next(this.cachedLayers.getValue().concat([cacheLayer]));
-        this.instanceHook(cacheLayer);
+        this.createLayerHook(cacheLayer);
         return cacheLayer;
     };
     /**
@@ -106,11 +115,15 @@ var CacheService = (function () {
         return (JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME)));
     };
     /**
-     * @param {?} settings
+     * @template T
+     * @param {?} cacheLayer
      * @return {?}
      */
-    CacheService.prototype.instanceHook = function (settings) {
-        this.onExpire(settings.name);
+    CacheService.prototype.protectLayerFromInvaders = function (cacheLayer) {
+        cacheLayer.items.constructor.prototype.unsubsribeFromLayer = cacheLayer.items.constructor.prototype.unsubscribe;
+        cacheLayer.items.constructor.prototype.unsubscribe = function () {
+            console.error(FRIENDLY_ERROR_MESSAGES.TRY_TO_UNSUBSCRIBE + cacheLayer.name);
+        };
     };
     /**
      * @param {?} name
