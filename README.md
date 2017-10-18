@@ -373,26 +373,27 @@ function getUserById(id: number) {
 
 <br>
 
-### Cache Layer methods
+### Cache Layer Instance methods
+
+```typescript
+const cache = CacheService.getLayer<any>('layer-name');
+```
 
 ##### Put item to cache
 
 ```typescript
-const cache = CacheService.getLayer<any>('layer-name');
 cache.putItem({key:'example-key', data:{exampleData:''}});
 ```
 
 ##### Get item from cache
 
 ```typescript
-const cache = CacheService.getLayer<any>('layer-name');
 cache.getItem('example-key');
 ```
 
 ##### Remove item from cache
 
 ```typescript
-const cache = CacheService.getLayer<any>('layer-name');
 cache.removeItem('example-key');
 ```
 
