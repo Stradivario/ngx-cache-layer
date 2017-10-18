@@ -49,7 +49,7 @@ export class AppModule { }
 
 ```typescript
 import {Component, OnInit} from '@angular/core';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, Subscription} from 'rxjs';
 import {CacheService, CacheLayer, CacheLayerItem} from 'ngx-cache-layer';
 
 export interface Item {
@@ -67,7 +67,7 @@ export class ExampleComponent implements OnInit {
 
     exampleLayer: CacheLayer<CacheLayerItem<Item>>;
     exampleLayerItems: BehaviorSubject<CacheLayerItem<Item>[]>;
-
+	subscription: Subscription;
 	constructor(
 		private cacheService: CacheService
 	) {}
@@ -81,7 +81,20 @@ export class ExampleComponent implements OnInit {
 		// inside this.exampleCache you can find object named items returns BehaviorSubject<CacheLayerItem<Item>[]> object type
 		this.exampleLayerItems = this.exampleLayer.items
 
-		// !!!IMPORTANT!!! Take a look at the notes above for better understanding why we subscribe only once to collection !!!IMPORTANT!!!
+
+	    // Correct implementation of subscribing to collection of layer items and work inside component with it:
+	    // Recommended way to work with cacheLayer collection items is to create another observable asObservable and use items this way
+	    // Anyway it is better to let angular view model to handle subscription itself ( cartItems | async)
+	    // To work with collection this way you can use collection Instance returned from getLayer above (this.cacheLayer) (Examples Below)
+
+	    this.subscription = this.exampleLayerItems.asObservable()
+	      .subscribe(items => {
+
+	      });
+
+	    // If you try to unsubscribe from this.cacheItems when you leave component state ngOnDestroy(),
+	    // you will loose observable stream from the cache layer and the result will be error ***Check NOTES below***
+		// Another method is to take values single time only per component initialization
 		this.exampleLayerItems
 		  .take(1)
 		  .subscribe(itemCollection => itemCollection
