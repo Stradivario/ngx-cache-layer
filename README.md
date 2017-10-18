@@ -378,11 +378,17 @@ cache.removeItem('example-key');
     this.cacheLayer = this.cache.getLayer<Product>(CART_CACHE_LAYER_NAME);
     this.cartItems = this.cacheLayer.items;
 
-    // CORRECT EXAMPLE
-    this.cartItems.take(1).subscribe(collection => {
-        // Do something with collection here and initialize only once inside component
-    });
 
+	// CORRECT EXAMPLE
+	this.subscription = this.cartItems.asObservable()
+	  .subscribe(items => {
+
+	  });
+
+	// ANOTHER CORRECT EXAMPLE (this method will subscribe only once and you cannot get new results if there are any new)
+	this.cartItems.take(1).subscribe(collection => {
+	  // Do something with collection here and initialize only once inside component
+	});
     // WRONG EXAMPLE
     this.cartItems.subscribe(collection => {
     // don't do anything with collection this way or you will lead subscribing many times to the same collection
