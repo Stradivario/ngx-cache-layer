@@ -1,29 +1,30 @@
-import { Injectable, Inject } from '@angular/core';
+import { Inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 import { CacheLayer } from './ngx-cache-layer.layer';
 import { CacheServiceConfigInterface } from './ngx-cache-layer.interfaces';
 import { CACHE_MODULE_CONFIG, CACHE_MODULE_DI_CONFIG } from './index';
-var /** @type {?} */ INTERNAL_PROCEDURE_CACHE_NAME = 'cache_layers';
-var /** @type {?} */ FRIENDLY_ERROR_MESSAGES = {
+const /** @type {?} */ INTERNAL_PROCEDURE_CACHE_NAME = 'cache_layers';
+const /** @type {?} */ FRIENDLY_ERROR_MESSAGES = {
     TRY_TO_UNSUBSCRIBE: 'Someone try to unsubscribe from collection directly... agghhh.. read docs! Blame: ',
     LOCAL_STORAGE_DISABLED: 'LocalStorage is disabled switching to regular in-memory storage.Please relate issue if you think it is enabled and there is a problem with the library itself.'
 };
-var CacheService = (function () {
+export class CacheService extends Map {
     /**
      * @param {?} config
      */
-    function CacheService(config) {
-        var _this = this;
+    constructor(config) {
+        super();
         this.config = config;
-        this.cachedLayers = new BehaviorSubject([]);
+        this._cachedLayers = new BehaviorSubject([]);
         if (this.config.localStorage && CacheService.isLocalStorageUsable()) {
-            var layers = JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
+            const layers = JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
             if (layers) {
-                layers.forEach(function (layer) {
-                    var cachedLayer = JSON.parse(localStorage.getItem(layer));
+                layers.forEach(layer => {
+                    const cachedLayer = JSON.parse(localStorage.getItem(layer));
                     if (cachedLayer) {
-                        _this.cachedLayers.next(_this.cachedLayers.getValue().concat([CacheService.createCacheInstance(cachedLayer)]));
+                        this.LayerHook(cachedLayer);
+                        this.set(cachedLayer.name, CacheService.createCacheInstance(cachedLayer));
                     }
                 });
             }
@@ -33,18 +34,31 @@ var CacheService = (function () {
         }
     }
     /**
-     * @template T
+     * @return {?}
+     */
+    get asObservable() {
+        return this._cachedLayers;
+    }
+    /**
      * @param {?} name
      * @return {?}
      */
-    CacheService.createCacheInstance = function (name) {
-        return new CacheLayer(name);
-    };
+    get(name) {
+        return super.get(name);
+    }
+    /**
+     * @template T
+     * @param {?} cacheLayer
+     * @return {?}
+     */
+    static createCacheInstance(cacheLayer) {
+        return new CacheLayer(cacheLayer);
+    }
     /**
      * @return {?}
      */
-    CacheService.isLocalStorageUsable = function () {
-        var /** @type {?} */ error = [];
+    static isLocalStorageUsable() {
+        let /** @type {?} */ error = [];
         try {
             localStorage.setItem('test-key', JSON.stringify({ key: 'test-object' }));
             localStorage.removeItem('test-key');
@@ -54,111 +68,105 @@ var CacheService = (function () {
             console.log(FRIENDLY_ERROR_MESSAGES.LOCAL_STORAGE_DISABLED);
         }
         return error.length ? false : true;
-    };
-    /**
-     * @template T
-     * @param {?} layerInstance
-     * @return {?}
-     */
-    CacheService.prototype.createLayerHook = function (layerInstance) {
-        this.protectLayerFromInvaders(layerInstance);
-        this.onExpire(layerInstance.name);
-    };
+    }
     /**
      * @template T
      * @param {?} name
      * @return {?}
      */
-    CacheService.prototype.getLayer = function (name) {
-        var /** @type {?} */ result = this.cachedLayers.getValue().filter(function (layer) { return layer.name === name; });
-        if (!result.length) {
-            result = [this.createLayer({ name: name })];
+    getLayer(name) {
+        const /** @type {?} */ exists = this.has(name);
+        if (!exists) {
+            return this.createLayer({ name: name });
         }
-        return result[0];
-    };
+        return this.get(name);
+    }
     /**
      * @template T
      * @param {?} layer
      * @return {?}
      */
-    CacheService.prototype.createLayer = function (layer) {
-        var /** @type {?} */ exists = this.cachedLayers.getValue().filter(function (result) { return result.name === layer.name; });
-        if (exists.length) {
-            return exists[0];
+    createLayer(layer) {
+        const /** @type {?} */ exists = this.has(layer.name);
+        if (exists) {
+            return this.get(layer.name);
         }
         layer.items = layer.items || [];
         layer.config = layer.config || this.config || CACHE_MODULE_DI_CONFIG;
-        var /** @type {?} */ cacheLayer = CacheService.createCacheInstance(layer);
+        let /** @type {?} */ cacheLayer = CacheService.createCacheInstance(layer);
         if (layer.config.localStorage && CacheService.isLocalStorageUsable()) {
-            localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getLayersFromLS().concat([cacheLayer.name])));
+            localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify([...CacheService.getLayersFromLS(), cacheLayer.name]));
             localStorage.setItem(cacheLayer.name, JSON.stringify(layer));
         }
-        this.cachedLayers.next(this.cachedLayers.getValue().concat([cacheLayer]));
-        this.createLayerHook(cacheLayer);
+        this.set(cacheLayer.name, cacheLayer);
+        this.LayerHook(cacheLayer);
         return cacheLayer;
-    };
+    }
     /**
-     * @param {?} name
+     * @template T
+     * @param {?} layerInstance
      * @return {?}
      */
-    CacheService.prototype.removeLayer = function (name) {
-        if (this.config.localStorage) {
-            localStorage.removeItem(name);
-            localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getLayersFromLS().filter(function (layer) { return layer !== name; })));
-        }
-        this.cachedLayers.next(this.cachedLayers.getValue().filter(function (result) { return result.name !== name; }));
-    };
-    /**
-     * @return {?}
-     */
-    CacheService.getLayersFromLS = function () {
-        return (JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME)));
-    };
+    LayerHook(layerInstance) {
+        this.protectLayerFromInvaders(layerInstance);
+        this.OnExpire(layerInstance);
+    }
     /**
      * @template T
      * @param {?} cacheLayer
      * @return {?}
      */
-    CacheService.prototype.protectLayerFromInvaders = function (cacheLayer) {
+    protectLayerFromInvaders(cacheLayer) {
         cacheLayer.items.constructor.prototype.unsubsribeFromLayer = cacheLayer.items.constructor.prototype.unsubscribe;
-        cacheLayer.items.constructor.prototype.unsubscribe = function () {
+        cacheLayer.items.constructor.prototype.unsubscribe = () => {
             console.error(FRIENDLY_ERROR_MESSAGES.TRY_TO_UNSUBSCRIBE + cacheLayer.name);
         };
-    };
+    }
     /**
-     * @param {?} name
+     * @template T
+     * @param {?} layerInstance
      * @return {?}
      */
-    CacheService.prototype.onExpire = function (name) {
-        var _this = this;
+    OnExpire(layerInstance) {
         Observable
-            .create(function (observer) { return observer.next(); })
-            .timeoutWith(this.config.cacheFlushInterval, Observable.of(1))
+            .create(observer => observer.next())
+            .timeoutWith(layerInstance.config.cacheFlushInterval, Observable.of(1))
             .skip(1)
-            .subscribe(function (observer) { return _this.removeLayer(name); });
-    };
-    return CacheService;
-}());
-export { CacheService };
-CacheService.decorators = [
-    { type: Injectable },
-];
+            .subscribe(observer => this.removeLayer(layerInstance));
+    }
+    /**
+     * @template T
+     * @param {?} layerInstance
+     * @return {?}
+     */
+    removeLayer(layerInstance) {
+        this.delete(layerInstance.name);
+        if (this.config.localStorage) {
+            localStorage.removeItem(layerInstance.name);
+            localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getLayersFromLS().filter(layer => layer !== layerInstance.name)));
+        }
+    }
+    /**
+     * @return {?}
+     */
+    static getLayersFromLS() {
+        return JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
+    }
+}
 /**
  * @nocollapse
  */
-CacheService.ctorParameters = function () { return [
+CacheService.ctorParameters = () => [
     { type: CacheServiceConfigInterface, decorators: [{ type: Inject, args: [CACHE_MODULE_CONFIG,] },] },
-]; };
+];
 function CacheService_tsickle_Closure_declarations() {
-    /** @type {?} */
-    CacheService.decorators;
     /**
      * @nocollapse
      * @type {?}
      */
     CacheService.ctorParameters;
     /** @type {?} */
-    CacheService.prototype.cachedLayers;
+    CacheService.prototype._cachedLayers;
     /** @type {?} */
     CacheService.prototype.config;
 }

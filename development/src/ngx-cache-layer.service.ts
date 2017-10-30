@@ -14,13 +14,39 @@ const FRIENDLY_ERROR_MESSAGES = {
   LOCAL_STORAGE_DISABLED: 'LocalStorage is disabled switching to regular in-memory storage.Please relate issue if you think it is enabled and there is a problem with the library itself.'
 };
 
-@Injectable()
-export class CacheService {
 
-  public cachedLayers: BehaviorSubject<CacheLayer<CacheLayerItem<any>>[]> = new BehaviorSubject([]);
+export class CacheService extends Map {
 
-  private static createCacheInstance<T>(name): CacheLayer<CacheLayerItem<T>> {
-    return new CacheLayer<CacheLayerItem<T>>(name);
+  public _cachedLayers: BehaviorSubject<CacheLayer<CacheLayerItem<any>>[]> = new BehaviorSubject([]);
+
+  // --- Start Setters and Getters
+  get asObservable() {
+    return this._cachedLayers;
+  }
+  // --- END Setters and Getters
+  get(name) {
+    return super.get(name)
+  }
+  constructor(@Inject( CACHE_MODULE_CONFIG ) private config: CacheServiceConfigInterface) {
+    super()
+    if (this.config.localStorage && CacheService.isLocalStorageUsable()) {
+      const layers = <Array<string>>JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
+      if (layers) {
+        layers.forEach(layer => {
+            const cachedLayer = JSON.parse(localStorage.getItem(layer));
+            if (cachedLayer) {
+              this.LayerHook(cachedLayer);
+              this.set(cachedLayer.name, CacheService.createCacheInstance(cachedLayer))
+            }
+        });
+      } else {
+        localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify([]));
+      }
+    }
+  }
+
+  public static createCacheInstance<T>(cacheLayer): CacheLayer<CacheLayerItem<T>> {
+    return new CacheLayer<CacheLayerItem<T>>(cacheLayer);
   }
 
   public static isLocalStorageUsable(): boolean {
@@ -35,39 +61,18 @@ export class CacheService {
     return error.length ? false : true;
   }
 
-  constructor(@Inject( CACHE_MODULE_CONFIG ) private config: CacheServiceConfigInterface) {
-    if (this.config.localStorage && CacheService.isLocalStorageUsable()) {
-      const layers = <Array<string>>JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
-      if (layers) {
-        layers.forEach(layer => {
-            const cachedLayer = JSON.parse(localStorage.getItem(layer));
-            if (cachedLayer) {
-              this.cachedLayers.next([...this.cachedLayers.getValue(), CacheService.createCacheInstance(cachedLayer)]);
-            }
-        });
-      } else {
-        localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify([]));
-      }
-    }
-  }
-
-  private createLayerHook<T>(layerInstance: CacheLayer<CacheLayerItem<T>>): void {
-    this.protectLayerFromInvaders<T>(layerInstance);
-    this.onExpire(layerInstance.name);
-  }
-
   public getLayer<T>(name: string): CacheLayer<CacheLayerItem<T>> {
-    let result = this.cachedLayers.getValue().filter(layer => layer.name === name);
-    if (!result.length) {
-      result = [this.createLayer({name: name})]
+    const exists = this.has(name);
+    if (!exists) {
+      return this.createLayer<T>({name:name});
     }
-    return result[0];
+    return this.get(name);
   }
 
   public createLayer<T>(layer: CacheLayerInterface): CacheLayer<CacheLayerItem<T>> {
-    const exists = this.cachedLayers.getValue().filter(result => result.name === layer.name);
-    if (exists.length) {
-      return exists[0];
+    const exists = this.has(layer.name);
+    if (exists) {
+      return this.get(layer.name);
     }
     layer.items = layer.items || [];
     layer.config = layer.config || this.config || CACHE_MODULE_DI_CONFIG;
@@ -76,21 +81,14 @@ export class CacheService {
         localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify([...CacheService.getLayersFromLS(), cacheLayer.name]));
         localStorage.setItem(cacheLayer.name, JSON.stringify(layer));
     }
-    this.cachedLayers.next([...this.cachedLayers.getValue(), cacheLayer]);
-    this.createLayerHook<T>(cacheLayer);
+    this.set(cacheLayer.name, cacheLayer);
+    this.LayerHook<T>(cacheLayer);
     return cacheLayer;
   }
 
-  public removeLayer(name: string): void {
-    if (this.config.localStorage) {
-      localStorage.removeItem(name);
-      localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getLayersFromLS().filter(layer => layer !== name)));
-    }
-    this.cachedLayers.next(this.cachedLayers.getValue().filter(result => result.name !== name));
-  }
-
-  public static getLayersFromLS(): Array<string> {
-    return <Array<string>>JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
+  private LayerHook<T>(layerInstance: CacheLayer<CacheLayerItem<T>>): void {
+    this.protectLayerFromInvaders<T>(layerInstance);
+    this.OnExpire(layerInstance);
   }
 
   private protectLayerFromInvaders<T>(cacheLayer: CacheLayer<CacheLayerItem<T>>): void {
@@ -100,12 +98,24 @@ export class CacheService {
     };
   }
 
-  private onExpire(name: string): void {
+  private OnExpire<T>(layerInstance: CacheLayer<CacheLayerItem<T>>): void {
     Observable
       .create(observer => observer.next())
-      .timeoutWith(this.config.cacheFlushInterval, Observable.of(1))
+      .timeoutWith(layerInstance.config.cacheFlushInterval, Observable.of(1))
       .skip(1)
-      .subscribe(observer => this.removeLayer(name));
+      .subscribe(observer => this.removeLayer(layerInstance));
+  }
+
+  public removeLayer<T>(layerInstance: CacheLayer<CacheLayerItem<T>>): void {
+    this.delete(layerInstance.name);
+    if (this.config.localStorage) {
+      localStorage.removeItem(layerInstance.name);
+      localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getLayersFromLS().filter(layer => layer !== layerInstance.name)));
+    }
+  }
+
+  public static getLayersFromLS(): Array<string> {
+    return JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
   }
 
 }

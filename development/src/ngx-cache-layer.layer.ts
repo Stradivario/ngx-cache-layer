@@ -2,7 +2,7 @@ import {CacheLayerInterface, CacheServiceConfigInterface} from './ngx-cache-laye
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {Observable} from 'rxjs/Rx';
 
-export class CacheLayer<T> {
+export class CacheLayer<T> extends Map {
 
   public items: BehaviorSubject<Array<T>> = new BehaviorSubject([]);
   public name: string;
@@ -21,6 +21,7 @@ export class CacheLayer<T> {
   }
 
   constructor(layer: CacheLayerInterface) {
+    super();
     this.name = layer.name;
     this.config = layer.config;
     if (this.config.localStorage) {
@@ -85,3 +86,6 @@ export class CacheLayer<T> {
   }
 
 }
+
+
+// console.log(Array.from(this.keys()))

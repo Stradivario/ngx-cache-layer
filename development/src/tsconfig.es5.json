@@ -2,7 +2,7 @@
   "compilerOptions": {
     "declaration": true,
     "module": "es2015",
-    "target": "es5",
+    "target": "es6",
     "baseUrl": ".",
     "stripInternal": true,
     "emitDecoratorMetadata": true,
@@ -12,6 +12,8 @@
     "rootDir": ".",
     "lib": [
       "es2015",
+      "es5",
+      "es6",
       "dom"
     ],
     "skipLibCheck": true,
