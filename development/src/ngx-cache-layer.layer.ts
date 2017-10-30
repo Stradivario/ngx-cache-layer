@@ -19,6 +19,7 @@ export class CacheLayer<T> extends Map {
         return // Todo
       }
   }
+
   set(key, data) {
     return super.set(key, data);
   }
@@ -51,7 +52,6 @@ export class CacheLayer<T> extends Map {
   }
 
   public getItem(key: string): T {
-    debugger
     if (this.has(key)) {
       return this.get(key);
     } else {
@@ -62,17 +62,15 @@ export class CacheLayer<T> extends Map {
   public putItem(layerItem: T): T {
     this.set(layerItem['key'], layerItem);
     const item = this.get(layerItem['key']);
-    const test = this.items.getValue();
     const filteredItems = this.items.getValue().filter(item => item['key'] !== item['key']);
-    const collection = [...filteredItems, item];
     if (this.config.localStorage) {
       localStorage.setItem(this.name, JSON.stringify(<CacheLayerInterface>{
         config: this.config,
         name: this.name,
-        items: collection
+        items: [...filteredItems, item]
       }));
     }
-    this.items.next(collection);
+    this.items.next([...filteredItems, item]);
     this.putItemHook(layerItem);
     return layerItem;
   }
