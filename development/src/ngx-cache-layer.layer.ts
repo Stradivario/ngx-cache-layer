@@ -19,12 +19,20 @@ export class CacheLayer<T> extends Map {
         return // Todo
       }
   }
+  set(key, data) {
+    return super.set(key, data);
+  }
+
+  get(name) {
+    return super.get(name)
+  }
 
   constructor(layer: CacheLayerInterface) {
     super();
     this.name = layer.name;
     this.config = layer.config;
     if (this.config.localStorage) {
+      layer.items.forEach(item => this.set(item['key'], item));
       this.items.next([...this.items.getValue(), ...layer.items]);
     }
     this.initHook(layer);
@@ -43,23 +51,28 @@ export class CacheLayer<T> extends Map {
   }
 
   public getItem(key: string): T {
-    let item = this.items.getValue().filter(item => item['key'] === key);
-    if (!item.length) {
-      return null;
+    debugger
+    if (this.has(key)) {
+      return this.get(key);
     } else {
-      return item[0];
+      return null;
     }
   }
 
   public putItem(layerItem: T): T {
+    this.set(layerItem['key'], layerItem);
+    const item = this.get(layerItem['key']);
+    const test = this.items.getValue();
+    const filteredItems = this.items.getValue().filter(item => item['key'] !== item['key']);
+    const collection = [...filteredItems, item];
     if (this.config.localStorage) {
       localStorage.setItem(this.name, JSON.stringify(<CacheLayerInterface>{
         config: this.config,
         name: this.name,
-        items: [...this.items.getValue(), layerItem]
+        items: collection
       }));
     }
-    this.items.next([...this.items.getValue(), layerItem]);
+    this.items.next(collection);
     this.putItemHook(layerItem);
     return layerItem;
   }

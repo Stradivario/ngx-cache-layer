@@ -5,6 +5,8 @@ export declare class CacheLayer<T> extends Map {
     name: string;
     config: CacheServiceConfigInterface;
     static createCacheParams(config: any): void;
+    set(key: any, data: any): this;
+    get(name: any): any;
     constructor(layer: CacheLayerInterface);
     private initHook(layer);
     private onExpireAll(layer);

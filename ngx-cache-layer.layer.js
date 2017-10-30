@@ -10,6 +10,7 @@ export class CacheLayer extends Map {
         this.name = layer.name;
         this.config = layer.config;
         if (this.config.localStorage) {
+            layer.items.forEach(item => this.set(item['key'], item));
             this.items.next([...this.items.getValue(), ...layer.items]);
         }
         this.initHook(layer);
@@ -31,6 +32,21 @@ export class CacheLayer extends Map {
         else if (config.params.constructor === Array) {
             return; // Todo
         }
+    }
+    /**
+     * @param {?} key
+     * @param {?} data
+     * @return {?}
+     */
+    set(key, data) {
+        return super.set(key, data);
+    }
+    /**
+     * @param {?} name
+     * @return {?}
+     */
+    get(name) {
+        return super.get(name);
     }
     /**
      * @param {?} layer
@@ -58,12 +74,12 @@ export class CacheLayer extends Map {
      * @return {?}
      */
     getItem(key) {
-        let /** @type {?} */ item = this.items.getValue().filter(item => item['key'] === key);
-        if (!item.length) {
-            return null;
+        debugger;
+        if (this.has(key)) {
+            return this.get(key);
         }
         else {
-            return item[0];
+            return null;
         }
     }
     /**
@@ -71,14 +87,19 @@ export class CacheLayer extends Map {
      * @return {?}
      */
     putItem(layerItem) {
+        this.set(layerItem['key'], layerItem);
+        const /** @type {?} */ item = this.get(layerItem['key']);
+        const /** @type {?} */ test = this.items.getValue();
+        const /** @type {?} */ filteredItems = this.items.getValue().filter(item => item['key'] !== item['key']);
+        const /** @type {?} */ collection = [...filteredItems, item];
         if (this.config.localStorage) {
             localStorage.setItem(this.name, JSON.stringify(/** @type {?} */ ({
                 config: this.config,
                 name: this.name,
-                items: [...this.items.getValue(), layerItem]
+                items: collection
             })));
         }
-        this.items.next([...this.items.getValue(), layerItem]);
+        this.items.next(collection);
         this.putItemHook(layerItem);
         return layerItem;
     }
