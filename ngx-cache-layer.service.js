@@ -23,8 +23,7 @@ export class CacheService extends Map {
                 layers.forEach(layer => {
                     const cachedLayer = JSON.parse(localStorage.getItem(layer));
                     if (cachedLayer) {
-                        this.LayerHook(cachedLayer);
-                        this.set(cachedLayer.name, CacheService.createCacheInstance(cachedLayer));
+                        this.createLayer(cachedLayer);
                     }
                 });
             }
@@ -95,10 +94,11 @@ export class CacheService extends Map {
         layer.config = layer.config || this.config || CACHE_MODULE_DI_CONFIG;
         let /** @type {?} */ cacheLayer = CacheService.createCacheInstance(layer);
         if (layer.config.localStorage && CacheService.isLocalStorageUsable()) {
-            localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify([...CacheService.getLayersFromLS(), cacheLayer.name]));
+            localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify([...CacheService.getLayersFromLS().filter(l => l !== cacheLayer.name), cacheLayer.name]));
             localStorage.setItem(cacheLayer.name, JSON.stringify(layer));
         }
         this.set(cacheLayer.name, cacheLayer);
+        this._cachedLayers.next([...this._cachedLayers.getValue(), cacheLayer]);
         this.LayerHook(cacheLayer);
         return cacheLayer;
     }
@@ -121,6 +121,9 @@ export class CacheService extends Map {
         cacheLayer.items.constructor.prototype.unsubscribe = () => {
             console.error(FRIENDLY_ERROR_MESSAGES.TRY_TO_UNSUBSCRIBE + cacheLayer.name);
         };
+        // cacheLayer.items.constructor.prototype.subscribe = () => {
+        //   return cacheLayer.items.getValue();
+        // }
     }
     /**
      * @template T
@@ -145,6 +148,7 @@ export class CacheService extends Map {
             localStorage.removeItem(layerInstance.name);
             localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getLayersFromLS().filter(layer => layer !== layerInstance.name)));
         }
+        this._cachedLayers.next([...this._cachedLayers.getValue().filter(layer => layer.name !== layerInstance.name)]);
     }
     /**
      * @return {?}

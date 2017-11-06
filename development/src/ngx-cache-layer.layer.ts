@@ -20,6 +20,10 @@ export class CacheLayer<T> extends Map {
       }
   }
 
+  asBehaviorSubject() {
+    return new BehaviorSubject(this.items.getValue());
+  }
+
   set(key, data) {
     return super.set(key, data);
   }
@@ -34,6 +38,9 @@ export class CacheLayer<T> extends Map {
     this.config = layer.config;
     if (this.config.localStorage) {
       layer.items.forEach(item => this.set(item['key'], item));
+      if(layer.items.constructor === BehaviorSubject) {
+        layer.items = layer.items.getValue() || [];
+      }
       this.items.next([...this.items.getValue(), ...layer.items]);
     }
     this.initHook(layer);
@@ -93,6 +100,7 @@ export class CacheLayer<T> extends Map {
       };
       localStorage.setItem(this.name, JSON.stringify(newLayer));
     }
+    this.delete(key);
     this.items.next(newLayerItems);
   }
 
