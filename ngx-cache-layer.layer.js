@@ -95,9 +95,11 @@ export class CacheLayer extends Map {
      * @return {?}
      */
     putItem(layerItem) {
+        debugger;
+        ;
         this.set(layerItem['key'], layerItem);
         const /** @type {?} */ item = this.get(layerItem['key']);
-        const /** @type {?} */ filteredItems = this.items.getValue().filter(item => item['key'] !== item['key']);
+        const /** @type {?} */ filteredItems = this.items.getValue().filter(item => item['key'] !== layerItem['key']);
         if (this.config.localStorage) {
             localStorage.setItem(this.name, JSON.stringify(/** @type {?} */ ({
                 config: this.config,
