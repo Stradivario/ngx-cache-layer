@@ -67,7 +67,6 @@ export class CacheLayer<T> extends Map {
   }
 
   public putItem(layerItem: T): T {
-    debugger;;
     this.set(layerItem['key'], layerItem);
     const item = this.get(layerItem['key']);
     const filteredItems = this.items.getValue().filter(item => item['key'] !== layerItem['key']);
