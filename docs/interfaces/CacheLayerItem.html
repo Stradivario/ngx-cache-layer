@@ -410,7 +410,7 @@
 }
 
 export class CacheServiceConfigInterface {
-  deleteOnExpire &#x3D; &#x27;aggressive&#x27;;
+  deleteOnExpire?: string &#x3D; &#x27;aggressive&#x27;;
   cacheFlushInterval: number &#x3D; 60 * 60 * 1000;
   maxAge: number &#x3D; 15 * 60 * 1000;
   localStorage: boolean;
@@ -420,7 +420,6 @@ export interface CacheLayerInterface {
   name: string;
   config?: CacheServiceConfigInterface;
   items?: any;
-  customConfigSet?: boolean;
 }
 </code></pre>
     </div>
