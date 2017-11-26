@@ -19,11 +19,6 @@ export class CacheService extends Map {
 
   public _cachedLayers: BehaviorSubject<CacheLayer<CacheLayerItem<any>>[]> = new BehaviorSubject([]);
 
-  // --- Start Setters and Getters
-  get asObservable() {
-    return this._cachedLayers;
-  }
-  // --- END Setters and Getters
   get(name) {
     return super.get(name)
   }
@@ -96,9 +91,6 @@ export class CacheService extends Map {
     cacheLayer.items.constructor.prototype.unsubscribe = () => {
       console.error(FRIENDLY_ERROR_MESSAGES.TRY_TO_UNSUBSCRIBE + cacheLayer.name)
     };
-    // cacheLayer.items.constructor.prototype.subscribe = () => {
-    //   return cacheLayer.items.getValue();
-    // }
   }
 
   private OnExpire<T>(layerInstance: CacheLayer<CacheLayerItem<T>>): void {
@@ -117,7 +109,16 @@ export class CacheService extends Map {
     }
     this._cachedLayers.next([...this._cachedLayers.getValue().filter(layer => layer.name !== layerInstance.name)]);
   }
-
+  public transferItems(name: string, newCacheLayers: CacheLayerInterface[]): CacheLayer<CacheLayerItem<any>>[] {
+    const oldLayer = this.getLayer(name);
+    const newLayers = [];
+    newCacheLayers.forEach(layerName => {
+      const newLayer = this.createLayer(layerName);
+      oldLayer.items.getValue().forEach(item => newLayer.putItem(item));
+      newLayers.push(newLayer);
+    })
+    return newLayers;
+  }
   public static getLayersFromLS(): Array<string> {
     return JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
   }

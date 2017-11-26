@@ -3,7 +3,7 @@ export interface CacheLayerItem<T> {
     data: T;
 }
 export declare class CacheServiceConfigInterface {
-    deleteOnExpire: string;
+    deleteOnExpire?: string;
     cacheFlushInterval: number;
     maxAge: number;
     localStorage: boolean;
@@ -12,5 +12,4 @@ export interface CacheLayerInterface {
     name: string;
     config?: CacheServiceConfigInterface;
     items?: any;
-    customConfigSet?: boolean;
 }

@@ -1,9 +1,10 @@
 {
   "name": "ngx-cache-layer",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "scripts": {
     "build": "gulp build",
     "build:watch": "gulp",
+    "prepublish": "npm run build",
     "docs": "npm run docs:build",
     "docs:build": "compodoc -p tsconfig.json -n ngx-cache-layer -d ../docs --hideGenerator",
     "docs:serve": "npm run docs:build -- -s",

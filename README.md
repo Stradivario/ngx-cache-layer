@@ -2,7 +2,7 @@
 
 ![Build Status](http://gitlab.youvolio.com/open-source/ngx-cache-layer/badges/branch/build.svg)
 
-#### @StrongTyped @EasyAPI Created on Angular@5.0.0-rc.2 and tested on @Angular4+
+#### @StrongTyped @EasyAPI Created on Angular@5.0.0
 #### @Cache layer with capability to write in LocalStorage
 
 ##### More detailed documentation you can find [here](https://stradivario.github.io/ngx-cache-layer/)

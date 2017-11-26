@@ -37,12 +37,6 @@ export class CacheLayer extends Map {
         }
     }
     /**
-     * @return {?}
-     */
-    asBehaviorSubject() {
-        return new BehaviorSubject(this.items.getValue());
-    }
-    /**
      * @param {?} key
      * @param {?} data
      * @return {?}
@@ -136,6 +130,13 @@ export class CacheLayer extends Map {
         }
         this.delete(key);
         this.items.next(newLayerItems);
+    }
+    /**
+     * @param {?} key
+     * @return {?}
+     */
+    getItemObservable(key) {
+        return this.items.asObservable().map(res => this.has(key) ? this.items.getValue().filter(item => item['key'] === key)[0]['data'] : null);
     }
 }
 function CacheLayer_tsickle_Closure_declarations() {

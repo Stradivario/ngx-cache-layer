@@ -33,12 +33,6 @@ export class CacheService extends Map {
         }
     }
     /**
-     * @return {?}
-     */
-    get asObservable() {
-        return this._cachedLayers;
-    }
-    /**
      * @param {?} name
      * @return {?}
      */
@@ -121,9 +115,6 @@ export class CacheService extends Map {
         cacheLayer.items.constructor.prototype.unsubscribe = () => {
             console.error(FRIENDLY_ERROR_MESSAGES.TRY_TO_UNSUBSCRIBE + cacheLayer.name);
         };
-        // cacheLayer.items.constructor.prototype.subscribe = () => {
-        //   return cacheLayer.items.getValue();
-        // }
     }
     /**
      * @template T
@@ -149,6 +140,21 @@ export class CacheService extends Map {
             localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getLayersFromLS().filter(layer => layer !== layerInstance.name)));
         }
         this._cachedLayers.next([...this._cachedLayers.getValue().filter(layer => layer.name !== layerInstance.name)]);
+    }
+    /**
+     * @param {?} name
+     * @param {?} newCacheLayers
+     * @return {?}
+     */
+    transferItems(name, newCacheLayers) {
+        const /** @type {?} */ oldLayer = this.getLayer(name);
+        const /** @type {?} */ newLayers = [];
+        newCacheLayers.forEach(layerName => {
+            const /** @type {?} */ newLayer = this.createLayer(layerName);
+            oldLayer.items.getValue().forEach(item => newLayer.putItem(item));
+            newLayers.push(newLayer);
+        });
+        return newLayers;
     }
     /**
      * @return {?}

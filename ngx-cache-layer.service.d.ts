@@ -4,7 +4,6 @@ import { CacheLayerInterface, CacheServiceConfigInterface, CacheLayerItem } from
 export declare class CacheService extends Map {
     private config;
     _cachedLayers: BehaviorSubject<CacheLayer<CacheLayerItem<any>>[]>;
-    readonly asObservable: BehaviorSubject<CacheLayer<CacheLayerItem<any>>[]>;
     get(name: any): any;
     constructor(config: CacheServiceConfigInterface);
     static createCacheInstance<T>(cacheLayer: any): CacheLayer<CacheLayerItem<T>>;
@@ -15,5 +14,6 @@ export declare class CacheService extends Map {
     private protectLayerFromInvaders<T>(cacheLayer);
     private OnExpire<T>(layerInstance);
     removeLayer<T>(layerInstance: CacheLayer<CacheLayerItem<T>>): void;
+    transferItems(name: string, newCacheLayers: CacheLayerInterface[]): CacheLayer<CacheLayerItem<any>>[];
     static getLayersFromLS(): Array<string>;
 }

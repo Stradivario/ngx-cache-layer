@@ -1,6 +1,7 @@
 import {CacheLayerInterface, CacheServiceConfigInterface} from './ngx-cache-layer.interfaces';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {Observable} from 'rxjs/Rx';
+import { Subscription } from 'rxjs/Subscription';
 
 export class CacheLayer<T> extends Map {
 
@@ -18,10 +19,6 @@ export class CacheLayer<T> extends Map {
       } else if (config.params.constructor === Array) {
         return // Todo
       }
-  }
-
-  asBehaviorSubject() {
-    return new BehaviorSubject(this.items.getValue());
   }
 
   set(key, data) {
@@ -105,7 +102,10 @@ export class CacheLayer<T> extends Map {
     this.items.next(newLayerItems);
   }
 
-}
+  getItemObservable(key: string): Observable<T> {
+    return this.items.asObservable().map(res => this.has(key) ? this.items.getValue().filter(item => item['key'] === key)[0]['data']: null);
+  }
 
+}
 
 // console.log(Array.from(this.keys()))
