@@ -9,6 +9,9 @@
 
 ##### For questions/issues you can write ticket [here](http://gitlab.youvolio.com/open-source/ngx-cache-layer/issues)
 
+##### Animation explanation:
+![Alt Text](https://github.com/Stradivario/ngx-cache-layer/raw/master/docs/animation/index.gif)
+
 ## Installation and basic examples:
 ##### To install this library, run:
 
@@ -389,6 +392,12 @@ cache.putItem({key:'example-key', data:{exampleData:''}});
 
 ```typescript
 cache.getItem('example-key');
+```
+
+##### Get item from cache as observable it will emit every value changed for that specific key
+
+```typescript
+cache.getItemObservable('example-key');
 ```
 
 ##### Remove item from cache
