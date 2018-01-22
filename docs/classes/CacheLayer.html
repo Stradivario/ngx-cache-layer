@@ -1321,7 +1321,7 @@ export class CacheLayer&lt;T&gt; extends Map {
   }
 
   getItemObservable(key: string): Observable&lt;T&gt; {
-    return this.items.asObservable().map(res &#x3D;&gt; this.has(key) ? this.items.getValue().filter(item &#x3D;&gt; item[&#x27;key&#x27;] &#x3D;&#x3D;&#x3D; key)[0][&#x27;data&#x27;]: null);
+    return this.items.asObservable().map(res &#x3D;&gt; this.has(key) ? this.items.getValue().filter(item &#x3D;&gt; item[&#x27;key&#x27;] &#x3D;&#x3D;&#x3D; key)[0]: null);
   }
 
 }

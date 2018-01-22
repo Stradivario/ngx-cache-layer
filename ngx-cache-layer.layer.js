@@ -136,7 +136,7 @@ export class CacheLayer extends Map {
      * @return {?}
      */
     getItemObservable(key) {
-        return this.items.asObservable().map(res => this.has(key) ? this.items.getValue().filter(item => item['key'] === key)[0]['data'] : null);
+        return this.items.asObservable().map(res => this.has(key) ? this.items.getValue().filter(item => item['key'] === key)[0] : null);
     }
 }
 function CacheLayer_tsickle_Closure_declarations() {
