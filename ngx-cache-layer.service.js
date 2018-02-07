@@ -162,6 +162,17 @@ export class CacheService extends Map {
     static getLayersFromLS() {
         return JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
     }
+    /**
+     * @return {?}
+     */
+    flushCache() {
+        return this._cachedLayers.take(1)
+            .map(layers => {
+            layers.forEach(layer => this.removeLayer(layer));
+            localStorage.removeItem(INTERNAL_PROCEDURE_CACHE_NAME);
+            return true;
+        });
+    }
 }
 /**
  * @nocollapse

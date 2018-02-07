@@ -1,4 +1,5 @@
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable } from 'rxjs/Observable';
 import { CacheLayer } from './ngx-cache-layer.layer';
 import { CacheLayerInterface, CacheServiceConfigInterface, CacheLayerItem } from './ngx-cache-layer.interfaces';
 export declare class CacheService extends Map {
@@ -16,4 +17,5 @@ export declare class CacheService extends Map {
     removeLayer<T>(layerInstance: CacheLayer<CacheLayerItem<T>>): void;
     transferItems(name: string, newCacheLayers: CacheLayerInterface[]): CacheLayer<CacheLayerItem<any>>[];
     static getLayersFromLS(): Array<string>;
+    flushCache(): Observable<boolean>;
 }

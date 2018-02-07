@@ -1,11 +1,11 @@
-import {Injectable, Inject} from '@angular/core';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {Observable} from 'rxjs/Observable';
+import { Injectable, Inject } from '@angular/core';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable } from 'rxjs/Observable';
 
-import {CacheLayer} from './ngx-cache-layer.layer';
-import {CacheLayerInterface, CacheServiceConfigInterface, CacheLayerItem} from './ngx-cache-layer.interfaces';
+import { CacheLayer } from './ngx-cache-layer.layer';
+import { CacheLayerInterface, CacheServiceConfigInterface, CacheLayerItem } from './ngx-cache-layer.interfaces';
 
-import {CACHE_MODULE_CONFIG, CACHE_MODULE_DI_CONFIG} from './index';
+import { CACHE_MODULE_CONFIG, CACHE_MODULE_DI_CONFIG } from './index';
 
 const INTERNAL_PROCEDURE_CACHE_NAME = 'cache_layers';
 
@@ -22,16 +22,16 @@ export class CacheService extends Map {
   get(name) {
     return super.get(name)
   }
-  constructor(@Inject( CACHE_MODULE_CONFIG ) private config: CacheServiceConfigInterface) {
+  constructor( @Inject(CACHE_MODULE_CONFIG) private config: CacheServiceConfigInterface) {
     super()
     if (this.config.localStorage && CacheService.isLocalStorageUsable()) {
       const layers = <Array<string>>JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
       if (layers) {
         layers.forEach(layer => {
-            const cachedLayer = JSON.parse(localStorage.getItem(layer));
-            if (cachedLayer) {
-                this.createLayer(cachedLayer);
-            }
+          const cachedLayer = JSON.parse(localStorage.getItem(layer));
+          if (cachedLayer) {
+            this.createLayer(cachedLayer);
+          }
         });
       } else {
         localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify([]));
@@ -46,7 +46,7 @@ export class CacheService extends Map {
   public static isLocalStorageUsable(): boolean {
     let error = [];
     try {
-      localStorage.setItem('test-key', JSON.stringify({key: 'test-object'}));
+      localStorage.setItem('test-key', JSON.stringify({ key: 'test-object' }));
       localStorage.removeItem('test-key');
     } catch (e) {
       error.push(e);
@@ -58,7 +58,7 @@ export class CacheService extends Map {
   public getLayer<T>(name: string): CacheLayer<CacheLayerItem<T>> {
     const exists = this.has(name);
     if (!exists) {
-      return this.createLayer<T>({name:name});
+      return this.createLayer<T>({ name: name });
     }
     return this.get(name);
   }
@@ -72,8 +72,8 @@ export class CacheService extends Map {
     layer.config = layer.config || this.config || CACHE_MODULE_DI_CONFIG;
     let cacheLayer = CacheService.createCacheInstance<T>(layer);
     if (layer.config.localStorage && CacheService.isLocalStorageUsable()) {
-        localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify([...CacheService.getLayersFromLS().filter(l => l !== cacheLayer.name), cacheLayer.name]));
-        localStorage.setItem(cacheLayer.name, JSON.stringify(layer));
+      localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify([...CacheService.getLayersFromLS().filter(l => l !== cacheLayer.name), cacheLayer.name]));
+      localStorage.setItem(cacheLayer.name, JSON.stringify(layer));
     }
     this.set(cacheLayer.name, cacheLayer);
     this._cachedLayers.next([...this._cachedLayers.getValue(), cacheLayer]);
@@ -109,6 +109,7 @@ export class CacheService extends Map {
     }
     this._cachedLayers.next([...this._cachedLayers.getValue().filter(layer => layer.name !== layerInstance.name)]);
   }
+
   public transferItems(name: string, newCacheLayers: CacheLayerInterface[]): CacheLayer<CacheLayerItem<any>>[] {
     const oldLayer = this.getLayer(name);
     const newLayers = [];
@@ -119,8 +120,18 @@ export class CacheService extends Map {
     })
     return newLayers;
   }
+
   public static getLayersFromLS(): Array<string> {
     return JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
+  }
+
+  public flushCache(): Observable<boolean> {
+    return this._cachedLayers.take(1)
+      .map(layers => {
+        layers.forEach(layer => this.removeLayer(layer));
+        localStorage.removeItem(INTERNAL_PROCEDURE_CACHE_NAME);
+        return true;
+      })
   }
 
 }
