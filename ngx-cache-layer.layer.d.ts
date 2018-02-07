@@ -7,7 +7,7 @@ export declare class CacheLayer<T> extends Map {
     config: CacheServiceConfigInterface;
     static createCacheParams(config: any): void;
     set(key: any, data: any): this;
-    get(name: any): any;
+    get(name: any): T;
     constructor(layer: CacheLayerInterface);
     private initHook(layer);
     private onExpireAll(layer);

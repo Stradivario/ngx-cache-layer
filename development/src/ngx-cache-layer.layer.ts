@@ -21,11 +21,11 @@ export class CacheLayer<T> extends Map {
       }
   }
 
-  set(key, data) {
+  public set(key, data): this {
     return super.set(key, data);
   }
 
-  get(name) {
+  public get(name): T {
     return super.get(name)
   }
 
@@ -102,7 +102,7 @@ export class CacheLayer<T> extends Map {
     this.items.next(newLayerItems);
   }
 
-  getItemObservable(key: string): Observable<T> {
+  public getItemObservable(key: string): Observable<T> {
     return this.items.asObservable().filter(() => this.has(key)).map(res => res[0]);
   }
 
