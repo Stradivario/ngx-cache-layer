@@ -15,15 +15,12 @@ const FRIENDLY_ERROR_MESSAGES = {
 };
 
 
-export class CacheService extends Map {
+export class CacheService {
 
   public _cachedLayers: BehaviorSubject<CacheLayer<CacheLayerItem<any>>[]> = new BehaviorSubject([]);
+  private map: Map<any, any> = new Map();
 
-  get(name) {
-    return super.get(name)
-  }
-  constructor( @Inject(CACHE_MODULE_CONFIG) private config: CacheServiceConfigInterface) {
-    super()
+  constructor(@Inject(CACHE_MODULE_CONFIG) private config: CacheServiceConfigInterface) {
     if (this.config.localStorage && CacheService.isLocalStorageUsable()) {
       const layers = <Array<string>>JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
       if (layers) {
@@ -56,17 +53,17 @@ export class CacheService extends Map {
   }
 
   public getLayer<T>(name: string): CacheLayer<CacheLayerItem<T>> {
-    const exists = this.has(name);
+    const exists = this.map.has(name);
     if (!exists) {
       return this.createLayer<T>({ name: name });
     }
-    return this.get(name);
+    return this.map.get(name);
   }
 
   public createLayer<T>(layer: CacheLayerInterface): CacheLayer<CacheLayerItem<T>> {
-    const exists = this.has(layer.name);
+    const exists = this.map.has(layer.name);
     if (exists) {
-      return this.get(layer.name);
+      return this.map.get(layer.name);
     }
     layer.items = layer.items || [];
     layer.config = layer.config || this.config || CACHE_MODULE_DI_CONFIG;
@@ -75,7 +72,7 @@ export class CacheService extends Map {
       localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify([...CacheService.getLayersFromLS().filter(l => l !== cacheLayer.name), cacheLayer.name]));
       localStorage.setItem(cacheLayer.name, JSON.stringify(layer));
     }
-    this.set(cacheLayer.name, cacheLayer);
+    this.map.set(cacheLayer.name, cacheLayer);
     this._cachedLayers.next([...this._cachedLayers.getValue(), cacheLayer]);
     this.LayerHook<T>(cacheLayer);
     return cacheLayer;
@@ -102,7 +99,7 @@ export class CacheService extends Map {
   }
 
   public removeLayer<T>(layerInstance: CacheLayer<CacheLayerItem<T>>): void {
-    this.delete(layerInstance.name);
+    this.map.delete(layerInstance.name);
     if (this.config.localStorage) {
       localStorage.removeItem(layerInstance.name);
       localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getLayersFromLS().filter(layer => layer !== layerInstance.name)));

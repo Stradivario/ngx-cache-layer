@@ -3,12 +3,12 @@ import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {Observable} from 'rxjs/Rx';
 import { Subscription } from 'rxjs/Subscription';
 
-export class CacheLayer<T> extends Map {
+export class CacheLayer<T> {
 
   public items: BehaviorSubject<Array<T>> = new BehaviorSubject([]);
   public name: string;
   public config: CacheServiceConfigInterface;
-
+  private map: Map<any, any> = new Map();
   static createCacheParams(config) {
       if(config.params.constructor === Object) {
         return // Todo
@@ -21,20 +21,15 @@ export class CacheLayer<T> extends Map {
       }
   }
 
-  public set(key, data): this {
-    return super.set(key, data);
-  }
-
   public get(name): T {
-    return super.get(name)
+    return this.map.get(name)
   }
 
   constructor(layer: CacheLayerInterface) {
-    super();
     this.name = layer.name;
     this.config = layer.config;
     if (this.config.localStorage) {
-      layer.items.forEach(item => this.set(item['key'], item));
+      layer.items.forEach(item => this.map.set(item['key'], item));
       if(layer.items.constructor === BehaviorSubject) {
         layer.items = layer.items.getValue() || [];
       }
@@ -56,7 +51,7 @@ export class CacheLayer<T> extends Map {
   }
 
   public getItem(key: string): T {
-    if (this.has(key)) {
+    if (this.map.has(key)) {
       return this.get(key);
     } else {
       return null;
@@ -64,7 +59,7 @@ export class CacheLayer<T> extends Map {
   }
 
   public putItem(layerItem: T): T {
-    this.set(layerItem['key'], layerItem);
+    this.map.set(layerItem['key'], layerItem);
     const item = this.get(layerItem['key']);
     const filteredItems = this.items.getValue().filter(item => item['key'] !== layerItem['key']);
     if (this.config.localStorage) {
@@ -98,12 +93,12 @@ export class CacheLayer<T> extends Map {
       };
       localStorage.setItem(this.name, JSON.stringify(newLayer));
     }
-    this.delete(key);
+    this.map.delete(key);
     this.items.next(newLayerItems);
   }
 
   public getItemObservable(key: string): Observable<T> {
-    return this.items.asObservable().filter(() => this.has(key)).map(res => res[0]);
+    return this.items.asObservable().filter(() => this.map.has(key)).map(res => res[0]);
   }
 
 }

@@ -2,10 +2,10 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 import { CacheLayer } from './ngx-cache-layer.layer';
 import { CacheLayerInterface, CacheServiceConfigInterface, CacheLayerItem } from './ngx-cache-layer.interfaces';
-export declare class CacheService extends Map {
+export declare class CacheService {
     private config;
     _cachedLayers: BehaviorSubject<CacheLayer<CacheLayerItem<any>>[]>;
-    get(name: any): any;
+    private map;
     constructor(config: CacheServiceConfigInterface);
     static createCacheInstance<T>(cacheLayer: any): CacheLayer<CacheLayerItem<T>>;
     static isLocalStorageUsable(): boolean;

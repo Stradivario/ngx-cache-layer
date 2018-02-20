@@ -1,17 +1,19 @@
 import { NgModule, InjectionToken } from '@angular/core';
 import { CacheService } from './ngx-cache-layer.service';
-export const /** @type {?} */ CACHE_MODULE_CONFIG = new InjectionToken('module.config');
-export const /** @type {?} */ CACHE_MODULE_DI_CONFIG = ({
+export var /** @type {?} */ CACHE_MODULE_CONFIG = new InjectionToken('module.config');
+export var /** @type {?} */ CACHE_MODULE_DI_CONFIG = ({
     deleteOnExpire: 'aggressive',
     cacheFlushInterval: 60 * 60 * 1000,
     maxAge: 15 * 60 * 1000
 });
-export class CacheModule {
+var CacheModule = /** @class */ (function () {
+    function CacheModule() {
+    }
     /**
      * @param {?=} config
      * @return {?}
      */
-    static forRoot(config) {
+    CacheModule.forRoot = function (config) {
         return {
             ngModule: CacheModule,
             providers: [
@@ -19,15 +21,17 @@ export class CacheModule {
                 CacheService
             ]
         };
-    }
-}
-CacheModule.decorators = [
-    { type: NgModule },
-];
-/**
- * @nocollapse
- */
-CacheModule.ctorParameters = () => [];
+    };
+    CacheModule.decorators = [
+        { type: NgModule },
+    ];
+    /**
+     * @nocollapse
+     */
+    CacheModule.ctorParameters = function () { return []; };
+    return CacheModule;
+}());
+export { CacheModule };
 function CacheModule_tsickle_Closure_declarations() {
     /** @type {?} */
     CacheModule.decorators;

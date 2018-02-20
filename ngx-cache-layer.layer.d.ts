@@ -1,12 +1,12 @@
 import { CacheLayerInterface, CacheServiceConfigInterface } from './ngx-cache-layer.interfaces';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Rx';
-export declare class CacheLayer<T> extends Map {
+export declare class CacheLayer<T> {
     items: BehaviorSubject<Array<T>>;
     name: string;
     config: CacheServiceConfigInterface;
+    private map;
     static createCacheParams(config: any): void;
-    set(key: any, data: any): this;
     get(name: any): T;
     constructor(layer: CacheLayerInterface);
     private initHook(layer);

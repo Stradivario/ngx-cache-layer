@@ -1,20 +1,21 @@
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Rx';
-export class CacheLayer extends Map {
+var CacheLayer = /** @class */ (function () {
     /**
      * @param {?} layer
      */
-    constructor(layer) {
-        super();
+    function CacheLayer(layer) {
+        var _this = this;
         this.items = new BehaviorSubject([]);
+        this.map = new Map();
         this.name = layer.name;
         this.config = layer.config;
         if (this.config.localStorage) {
-            layer.items.forEach(item => this.set(item['key'], item));
+            layer.items.forEach(function (item) { return _this.map.set(item['key'], item); });
             if (layer.items.constructor === BehaviorSubject) {
                 layer.items = layer.items.getValue() || [];
             }
-            this.items.next([...this.items.getValue(), ...layer.items]);
+            this.items.next(this.items.getValue().concat(layer.items));
         }
         this.initHook(layer);
     }
@@ -22,7 +23,7 @@ export class CacheLayer extends Map {
      * @param {?} config
      * @return {?}
      */
-    static createCacheParams(config) {
+    CacheLayer.createCacheParams = function (config) {
         if (config.params.constructor === Object) {
             return; // Todo
         }
@@ -35,110 +36,107 @@ export class CacheLayer extends Map {
         else if (config.params.constructor === Array) {
             return; // Todo
         }
-    }
-    /**
-     * @param {?} key
-     * @param {?} data
-     * @return {?}
-     */
-    set(key, data) {
-        return super.set(key, data);
-    }
+    };
     /**
      * @param {?} name
      * @return {?}
      */
-    get(name) {
-        return super.get(name);
-    }
+    CacheLayer.prototype.get = function (name) {
+        return this.map.get(name);
+    };
     /**
      * @param {?} layer
      * @return {?}
      */
-    initHook(layer) {
+    CacheLayer.prototype.initHook = function (layer) {
         this.onExpireAll(layer);
-    }
+    };
     /**
      * @param {?} layer
      * @return {?}
      */
-    onExpireAll(layer) {
-        layer.items.forEach(item => this.onExpire(item['key']));
-    }
+    CacheLayer.prototype.onExpireAll = function (layer) {
+        var _this = this;
+        layer.items.forEach(function (item) { return _this.onExpire(item['key']); });
+    };
     /**
      * @param {?} layerItem
      * @return {?}
      */
-    putItemHook(layerItem) {
+    CacheLayer.prototype.putItemHook = function (layerItem) {
         this.onExpire(layerItem['key']);
-    }
+    };
     /**
      * @param {?} key
      * @return {?}
      */
-    getItem(key) {
-        if (this.has(key)) {
+    CacheLayer.prototype.getItem = function (key) {
+        if (this.map.has(key)) {
             return this.get(key);
         }
         else {
             return null;
         }
-    }
+    };
     /**
      * @param {?} layerItem
      * @return {?}
      */
-    putItem(layerItem) {
-        this.set(layerItem['key'], layerItem);
-        const /** @type {?} */ item = this.get(layerItem['key']);
-        const /** @type {?} */ filteredItems = this.items.getValue().filter(item => item['key'] !== layerItem['key']);
+    CacheLayer.prototype.putItem = function (layerItem) {
+        this.map.set(layerItem['key'], layerItem);
+        var /** @type {?} */ item = this.get(layerItem['key']);
+        var /** @type {?} */ filteredItems = this.items.getValue().filter(function (item) { return item['key'] !== layerItem['key']; });
         if (this.config.localStorage) {
             localStorage.setItem(this.name, JSON.stringify(/** @type {?} */ ({
                 config: this.config,
                 name: this.name,
-                items: [...filteredItems, item]
+                items: filteredItems.concat([item])
             })));
         }
-        this.items.next([...filteredItems, item]);
+        this.items.next(filteredItems.concat([item]));
         this.putItemHook(layerItem);
         return layerItem;
-    }
+    };
     /**
      * @param {?} key
      * @return {?}
      */
-    onExpire(key) {
+    CacheLayer.prototype.onExpire = function (key) {
+        var _this = this;
         Observable
-            .create(observer => observer.next())
+            .create(function (observer) { return observer.next(); })
             .timeoutWith(this.config.maxAge, Observable.of(1))
             .skip(1)
-            .subscribe(observer => this.removeItem(key));
-    }
+            .subscribe(function (observer) { return _this.removeItem(key); });
+    };
     /**
      * @param {?} key
      * @return {?}
      */
-    removeItem(key) {
-        let /** @type {?} */ newLayerItems = this.items.getValue().filter(item => item['key'] !== key);
+    CacheLayer.prototype.removeItem = function (key) {
+        var /** @type {?} */ newLayerItems = this.items.getValue().filter(function (item) { return item['key'] !== key; });
         if (this.config.localStorage) {
-            const /** @type {?} */ newLayer = ({
+            var /** @type {?} */ newLayer = ({
                 config: this.config,
                 name: this.name,
                 items: newLayerItems
             });
             localStorage.setItem(this.name, JSON.stringify(newLayer));
         }
-        this.delete(key);
+        this.map.delete(key);
         this.items.next(newLayerItems);
-    }
+    };
     /**
      * @param {?} key
      * @return {?}
      */
-    getItemObservable(key) {
-        return this.items.asObservable().filter(() => this.has(key)).map(res => res[0]);
-    }
-}
+    CacheLayer.prototype.getItemObservable = function (key) {
+        var _this = this;
+        return this.items.asObservable().filter(function () { return _this.map.has(key); }).map(function (res) { return res[0]; });
+    };
+    return CacheLayer;
+}());
+export { CacheLayer };
 function CacheLayer_tsickle_Closure_declarations() {
     /** @type {?} */
     CacheLayer.prototype.items;
@@ -146,5 +144,7 @@ function CacheLayer_tsickle_Closure_declarations() {
     CacheLayer.prototype.name;
     /** @type {?} */
     CacheLayer.prototype.config;
+    /** @type {?} */
+    CacheLayer.prototype.map;
 }
-// console.log(Array.from(this.keys())) 
+// console.log(Array.from(this.keys()))
