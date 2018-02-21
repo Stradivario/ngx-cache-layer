@@ -1,5 +1,8 @@
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Rx';
+var /** @type {?} */ FRIENDLY_ERROR_MESSAGES = {
+    MISSING_OBSERVABLE_ITEM: "is missing from the layer misspelled name ? as soon as you provide correct name value will be emitted!"
+};
 var CacheLayer = /** @class */ (function () {
     /**
      * @param {?} layer
@@ -49,7 +52,9 @@ var CacheLayer = /** @class */ (function () {
      * @return {?}
      */
     CacheLayer.prototype.initHook = function (layer) {
-        this.onExpireAll(layer);
+        if (this.config.maxAge) {
+            this.onExpireAll(layer);
+        }
     };
     /**
      * @param {?} layer
@@ -64,7 +69,9 @@ var CacheLayer = /** @class */ (function () {
      * @return {?}
      */
     CacheLayer.prototype.putItemHook = function (layerItem) {
-        this.onExpire(layerItem['key']);
+        if (this.config.maxAge) {
+            this.onExpire(layerItem['key']);
+        }
     };
     /**
      * @param {?} key
@@ -132,7 +139,19 @@ var CacheLayer = /** @class */ (function () {
      */
     CacheLayer.prototype.getItemObservable = function (key) {
         var _this = this;
+        this.map.has(key) ? null : console.error("Key: " + key + " " + FRIENDLY_ERROR_MESSAGES.MISSING_OBSERVABLE_ITEM);
         return this.items.asObservable().filter(function () { return _this.map.has(key); }).map(function (res) { return res[0]; });
+    };
+    /**
+     * @return {?}
+     */
+    CacheLayer.prototype.flushCache = function () {
+        var _this = this;
+        return this.items.asObservable()
+            .map(function (items) {
+            items.forEach(function (i) { return _this.removeItem(i['key']); });
+            return true;
+        });
     };
     return CacheLayer;
 }());

@@ -17,4 +17,5 @@ export declare class CacheLayer<T> {
     private onExpire(key);
     removeItem(key: string): void;
     getItemObservable(key: string): Observable<T>;
+    flushCache(): Observable<boolean>;
 }

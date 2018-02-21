@@ -97,7 +97,9 @@ var CacheService = /** @class */ (function () {
      */
     CacheService.prototype.LayerHook = function (layerInstance) {
         this.protectLayerFromInvaders(layerInstance);
-        this.OnExpire(layerInstance);
+        if (layerInstance.config.cacheFlushInterval || this.config.cacheFlushInterval) {
+            this.OnExpire(layerInstance);
+        }
     };
     /**
      * @template T
@@ -119,7 +121,7 @@ var CacheService = /** @class */ (function () {
         var _this = this;
         Observable
             .create(function (observer) { return observer.next(); })
-            .timeoutWith(layerInstance.config.cacheFlushInterval, Observable.of(1))
+            .timeoutWith(layerInstance.config.cacheFlushInterval || this.config.cacheFlushInterval, Observable.of(1))
             .skip(1)
             .subscribe(function (observer) { return _this.removeLayer(layerInstance); });
     };
@@ -159,14 +161,22 @@ var CacheService = /** @class */ (function () {
         return JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
     };
     /**
+     * @param {?=} force
      * @return {?}
      */
-    CacheService.prototype.flushCache = function () {
+    CacheService.prototype.flushCache = function (force) {
         var _this = this;
+        var /** @type {?} */ oldLayersNames;
         return this._cachedLayers.take(1)
             .map(function (layers) {
+            oldLayersNames = layers.map(function (l) { return l.name; });
             layers.forEach(function (layer) { return _this.removeLayer(layer); });
-            localStorage.removeItem(INTERNAL_PROCEDURE_CACHE_NAME);
+            if (force) {
+                localStorage.removeItem(INTERNAL_PROCEDURE_CACHE_NAME);
+            }
+            else {
+                oldLayersNames.forEach(function (l) { return _this.createLayer({ name: l }); });
+            }
             return true;
         });
     };

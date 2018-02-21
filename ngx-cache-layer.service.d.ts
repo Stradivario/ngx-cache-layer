@@ -17,5 +17,5 @@ export declare class CacheService {
     removeLayer<T>(layerInstance: CacheLayer<CacheLayerItem<T>>): void;
     transferItems(name: string, newCacheLayers: CacheLayerInterface[]): CacheLayer<CacheLayerItem<any>>[];
     static getLayersFromLS(): Array<string>;
-    flushCache(): Observable<boolean>;
+    flushCache(force?: boolean): Observable<boolean>;
 }

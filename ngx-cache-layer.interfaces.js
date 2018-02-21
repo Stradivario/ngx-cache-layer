@@ -3,6 +3,7 @@ var CacheServiceConfigInterface = /** @class */ (function () {
         this.deleteOnExpire = 'aggressive';
         this.cacheFlushInterval = 60 * 60 * 1000;
         this.maxAge = 15 * 60 * 1000;
+        this.localStorage = false;
     }
     return CacheServiceConfigInterface;
 }());

@@ -1,7 +1,11 @@
-import {CacheLayerInterface, CacheServiceConfigInterface} from './ngx-cache-layer.interfaces';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {Observable} from 'rxjs/Rx';
+import { CacheLayerInterface, CacheServiceConfigInterface } from './ngx-cache-layer.interfaces';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable } from 'rxjs/Rx';
 import { Subscription } from 'rxjs/Subscription';
+
+const FRIENDLY_ERROR_MESSAGES = {
+  MISSING_OBSERVABLE_ITEM: `is missing from the layer misspelled name ? as soon as you provide correct name value will be emitted!`
+};
 
 export class CacheLayer<T> {
 
@@ -10,19 +14,19 @@ export class CacheLayer<T> {
   public config: CacheServiceConfigInterface;
   private map: Map<any, any> = new Map();
   static createCacheParams(config) {
-      if(config.params.constructor === Object) {
-        return // Todo
-      } else if (config.constructor === String) {
-        return // Todo
-      } else if (config.params.constructor === Number) {
-        return // Todo
-      } else if (config.params.constructor === Array) {
-        return // Todo
-      }
+    if (config.params.constructor === Object) {
+      return // Todo
+    } else if (config.constructor === String) {
+      return // Todo
+    } else if (config.params.constructor === Number) {
+      return // Todo
+    } else if (config.params.constructor === Array) {
+      return // Todo
+    }
   }
 
   public get(name): T {
-    return this.map.get(name)
+    return this.map.get(name);
   }
 
   constructor(layer: CacheLayerInterface) {
@@ -30,7 +34,7 @@ export class CacheLayer<T> {
     this.config = layer.config;
     if (this.config.localStorage) {
       layer.items.forEach(item => this.map.set(item['key'], item));
-      if(layer.items.constructor === BehaviorSubject) {
+      if (layer.items.constructor === BehaviorSubject) {
         layer.items = layer.items.getValue() || [];
       }
       this.items.next([...this.items.getValue(), ...layer.items]);
@@ -39,15 +43,19 @@ export class CacheLayer<T> {
   }
 
   private initHook(layer) {
-    this.onExpireAll(layer)
+    if (this.config.maxAge) {
+      this.onExpireAll(layer);
+    }
   }
 
   private onExpireAll(layer) {
-    layer.items.forEach(item => this.onExpire(item['key']))
+    layer.items.forEach(item => this.onExpire(item['key']));
   }
 
   private putItemHook(layerItem): void {
-    this.onExpire(layerItem['key']);
+    if (this.config.maxAge) {
+      this.onExpire(layerItem['key']);
+    }
   }
 
   public getItem(key: string): T {
@@ -69,7 +77,7 @@ export class CacheLayer<T> {
         items: [...filteredItems, item]
       }));
     }
-    
+
     this.items.next([...filteredItems, item]);
     this.putItemHook(layerItem);
     return layerItem;
@@ -98,7 +106,16 @@ export class CacheLayer<T> {
   }
 
   public getItemObservable(key: string): Observable<T> {
+    this.map.has(key) ? null : console.error(`Key: ${key} ${FRIENDLY_ERROR_MESSAGES.MISSING_OBSERVABLE_ITEM}`);
     return this.items.asObservable().filter(() => this.map.has(key)).map(res => res[0]);
+  }
+
+  public flushCache(): Observable<boolean> {
+    return this.items.asObservable()
+      .map(items => {
+        items.forEach(i => this.removeItem(i['key']))
+        return true;
+      });
   }
 
 }

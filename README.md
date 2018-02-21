@@ -37,7 +37,7 @@ import {CacheModule} from 'ngx-cache-layer';
   ],
   imports: [
     BrowserModule,
-    // Import CacheModule
+    // Import CacheModule optional parameters provided at the bottom of readme
     CacheModule.forRoot(),
     LibraryModule
   ],

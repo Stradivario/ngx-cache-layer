@@ -80,7 +80,9 @@ export class CacheService {
 
   private LayerHook<T>(layerInstance: CacheLayer<CacheLayerItem<T>>): void {
     this.protectLayerFromInvaders<T>(layerInstance);
-    this.OnExpire(layerInstance);
+    if (layerInstance.config.cacheFlushInterval || this.config.cacheFlushInterval) {
+      this.OnExpire(layerInstance);
+    }
   }
 
   private protectLayerFromInvaders<T>(cacheLayer: CacheLayer<CacheLayerItem<T>>): void {
@@ -93,7 +95,7 @@ export class CacheService {
   private OnExpire<T>(layerInstance: CacheLayer<CacheLayerItem<T>>): void {
     Observable
       .create(observer => observer.next())
-      .timeoutWith(layerInstance.config.cacheFlushInterval, Observable.of(1))
+      .timeoutWith(layerInstance.config.cacheFlushInterval || this.config.cacheFlushInterval, Observable.of(1))
       .skip(1)
       .subscribe(observer => this.removeLayer(layerInstance));
   }
@@ -122,11 +124,17 @@ export class CacheService {
     return JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
   }
 
-  public flushCache(): Observable<boolean> {
+  public flushCache(force?: boolean): Observable<boolean> {
+    let oldLayersNames: string[];
     return this._cachedLayers.take(1)
       .map(layers => {
+        oldLayersNames = layers.map(l => l.name);
         layers.forEach(layer => this.removeLayer(layer));
-        localStorage.removeItem(INTERNAL_PROCEDURE_CACHE_NAME);
+        if (force) {
+          localStorage.removeItem(INTERNAL_PROCEDURE_CACHE_NAME);
+        } else {
+          oldLayersNames.forEach((l) => this.createLayer({ name: l }))
+        }
         return true;
       })
   }

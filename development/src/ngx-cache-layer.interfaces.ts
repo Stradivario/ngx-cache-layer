@@ -5,9 +5,9 @@ export interface CacheLayerItem<T> {
 
 export class CacheServiceConfigInterface {
   deleteOnExpire?: string = 'aggressive';
-  cacheFlushInterval: number = 60 * 60 * 1000;
-  maxAge: number = 15 * 60 * 1000;
-  localStorage: boolean;
+  cacheFlushInterval?: number | null = 60 * 60 * 1000;
+  maxAge?: number | null = 15 * 60 * 1000;
+  localStorage?: boolean = false;
 }
 
 export interface CacheLayerInterface {
