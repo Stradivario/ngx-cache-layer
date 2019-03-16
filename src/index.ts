@@ -1,16 +1,10 @@
 import { NgModule, ModuleWithProviders, InjectionToken } from '@angular/core';
 import { CacheService } from './ngx-cache-layer.service';
-import { CacheServiceConfigInterface } from './ngx-cache-layer.interfaces';
+import { CacheServiceConfigInterface, CACHE_MODULE_CONFIG, CACHE_MODULE_DI_CONFIG } from './ngx-cache-layer.interfaces';
 
-export const CACHE_MODULE_CONFIG = new InjectionToken<CacheServiceConfigInterface>('module.config');
-
-export const CACHE_MODULE_DI_CONFIG = <CacheServiceConfigInterface>{
-  deleteOnExpire: 'aggressive',
-  cacheFlushInterval: 60 * 60 * 1000,
-  maxAge: 15 * 60 * 1000
-};
-
-@NgModule()
+@NgModule({
+  providers: [CacheService]
+})
 export class CacheModule {
   static forRoot(config?: CacheServiceConfigInterface): ModuleWithProviders {
     return {

@@ -1,27 +1,36 @@
 import { Inject } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { CacheLayerInstance } from './ngx-cache-layer.instance';
-import { CacheLayerInterface, CacheServiceConfigInterface, CacheLayerItem } from './ngx-cache-layer.interfaces';
+import {
+  CacheLayerInterface,
+  CacheServiceConfigInterface,
+  CacheLayerItem, CACHE_MODULE_CONFIG,
+  CACHE_MODULE_DI_CONFIG
+} from './ngx-cache-layer.interfaces';
 
-import { CACHE_MODULE_CONFIG, CACHE_MODULE_DI_CONFIG } from './index';
 import { take, map, timeoutWith, skip } from 'rxjs/operators';
 
 const INTERNAL_PROCEDURE_CACHE_NAME = 'cache_layers';
 
 const FRIENDLY_ERROR_MESSAGES = {
   TRY_TO_UNSUBSCRIBE: 'Someone try to unsubscribe from collection directly... agghhh.. read docs! Blame: ',
+  // tslint:disable-next-line:max-line-length
   LOCAL_STORAGE_DISABLED: 'LocalStorage is disabled switching to regular in-memory storage.Please relate issue if you think it is enabled and there is a problem with the library itself.'
 };
 
 
 export class CacheService {
 
-  public _cachedLayers: BehaviorSubject<CacheLayerInstance<CacheLayerItem<any>>[]> = new BehaviorSubject([]);
+  public cachedLayers: BehaviorSubject<CacheLayerInstance<CacheLayerItem<any>>[]> = new BehaviorSubject([]);
   private map: Map<any, any> = new Map();
+
+  public static getLayersFromLS(): Array<string> {
+    return JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
+  }
 
   constructor(@Inject(CACHE_MODULE_CONFIG) private config: CacheServiceConfigInterface) {
     if (this.config.localStorage && CacheService.isLocalStorageUsable()) {
-      const layers = <Array<string>>JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
+      const layers: Array<string> = JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
       if (layers) {
         layers.forEach(layer => {
           const cachedLayer = JSON.parse(localStorage.getItem(layer));
@@ -40,7 +49,7 @@ export class CacheService {
   }
 
   public static isLocalStorageUsable(): boolean {
-    let error = [];
+    const error = [];
     try {
       localStorage.setItem('test-key', JSON.stringify({ key: 'test-object' }));
       localStorage.removeItem('test-key');
@@ -54,7 +63,7 @@ export class CacheService {
   public getLayer<T>(name: string): CacheLayerInstance<CacheLayerItem<T>> {
     const exists = this.map.has(name);
     if (!exists) {
-      return this.createLayer<T>({ name: name });
+      return this.createLayer<T>({ name });
     }
     return this.map.get(name);
   }
@@ -66,13 +75,14 @@ export class CacheService {
     }
     layer.items = layer.items || [];
     layer.config = layer.config || this.config || CACHE_MODULE_DI_CONFIG;
-    let cacheLayer = CacheService.createCacheInstance<T>(layer);
+    const cacheLayer = CacheService.createCacheInstance<T>(layer);
     if (layer.config.localStorage && CacheService.isLocalStorageUsable()) {
+      // tslint:disable-next-line:max-line-length
       localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify([...CacheService.getLayersFromLS().filter(l => l !== cacheLayer.name), cacheLayer.name]));
       localStorage.setItem(cacheLayer.name, JSON.stringify(layer));
     }
     this.map.set(cacheLayer.name, cacheLayer);
-    this._cachedLayers.next([...this._cachedLayers.getValue(), cacheLayer]);
+    this.cachedLayers.next([...this.cachedLayers.getValue(), cacheLayer]);
     this.LayerHook<T>(cacheLayer);
     return cacheLayer;
   }
@@ -87,7 +97,7 @@ export class CacheService {
   private protectLayerFromInvaders<T>(cacheLayer: CacheLayerInstance<CacheLayerItem<T>>): void {
     cacheLayer.items.constructor.prototype.unsubsribeFromLayer = cacheLayer.items.constructor.prototype.unsubscribe;
     cacheLayer.items.constructor.prototype.unsubscribe = () => {
-      console.error(FRIENDLY_ERROR_MESSAGES.TRY_TO_UNSUBSCRIBE + cacheLayer.name)
+      console.error(FRIENDLY_ERROR_MESSAGES.TRY_TO_UNSUBSCRIBE + cacheLayer.name);
     };
   }
 
@@ -103,9 +113,10 @@ export class CacheService {
     this.map.delete(layerInstance.name);
     if (this.config.localStorage) {
       localStorage.removeItem(layerInstance.name);
+      // tslint:disable-next-line:max-line-length
       localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getLayersFromLS().filter(layer => layer !== layerInstance.name)));
     }
-    this._cachedLayers.next([...this._cachedLayers.getValue().filter(layer => layer.name !== layerInstance.name)]);
+    this.cachedLayers.next([...this.cachedLayers.getValue().filter(layer => layer.name !== layerInstance.name)]);
   }
 
   public transferItems(name: string, newCacheLayers: CacheLayerInterface[]): CacheLayerInstance<CacheLayerItem<any>>[] {
@@ -115,17 +126,14 @@ export class CacheService {
       const newLayer = this.createLayer(layerName);
       oldLayer.items.getValue().forEach(item => newLayer.putItem(item));
       newLayers.push(newLayer);
-    })
+    });
     return newLayers;
   }
 
-  public static getLayersFromLS(): Array<string> {
-    return JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
-  }
 
   public flushCache(force?: boolean): Observable<boolean> {
     let oldLayersNames: string[];
-    return this._cachedLayers.pipe(
+    return this.cachedLayers.pipe(
       take(1),
       map(layers => {
         oldLayersNames = layers.map(l => l.name);
@@ -133,11 +141,11 @@ export class CacheService {
         if (force) {
           localStorage.removeItem(INTERNAL_PROCEDURE_CACHE_NAME);
         } else {
-          oldLayersNames.forEach((l) => this.createLayer({ name: l }))
+          oldLayersNames.forEach((l) => this.createLayer({ name: l }));
         }
         return true;
       })
-    )
+    );
   }
 
 }

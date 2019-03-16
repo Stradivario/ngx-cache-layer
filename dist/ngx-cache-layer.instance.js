@@ -12,6 +12,7 @@ define(["require", "exports", "rxjs", "rxjs/operators"], function (require, expo
             this.name = layer.name;
             this.config = layer.config;
             if (this.config.localStorage) {
+                // tslint:disable-next-line:no-string-literal
                 layer.items.forEach(function (item) { return _this.map.set(item['key'], item); });
                 if (layer.items.constructor === rxjs_1.BehaviorSubject) {
                     layer.items = layer.items.getValue() || [];
@@ -44,10 +45,12 @@ define(["require", "exports", "rxjs", "rxjs/operators"], function (require, expo
         };
         CacheLayerInstance.prototype.onExpireAll = function (layer) {
             var _this = this;
+            // tslint:disable-next-line:no-string-literal
             layer.items.forEach(function (item) { return _this.onExpire(item['key']); });
         };
         CacheLayerInstance.prototype.putItemHook = function (layerItem) {
             if (this.config.maxAge) {
+                // tslint:disable-next-line:no-string-literal
                 this.onExpire(layerItem['key']);
             }
         };
@@ -60,9 +63,12 @@ define(["require", "exports", "rxjs", "rxjs/operators"], function (require, expo
             }
         };
         CacheLayerInstance.prototype.putItem = function (layerItem) {
+            // tslint:disable-next-line:no-string-literal
             this.map.set(layerItem['key'], layerItem);
+            // tslint:disable-next-line:no-string-literal
             var item = this.get(layerItem['key']);
-            var filteredItems = this.items.getValue().filter(function (item) { return item['key'] !== layerItem['key']; });
+            // tslint:disable-next-line:no-string-literal
+            var filteredItems = this.items.getValue().filter(function (i) { return i['key'] !== layerItem['key']; });
             if (this.config.localStorage) {
                 localStorage.setItem(this.name, JSON.stringify({
                     config: this.config,
@@ -80,6 +86,7 @@ define(["require", "exports", "rxjs", "rxjs/operators"], function (require, expo
                 .pipe(operators_1.timeoutWith(this.config.maxAge, rxjs_1.of(1)), operators_1.skip(1)).subscribe(function () { return _this.removeItem(key); });
         };
         CacheLayerInstance.prototype.removeItem = function (key) {
+            // tslint:disable-next-line:no-string-literal
             var newLayerItems = this.items.getValue().filter(function (item) { return item['key'] !== key; });
             if (this.config.localStorage) {
                 var newLayer = {
@@ -94,13 +101,16 @@ define(["require", "exports", "rxjs", "rxjs/operators"], function (require, expo
         };
         CacheLayerInstance.prototype.getItemObservable = function (key) {
             var _this = this;
-            this.map.has(key) ? null : console.error("Key: " + key + " " + FRIENDLY_ERROR_MESSAGES.MISSING_OBSERVABLE_ITEM);
+            if (this.map.has(key)) {
+                console.error("Key: " + key + " " + FRIENDLY_ERROR_MESSAGES.MISSING_OBSERVABLE_ITEM);
+            }
             return this.items.asObservable().pipe(operators_1.filter(function () { return _this.map.has(key); }), operators_1.map(function (res) { return res[0]; }));
         };
         CacheLayerInstance.prototype.flushCache = function () {
             var _this = this;
             return this.items.asObservable()
                 .pipe(operators_1.map(function (items) {
+                // tslint:disable-next-line:no-string-literal
                 items.forEach(function (i) { return _this.removeItem(i['key']); });
                 return true;
             }));
@@ -109,4 +119,3 @@ define(["require", "exports", "rxjs", "rxjs/operators"], function (require, expo
     }());
     exports.CacheLayerInstance = CacheLayerInstance;
 });
-// console.log(Array.from(this.keys()))

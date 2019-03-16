@@ -14,13 +14,13 @@ export class CacheLayerInstance<T = {}> {
   private map: Map<any, any> = new Map();
   static createCacheParams(config) {
     if (config.params.constructor === Object) {
-      return // Todo
+      return; // Todo
     } else if (config.constructor === String) {
-      return // Todo
+      return; // Todo
     } else if (config.params.constructor === Number) {
-      return // Todo
+      return; // Todo
     } else if (config.params.constructor === Array) {
-      return // Todo
+      return; // Todo
     }
   }
 
@@ -32,6 +32,7 @@ export class CacheLayerInstance<T = {}> {
     this.name = layer.name;
     this.config = layer.config;
     if (this.config.localStorage) {
+      // tslint:disable-next-line:no-string-literal
       layer.items.forEach(item => this.map.set(item['key'], item));
       if (layer.items.constructor === BehaviorSubject) {
         layer.items = layer.items.getValue() || [];
@@ -48,11 +49,13 @@ export class CacheLayerInstance<T = {}> {
   }
 
   private onExpireAll(layer) {
+    // tslint:disable-next-line:no-string-literal
     layer.items.forEach(item => this.onExpire(item['key']));
   }
 
   private putItemHook(layerItem): void {
     if (this.config.maxAge) {
+      // tslint:disable-next-line:no-string-literal
       this.onExpire(layerItem['key']);
     }
   }
@@ -66,11 +69,14 @@ export class CacheLayerInstance<T = {}> {
   }
 
   public putItem(layerItem: T): T {
+    // tslint:disable-next-line:no-string-literal
     this.map.set(layerItem['key'], layerItem);
+    // tslint:disable-next-line:no-string-literal
     const item = this.get(layerItem['key']);
-    const filteredItems = this.items.getValue().filter(item => item['key'] !== layerItem['key']);
+    // tslint:disable-next-line:no-string-literal
+    const filteredItems = this.items.getValue().filter(i => i['key'] !== layerItem['key']);
     if (this.config.localStorage) {
-      localStorage.setItem(this.name, JSON.stringify(<CacheLayerInterface>{
+      localStorage.setItem(this.name, JSON.stringify({
         config: this.config,
         name: this.name,
         items: [...filteredItems, item]
@@ -91,9 +97,10 @@ export class CacheLayerInstance<T = {}> {
   }
 
   public removeItem(key: string): void {
-    let newLayerItems = this.items.getValue().filter(item => item['key'] !== key);
+    // tslint:disable-next-line:no-string-literal
+    const newLayerItems = this.items.getValue().filter(item => item['key'] !== key);
     if (this.config.localStorage) {
-      const newLayer = <CacheLayerInterface>{
+      const newLayer: CacheLayerInterface = {
         config: this.config,
         name: this.name,
         items: newLayerItems
@@ -105,7 +112,9 @@ export class CacheLayerInstance<T = {}> {
   }
 
   public getItemObservable(key: string): Observable<T> {
-    this.map.has(key) ? null : console.error(`Key: ${key} ${FRIENDLY_ERROR_MESSAGES.MISSING_OBSERVABLE_ITEM}`);
+    if (this.map.has(key)) {
+      console.error(`Key: ${key} ${FRIENDLY_ERROR_MESSAGES.MISSING_OBSERVABLE_ITEM}`);
+    }
     return this.items.asObservable().pipe(
       filter(() => this.map.has(key)),
       map(res => res[0])
@@ -116,12 +125,11 @@ export class CacheLayerInstance<T = {}> {
     return this.items.asObservable()
       .pipe(
         map(items => {
-          items.forEach(i => this.removeItem(i['key']))
+          // tslint:disable-next-line:no-string-literal
+          items.forEach(i => this.removeItem(i['key']));
           return true;
         })
       );
   }
 
 }
-
-// console.log(Array.from(this.keys()))

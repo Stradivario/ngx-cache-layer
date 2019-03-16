@@ -10,19 +10,20 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-define(["require", "exports", "@angular/core", "rxjs", "./ngx-cache-layer.instance", "./ngx-cache-layer.interfaces", "./index", "rxjs/operators"], function (require, exports, core_1, rxjs_1, ngx_cache_layer_instance_1, ngx_cache_layer_interfaces_1, index_1, operators_1) {
+define(["require", "exports", "@angular/core", "rxjs", "./ngx-cache-layer.instance", "./ngx-cache-layer.interfaces", "rxjs/operators"], function (require, exports, core_1, rxjs_1, ngx_cache_layer_instance_1, ngx_cache_layer_interfaces_1, operators_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var INTERNAL_PROCEDURE_CACHE_NAME = 'cache_layers';
     var FRIENDLY_ERROR_MESSAGES = {
         TRY_TO_UNSUBSCRIBE: 'Someone try to unsubscribe from collection directly... agghhh.. read docs! Blame: ',
+        // tslint:disable-next-line:max-line-length
         LOCAL_STORAGE_DISABLED: 'LocalStorage is disabled switching to regular in-memory storage.Please relate issue if you think it is enabled and there is a problem with the library itself.'
     };
     var CacheService = /** @class */ (function () {
         function CacheService(config) {
             var _this = this;
             this.config = config;
-            this._cachedLayers = new rxjs_1.BehaviorSubject([]);
+            this.cachedLayers = new rxjs_1.BehaviorSubject([]);
             this.map = new Map();
             if (this.config.localStorage && CacheService.isLocalStorageUsable()) {
                 var layers = JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
@@ -39,6 +40,9 @@ define(["require", "exports", "@angular/core", "rxjs", "./ngx-cache-layer.instan
                 }
             }
         }
+        CacheService.getLayersFromLS = function () {
+            return JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
+        };
         CacheService.createCacheInstance = function (cacheLayer) {
             return new ngx_cache_layer_instance_1.CacheLayerInstance(cacheLayer);
         };
@@ -67,14 +71,15 @@ define(["require", "exports", "@angular/core", "rxjs", "./ngx-cache-layer.instan
                 return this.map.get(layer.name);
             }
             layer.items = layer.items || [];
-            layer.config = layer.config || this.config || index_1.CACHE_MODULE_DI_CONFIG;
+            layer.config = layer.config || this.config || ngx_cache_layer_interfaces_1.CACHE_MODULE_DI_CONFIG;
             var cacheLayer = CacheService.createCacheInstance(layer);
             if (layer.config.localStorage && CacheService.isLocalStorageUsable()) {
+                // tslint:disable-next-line:max-line-length
                 localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getLayersFromLS().filter(function (l) { return l !== cacheLayer.name; }).concat([cacheLayer.name])));
                 localStorage.setItem(cacheLayer.name, JSON.stringify(layer));
             }
             this.map.set(cacheLayer.name, cacheLayer);
-            this._cachedLayers.next(this._cachedLayers.getValue().concat([cacheLayer]));
+            this.cachedLayers.next(this.cachedLayers.getValue().concat([cacheLayer]));
             this.LayerHook(cacheLayer);
             return cacheLayer;
         };
@@ -99,9 +104,10 @@ define(["require", "exports", "@angular/core", "rxjs", "./ngx-cache-layer.instan
             this.map.delete(layerInstance.name);
             if (this.config.localStorage) {
                 localStorage.removeItem(layerInstance.name);
+                // tslint:disable-next-line:max-line-length
                 localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getLayersFromLS().filter(function (layer) { return layer !== layerInstance.name; })));
             }
-            this._cachedLayers.next(this._cachedLayers.getValue().filter(function (layer) { return layer.name !== layerInstance.name; }).slice());
+            this.cachedLayers.next(this.cachedLayers.getValue().filter(function (layer) { return layer.name !== layerInstance.name; }).slice());
         };
         CacheService.prototype.transferItems = function (name, newCacheLayers) {
             var _this = this;
@@ -114,13 +120,10 @@ define(["require", "exports", "@angular/core", "rxjs", "./ngx-cache-layer.instan
             });
             return newLayers;
         };
-        CacheService.getLayersFromLS = function () {
-            return JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
-        };
         CacheService.prototype.flushCache = function (force) {
             var _this = this;
             var oldLayersNames;
-            return this._cachedLayers.pipe(operators_1.take(1), operators_1.map(function (layers) {
+            return this.cachedLayers.pipe(operators_1.take(1), operators_1.map(function (layers) {
                 oldLayersNames = layers.map(function (l) { return l.name; });
                 layers.forEach(function (layer) { return _this.removeLayer(layer); });
                 if (force) {
@@ -133,7 +136,7 @@ define(["require", "exports", "@angular/core", "rxjs", "./ngx-cache-layer.instan
             }));
         };
         CacheService = __decorate([
-            __param(0, core_1.Inject(index_1.CACHE_MODULE_CONFIG)),
+            __param(0, core_1.Inject(ngx_cache_layer_interfaces_1.CACHE_MODULE_CONFIG)),
             __metadata("design:paramtypes", [ngx_cache_layer_interfaces_1.CacheServiceConfigInterface])
         ], CacheService);
         return CacheService;
