@@ -1,25 +1,25 @@
-# @ngx-cache-layer
+# @rxdi/cache
 
-![Build Status](http://gitlab.youvolio.com/open-source/ngx-cache-layer/badges/branch/build.svg)
+![Build Status](http://gitlab.youvolio.com/open-source/rxdi/cache/badges/branch/build.svg)
 
 #### @StrongTyped @EasyAPI Created on Angular@2+
 #### @Cache layer with capability to write in LocalStorage
 
-##### More detailed documentation you can find [here](https://stradivario.github.io/ngx-cache-layer/)
+##### More detailed documentation you can find [here](https://stradivario.github.io/rxdi/cache/)
 
-##### For questions/issues you can write ticket [here](http://gitlab.youvolio.com/open-source/ngx-cache-layer/issues)
+##### For questions/issues you can write ticket [here](http://gitlab.youvolio.com/open-source/rxdi/cache/issues)
 
 ##### Animation explanation:
-![Alt Text](https://github.com/Stradivario/ngx-cache-layer/raw/master/docs/animation/index.gif)
+![Alt Text](https://github.com/rxdi/cache/raw/master/docs/animation/index.gif)
 
 ## Installation and basic examples:
 ##### To install this library, run:
 
 ```bash
-$ npm install ngx-cache-layer --save
+$ npm install rxdi/cache --save
 ```
 
-## Consuming @ngx-cache-layer
+## Consuming @rxdi/cache
 
 #### Import CacheModule.forRoot() in your Angular `AppModule`:
 
@@ -28,8 +28,8 @@ import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {AppComponent} from './app.component';
 
-// Import @ngx-cache-layer library
-import {CacheModule} from 'ngx-cache-layer';
+// Import @rxdi/cache library
+import {CacheModule} from '@rxdi/cache';
 
 @NgModule({
   declarations: [
@@ -54,7 +54,7 @@ export class AppModule { }
 ```typescript
 import {Component, OnInit} from '@angular/core';
 import {BehaviorSubject, Subscription} from 'rxjs';
-import {CacheService, CacheLayer, CacheLayerItem} from 'ngx-cache-layer';
+import {CacheService, CacheLayer, CacheLayerItem} from '@rxdi/cache';
 
 export interface Item {
   name: string;
@@ -147,7 +147,7 @@ export class ExampleComponent implements OnInit {
 ```typescript
 
 import {Injectable} from '@angular/core';
-import {CacheService, CacheLayer} from 'ngx-cache-layer';
+import {CacheService, CacheLayer} from '@rxdi/cache';
 import {EXAMPLE_CACHE_LAYER_NAME, Item} from './example.provider';
 
 @Injectable()
@@ -166,7 +166,7 @@ export class YourClass {
 ```typescript
 
 import {Injectable} from '@angular/core';
-import {CacheService} from 'ngx-cache-layer';
+import {CacheService} from '@rxdi/cache';
 import {EXAMPLE_CACHE_LAYER_NzAME} from './example.provider';
 
 @Injectable()
@@ -187,7 +187,7 @@ export class YourClass {
 ```typescript
 
 import {Injectable} from "@angular/core";
-import {CacheService, CacheLayer, CacheLayerItem, CacheServiceConfigInterface} from "ngx-cache-layer";
+import {CacheService, CacheLayer, CacheLayerItem, CacheServiceConfigInterface} from "@rxdi/cache";
 import {Product} from "../core/config/queries/product/product.interface";
 
 export const CART_CACHE_LAYER_NAME = 'cart';
@@ -287,8 +287,8 @@ import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {AppComponent} from './app.component';
 
-// Import ngx-cache-layer
-import {CacheModule, CacheConfigInterface} from 'ngx-cache-layer';
+// Import rxdi/cache
+import {CacheModule, CacheConfigInterface} from '@rxdi/cache';
 
 // Define global configuration
 // You can set localStorage to true it will cache every layers like a localStorage item
@@ -324,7 +324,7 @@ export class AppModule { }
 ```typescript
 CacheService.createLayer<any>({name: 'layer-name', settings?: CacheLayerInterface})
 ```
-`Optional you can define custom settings for every layer that you create just insert CacheLayerInterface from ngx-cache-layer like example for global config above`
+`Optional you can define custom settings for every layer that you create just insert CacheLayerInterface from rxdi/cache like example for global config above`
 
 Returns: `Instance of CacheLayer class`
 Optional: `settings interface CacheLayerInterface`
@@ -404,6 +404,12 @@ cache.getItemObservable('example-key');
 
 ```typescript
 cache.removeItem('example-key');
+```
+
+##### Cache all data from the request. It uses native `fetch` inside browser and will cache particular request to collection
+
+```typescript
+cache.fetch('https://api.github.com/repos/rxdi/core/releases');
 ```
 
 <br>
