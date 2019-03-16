@@ -4,35 +4,31 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-define(["require", "exports", "@angular/core", "./cache.service", "./cache.interfaces", "./cache.service", "./cache.instance", "./cache.interfaces"], function (require, exports, core_1, cache_service_1, cache_interfaces_1, cache_service_2, cache_instance_1, cache_interfaces_2) {
-    "use strict";
-    function __export(m) {
-        for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+import { NgModule } from '@angular/core';
+import { CacheService } from './cache.service';
+import { CACHE_MODULE_CONFIG, CACHE_MODULE_DI_CONFIG } from './cache.interfaces';
+var CacheModule = /** @class */ (function () {
+    function CacheModule() {
     }
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var CacheModule = /** @class */ (function () {
-        function CacheModule() {
-        }
-        CacheModule_1 = CacheModule;
-        CacheModule.forRoot = function (config) {
-            return {
-                ngModule: CacheModule_1,
-                providers: [
-                    { provide: cache_interfaces_1.CACHE_MODULE_CONFIG, useValue: config || cache_interfaces_1.CACHE_MODULE_DI_CONFIG },
-                    cache_service_1.CacheService
-                ]
-            };
+    CacheModule_1 = CacheModule;
+    CacheModule.forRoot = function (config) {
+        return {
+            ngModule: CacheModule_1,
+            providers: [
+                { provide: CACHE_MODULE_CONFIG, useValue: config || CACHE_MODULE_DI_CONFIG },
+                CacheService
+            ]
         };
-        var CacheModule_1;
-        CacheModule = CacheModule_1 = __decorate([
-            core_1.NgModule({
-                providers: [cache_service_1.CacheService]
-            })
-        ], CacheModule);
-        return CacheModule;
-    }());
-    exports.CacheModule = CacheModule;
-    __export(cache_service_2);
-    __export(cache_instance_1);
-    __export(cache_interfaces_2);
-});
+    };
+    var CacheModule_1;
+    CacheModule = CacheModule_1 = __decorate([
+        NgModule({
+            providers: [CacheService]
+        })
+    ], CacheModule);
+    return CacheModule;
+}());
+export { CacheModule };
+export * from './cache.service';
+export * from './cache.instance';
+export * from './cache.interfaces';
