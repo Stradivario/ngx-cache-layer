@@ -10,7 +10,7 @@ export class CacheModule {
     return {
       ngModule: CacheModule,
       providers: [
-        { provide: CACHE_MODULE_CONFIG, useValue: config || CACHE_MODULE_DI_CONFIG },
+        { provide: CACHE_MODULE_CONFIG, useFactory: () => config || CACHE_MODULE_DI_CONFIG },
         CacheService
       ]
     };
