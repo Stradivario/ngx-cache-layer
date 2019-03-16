@@ -1,4 +1,4 @@
-import { Inject } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { CacheLayerInstance } from './cache.instance';
 import {
@@ -19,6 +19,7 @@ const FRIENDLY_ERROR_MESSAGES = {
 };
 
 
+@Injectable()
 export class CacheService {
 
   public cachedLayers: BehaviorSubject<CacheLayerInstance<CacheLayerItem<any>>[]> = new BehaviorSubject([]);

@@ -29,7 +29,7 @@ var CacheService = /** @class */ (function () {
         this.config = config;
         this.cachedLayers = new rxjs_1.BehaviorSubject([]);
         this.map = new Map();
-        if (this.config.localStorage && CacheService.isLocalStorageUsable()) {
+        if (this.config.localStorage && CacheService_1.isLocalStorageUsable()) {
             var layers = JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
             if (layers) {
                 layers.forEach(function (layer) {
@@ -44,6 +44,7 @@ var CacheService = /** @class */ (function () {
             }
         }
     }
+    CacheService_1 = CacheService;
     CacheService.getLayersFromLS = function () {
         return JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
     };
@@ -76,10 +77,10 @@ var CacheService = /** @class */ (function () {
         }
         layer.items = layer.items || [];
         layer.config = layer.config || this.config || cache_interfaces_1.CACHE_MODULE_DI_CONFIG;
-        var cacheLayer = CacheService.createCacheInstance(layer);
-        if (layer.config.localStorage && CacheService.isLocalStorageUsable()) {
+        var cacheLayer = CacheService_1.createCacheInstance(layer);
+        if (layer.config.localStorage && CacheService_1.isLocalStorageUsable()) {
             // tslint:disable-next-line:max-line-length
-            localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getLayersFromLS().filter(function (l) { return l !== cacheLayer.name; }).concat([cacheLayer.name])));
+            localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService_1.getLayersFromLS().filter(function (l) { return l !== cacheLayer.name; }).concat([cacheLayer.name])));
             localStorage.setItem(cacheLayer.name, JSON.stringify(layer));
         }
         this.map.set(cacheLayer.name, cacheLayer);
@@ -109,7 +110,7 @@ var CacheService = /** @class */ (function () {
         if (this.config.localStorage) {
             localStorage.removeItem(layerInstance.name);
             // tslint:disable-next-line:max-line-length
-            localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getLayersFromLS().filter(function (layer) { return layer !== layerInstance.name; })));
+            localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService_1.getLayersFromLS().filter(function (layer) { return layer !== layerInstance.name; })));
         }
         this.cachedLayers.next(this.cachedLayers.getValue().filter(function (layer) { return layer.name !== layerInstance.name; }).slice());
     };
@@ -139,7 +140,9 @@ var CacheService = /** @class */ (function () {
             return true;
         }));
     };
-    CacheService = __decorate([
+    var CacheService_1;
+    CacheService = CacheService_1 = __decorate([
+        core_1.Injectable(),
         __param(0, core_1.Inject(cache_interfaces_1.CACHE_MODULE_CONFIG)),
         __metadata("design:paramtypes", [cache_interfaces_1.CacheServiceConfigInterface])
     ], CacheService);
