@@ -1,3 +1,4 @@
+"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -10,11 +11,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-import { Inject } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { CacheLayerInstance } from './cache.instance';
-import { CacheServiceConfigInterface, CACHE_MODULE_CONFIG, CACHE_MODULE_DI_CONFIG } from './cache.interfaces';
-import { take, map, timeoutWith, skip } from 'rxjs/operators';
+Object.defineProperty(exports, "__esModule", { value: true });
+var core_1 = require("@angular/core");
+var rxjs_1 = require("rxjs");
+var cache_instance_1 = require("./cache.instance");
+var cache_interfaces_1 = require("./cache.interfaces");
+var operators_1 = require("rxjs/operators");
 var INTERNAL_PROCEDURE_CACHE_NAME = 'cache_layers';
 var FRIENDLY_ERROR_MESSAGES = {
     TRY_TO_UNSUBSCRIBE: 'Someone try to unsubscribe from collection directly... agghhh.. read docs! Blame: ',
@@ -25,7 +27,7 @@ var CacheService = /** @class */ (function () {
     function CacheService(config) {
         var _this = this;
         this.config = config;
-        this.cachedLayers = new BehaviorSubject([]);
+        this.cachedLayers = new rxjs_1.BehaviorSubject([]);
         this.map = new Map();
         if (this.config.localStorage && CacheService.isLocalStorageUsable()) {
             var layers = JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
@@ -46,7 +48,7 @@ var CacheService = /** @class */ (function () {
         return JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
     };
     CacheService.createCacheInstance = function (cacheLayer) {
-        return new CacheLayerInstance(cacheLayer);
+        return new cache_instance_1.CacheLayerInstance(cacheLayer);
     };
     CacheService.isLocalStorageUsable = function () {
         var error = [];
@@ -73,7 +75,7 @@ var CacheService = /** @class */ (function () {
             return this.map.get(layer.name);
         }
         layer.items = layer.items || [];
-        layer.config = layer.config || this.config || CACHE_MODULE_DI_CONFIG;
+        layer.config = layer.config || this.config || cache_interfaces_1.CACHE_MODULE_DI_CONFIG;
         var cacheLayer = CacheService.createCacheInstance(layer);
         if (layer.config.localStorage && CacheService.isLocalStorageUsable()) {
             // tslint:disable-next-line:max-line-length
@@ -99,8 +101,8 @@ var CacheService = /** @class */ (function () {
     };
     CacheService.prototype.OnExpire = function (layerInstance) {
         var _this = this;
-        new Observable(function (observer) { return observer.next(); }).
-            pipe(timeoutWith(layerInstance.config.cacheFlushInterval || this.config.cacheFlushInterval, of(1)), skip(1)).subscribe(function () { return _this.removeLayer(layerInstance); });
+        new rxjs_1.Observable(function (observer) { return observer.next(); }).
+            pipe(operators_1.timeoutWith(layerInstance.config.cacheFlushInterval || this.config.cacheFlushInterval, rxjs_1.of(1)), operators_1.skip(1)).subscribe(function () { return _this.removeLayer(layerInstance); });
     };
     CacheService.prototype.removeLayer = function (layerInstance) {
         this.map.delete(layerInstance.name);
@@ -125,7 +127,7 @@ var CacheService = /** @class */ (function () {
     CacheService.prototype.flushCache = function (force) {
         var _this = this;
         var oldLayersNames;
-        return this.cachedLayers.pipe(take(1), map(function (layers) {
+        return this.cachedLayers.pipe(operators_1.take(1), operators_1.map(function (layers) {
             oldLayersNames = layers.map(function (l) { return l.name; });
             layers.forEach(function (layer) { return _this.removeLayer(layer); });
             if (force) {
@@ -138,9 +140,9 @@ var CacheService = /** @class */ (function () {
         }));
     };
     CacheService = __decorate([
-        __param(0, Inject(CACHE_MODULE_CONFIG)),
-        __metadata("design:paramtypes", [CacheServiceConfigInterface])
+        __param(0, core_1.Inject(cache_interfaces_1.CACHE_MODULE_CONFIG)),
+        __metadata("design:paramtypes", [cache_interfaces_1.CacheServiceConfigInterface])
     ], CacheService);
     return CacheService;
 }());
-export { CacheService };
+exports.CacheService = CacheService;

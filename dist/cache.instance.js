@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -33,22 +34,23 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-import { Observable, BehaviorSubject, of } from 'rxjs';
-import { filter, map, timeoutWith, skip } from 'rxjs/operators';
+Object.defineProperty(exports, "__esModule", { value: true });
+var rxjs_1 = require("rxjs");
+var operators_1 = require("rxjs/operators");
 var FRIENDLY_ERROR_MESSAGES = {
     MISSING_OBSERVABLE_ITEM: "is missing from the layer misspelled name ? as soon as you provide correct name value will be emitted!"
 };
 var CacheLayerInstance = /** @class */ (function () {
     function CacheLayerInstance(layer) {
         var _this = this;
-        this.items = new BehaviorSubject([]);
+        this.items = new rxjs_1.BehaviorSubject([]);
         this.map = new Map();
         this.name = layer.name;
         this.config = layer.config;
         if (this.config.localStorage) {
             // tslint:disable-next-line:no-string-literal
             layer.items.forEach(function (item) { return _this.map.set(item['key'], item); });
-            if (layer.items.constructor === BehaviorSubject) {
+            if (layer.items.constructor === rxjs_1.BehaviorSubject) {
                 layer.items = layer.items.getValue() || [];
             }
             this.items.next(this.items.getValue().concat(layer.items));
@@ -116,8 +118,8 @@ var CacheLayerInstance = /** @class */ (function () {
     };
     CacheLayerInstance.prototype.onExpire = function (key) {
         var _this = this;
-        new Observable(function (observer) { return observer.next(); })
-            .pipe(timeoutWith(this.config.maxAge, of(1)), skip(1)).subscribe(function () { return _this.removeItem(key); });
+        new rxjs_1.Observable(function (observer) { return observer.next(); })
+            .pipe(operators_1.timeoutWith(this.config.maxAge, rxjs_1.of(1)), operators_1.skip(1)).subscribe(function () { return _this.removeItem(key); });
     };
     CacheLayerInstance.prototype.removeItem = function (key) {
         // tslint:disable-next-line:no-string-literal
@@ -138,12 +140,12 @@ var CacheLayerInstance = /** @class */ (function () {
         if (this.map.has(key)) {
             console.error("Key: " + key + " " + FRIENDLY_ERROR_MESSAGES.MISSING_OBSERVABLE_ITEM);
         }
-        return this.items.asObservable().pipe(filter(function () { return _this.map.has(key); }), map(function (res) { return res[0]; }));
+        return this.items.asObservable().pipe(operators_1.filter(function () { return _this.map.has(key); }), operators_1.map(function (res) { return res[0]; }));
     };
     CacheLayerInstance.prototype.flushCache = function () {
         var _this = this;
         return this.items.asObservable()
-            .pipe(map(function (items) {
+            .pipe(operators_1.map(function (items) {
             // tslint:disable-next-line:no-string-literal
             items.forEach(function (i) { return _this.removeItem(i['key']); });
             return true;
@@ -173,4 +175,4 @@ var CacheLayerInstance = /** @class */ (function () {
     };
     return CacheLayerInstance;
 }());
-export { CacheLayerInstance };
+exports.CacheLayerInstance = CacheLayerInstance;
