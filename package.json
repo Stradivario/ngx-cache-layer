@@ -1,8 +1,10 @@
 {
   "name": "@rxdi/cache",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "module": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
@@ -21,8 +23,6 @@
   "bugs": {
     "url": "http://gitlab.youvolio.com/open-source/ngx-cache-layer/issues"
   },
-  "module": "ngx-cache-layer.js",
-  "typings": "ngx-cache-layer.d.ts",
   "devDependencies": {
     "@angular/core": "^7.0.0",
     "rxjs": "^6.3.3"
