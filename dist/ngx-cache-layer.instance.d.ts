@@ -17,4 +17,5 @@ export declare class CacheLayerInstance<T = {}> {
     removeItem(key: string): void;
     getItemObservable(key: string): Observable<T>;
     flushCache(): Observable<boolean>;
+    fetch(http: string, init?: RequestInit, cache?: boolean): Promise<any>;
 }

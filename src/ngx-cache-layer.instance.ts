@@ -132,4 +132,15 @@ export class CacheLayerInstance<T = {}> {
       );
   }
 
+  async fetch(http: string, init?: RequestInit, cache = true) {
+    if (this.config.localStorage && this.getItem(http) && cache) {
+      return this.getItem(http);
+    }
+    const data = await (await fetch(http)).json();
+    if (cache) {
+      this.putItem(<any>{ key: http, data: data })
+    }
+    return data;
+  }
+
 }
