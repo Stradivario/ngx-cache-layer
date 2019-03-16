@@ -1,386 +1,524 @@
 <!doctype html>
-<html class="no-js" lang="">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <title>ngx-cache-layer</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>ngx-cache-layer</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">ngx-cache-layer</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1> ngx-cache-layer</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<h1 id="-ngx-cache-layer">@ngx-cache-layer</h1>
+				<p><img src="http://gitlab.youvolio.com/open-source/ngx-cache-layer/badges/branch/build.svg" alt="Build Status"></p>
+				<h4 id="-strongtyped-easyapi-created-on-angular-2-">@StrongTyped @EasyAPI Created on Angular@2+</h4>
+				<h4 id="-cache-layer-with-capability-to-write-in-localstorage">@Cache layer with capability to write in LocalStorage</h4>
+				<h5 id="more-detailed-documentation-you-can-find-here">More detailed documentation you can find <a href="https://stradivario.github.io/ngx-cache-layer/">here</a></h5>
+				<h5 id="for-questions-issues-you-can-write-ticket-here">For questions/issues you can write ticket <a href="http://gitlab.youvolio.com/open-source/ngx-cache-layer/issues">here</a></h5>
+				<h5 id="animation-explanation-">Animation explanation:</h5>
+				<p><img src="https://github.com/Stradivario/ngx-cache-layer/raw/master/docs/animation/index.gif" alt="Alt Text"></p>
+				<h2 id="installation-and-basic-examples-">Installation and basic examples:</h2>
+				<h5 id="to-install-this-library-run-">To install this library, run:</h5>
+				<pre><code class="language-bash">$ npm install ngx-cache-layer --save</code></pre>
+				<h2 id="consuming-ngx-cache-layer">Consuming @ngx-cache-layer</h2>
+				<h4 id="import-cachemodule-forroot-in-your-angular-appmodule-">Import CacheModule.forRoot() in your Angular <code>AppModule</code>:</h4>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> {BrowserModule} <span class="hljs-keyword">from</span> <span class="hljs-string">'@angular/platform-browser'</span>;
+<span class="hljs-keyword">import</span> {NgModule} <span class="hljs-keyword">from</span> <span class="hljs-string">'@angular/core'</span>;
+<span class="hljs-keyword">import</span> {AppComponent} <span class="hljs-keyword">from</span> <span class="hljs-string">'./app.component'</span>;
 
-        <link rel="icon" type="image/x-icon" href="images/favicon.ico">
-	    <link rel="stylesheet" href="styles/style.css">
-    </head>
-    <body>
+<span class="hljs-comment">// Import @ngx-cache-layer library</span>
+<span class="hljs-keyword">import</span> {CacheModule} <span class="hljs-keyword">from</span> <span class="hljs-string">'ngx-cache-layer'</span>;
 
-        <div class="navbar navbar-default navbar-fixed-top visible-xs">
-            <a href="" class="navbar-brand">ngx-cache-layer</a>
-            <button type="button" class="btn btn-default btn-menu fa fa-bars" id="btn-menu"></button>
-        </div>
+<span class="hljs-meta">@NgModule</span>({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    <span class="hljs-comment">// Import CacheModule optional parameters provided at the bottom of readme</span>
+    CacheModule.forRoot(),
+    LibraryModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> AppModule { }</code></pre>
+				<h4 id="once-you-import-the-library-you-need-to-inject-cacheservice-inside-your-component-provider-etc-and-create-cache-layer">Once you import the library you need to inject CacheService inside your component, provider etc. and create cache Layer</h4>
+				<h5 id="-note-every-cache-created-by-cacheservice-is-treated-like-a-layer-so-you-need-to-specify-layer-name-like-example-above"><code>***NOTE Every cache created by cacheService is treated like a LAYER , so you need to specify layer name like example above</code></h5>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> {Component, OnInit} <span class="hljs-keyword">from</span> <span class="hljs-string">'@angular/core'</span>;
+<span class="hljs-keyword">import</span> {BehaviorSubject, Subscription} <span class="hljs-keyword">from</span> <span class="hljs-string">'rxjs'</span>;
+<span class="hljs-keyword">import</span> {CacheService, CacheLayer, CacheLayerItem} <span class="hljs-keyword">from</span> <span class="hljs-string">'ngx-cache-layer'</span>;
 
-        <div class="xs-menu menu" id="mobile-menu">
-            <div id="book-search-input" role="search">
-                <input type="text" placeholder="Type to search">
-            </div>
-            <nav>
-            
-                <ul class="list">
-            
-                    <li class="title">
-                        <a href="index.html">ngx-cache-layer</a>
-                    </li>
-            
-                    <li class="divider"></li>
-            
-            
-                    <li class="chapter">
-                        <a data-type="chapter-link" href="index.html"><span class="fa fa-home"></span>Getting started</a>
-                        <ul class="links">
-                                <li class="link">
-                                    <a href=""
-                                        
-                                         class="active" 
-                                        >
-                                        <span class="fa fa-th"></span>Overview
-                                    </a>
-                                </li>
-                        </ul>
-                    </li>
-            
-            
-                    <li class="chapter">
-                        <a data-type="chapter-link" href="modules.html" >
-                            <div class="menu-toggler linked" data-toggle="collapse"
-                                    data-target="#xs-modules-links"
-                            >
-                                <span class="fa fa-archive"></span>
-                                <span class="link-name">Modules</span>
-                                <span class="fa fa-angle-down"></span>
-                            </div>
-                        </a>
-                        <ul class="links collapse "
-                                id="xs-modules-links"
-                            >
-                                <li class="link">
-                                    <a href="modules/CacheModule.html" >CacheModule</a>
-                                </li>
-                        </ul>
-                    </li>
-            
-            
-            
-                    <li class="chapter">
-                        <div class="simple menu-toggler" data-toggle="collapse"
-                                data-target="#xs-classes-links"
-                            >
-                            <span class="fa fa-file-code-o"></span>
-                            <span>Classes</span>
-                            <span class="fa fa-angle-down"></span>
-                        </div>
-                        <ul class="links collapse "
-                                id="xs-classes-links"
-                            >
-                                <li class="link">
-                                    <a href="classes/CacheLayer.html" >CacheLayer</a>
-                                </li>
-                                <li class="link">
-                                    <a href="classes/CacheService.html" >CacheService</a>
-                                </li>
-                                <li class="link">
-                                    <a href="classes/CacheServiceConfigInterface.html" >CacheServiceConfigInterface</a>
-                                </li>
-                        </ul>
-                    </li>
-            
-            
-                    <li class="chapter">
-                        <div class="simple menu-toggler" data-toggle="collapse"
-                                data-target="#xs-interfaces-links"
-                            >
-                            <span class="fa fa-info"></span>
-                            <span>Interfaces</span>
-                            <span class="fa fa-angle-down"></span>
-                        </div>
-                        <ul class="links collapse "
-                                id="xs-interfaces-links"
-                            >
-                                <li class="link">
-                                    <a href="interfaces/CacheLayerInterface.html" >CacheLayerInterface</a>
-                                </li>
-                                <li class="link">
-                                    <a href="interfaces/CacheLayerItem.html" >CacheLayerItem</a>
-                                </li>
-                        </ul>
-                    </li>
-            
-            
-                    <li class="chapter">
-                        <div class="simple menu-toggler" data-toggle="collapse"
-                                data-target="#xs-miscellaneous-links"
-                            >
-                            <span class="fa fa-cubes"></span>
-                            <span>Miscellaneous</span>
-                            <span class="fa fa-angle-down"></span>
-                        </div>
-                        <ul class="links collapse "
-                                id="xs-miscellaneous-links"
-                            >
-                                <li class="link">
-                                  <a href="miscellaneous/variables.html" data-type="entity-link" >Variables</a>
-                                </li>
-                        </ul>
-                    </li>
-            
-            
-                    <li class="chapter">
-                        <a data-type="chapter-link" href="coverage.html" ><span class="fa fa-tasks"></span>Documentation coverage</a>
-                    </li>
-            
-            
-                </ul>
-            
-            </nav>
-        </div>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> Item {
+  name: <span class="hljs-built_in">string</span>;
+}
 
-        <div class="container-fluid main">
-           <div class="row main">
-               <div class="hidden-xs menu">
-                   <nav>
-                   
-                       <ul class="list">
-                   
-                           <li class="title">
-                               <a href="index.html">ngx-cache-layer</a>
-                           </li>
-                   
-                           <li class="divider"></li>
-                   
-                               <div id="book-search-input" role="search">
-                                   <input type="text" placeholder="Type to search">
-                               </div>
-                   
-                           <li class="chapter">
-                               <a data-type="chapter-link" href="index.html"><span class="fa fa-home"></span>Getting started</a>
-                               <ul class="links">
-                                       <li class="link">
-                                           <a href=""
-                                               
-                                                class="active" 
-                                               >
-                                               <span class="fa fa-th"></span>Overview
-                                           </a>
-                                       </li>
-                               </ul>
-                           </li>
-                   
-                   
-                           <li class="chapter">
-                               <a data-type="chapter-link" href="modules.html" >
-                                   <div class="menu-toggler linked" data-toggle="collapse"
-                                           data-target="#modules-links"
-                                   >
-                                       <span class="fa fa-archive"></span>
-                                       <span class="link-name">Modules</span>
-                                       <span class="fa fa-angle-down"></span>
-                                   </div>
-                               </a>
-                               <ul class="links collapse "
-                                       id="modules-links"
-                   >
-                                       <li class="link">
-                                           <a href="modules/CacheModule.html" >CacheModule</a>
-                                       </li>
-                               </ul>
-                           </li>
-                   
-                   
-                   
-                           <li class="chapter">
-                               <div class="simple menu-toggler" data-toggle="collapse"
-                                       data-target="#classes-links"
-                   >
-                                   <span class="fa fa-file-code-o"></span>
-                                   <span>Classes</span>
-                                   <span class="fa fa-angle-down"></span>
-                               </div>
-                               <ul class="links collapse "
-                                       id="classes-links"
-                   >
-                                       <li class="link">
-                                           <a href="classes/CacheLayer.html" >CacheLayer</a>
-                                       </li>
-                                       <li class="link">
-                                           <a href="classes/CacheService.html" >CacheService</a>
-                                       </li>
-                                       <li class="link">
-                                           <a href="classes/CacheServiceConfigInterface.html" >CacheServiceConfigInterface</a>
-                                       </li>
-                               </ul>
-                           </li>
-                   
-                   
-                           <li class="chapter">
-                               <div class="simple menu-toggler" data-toggle="collapse"
-                                       data-target="#interfaces-links"
-                   >
-                                   <span class="fa fa-info"></span>
-                                   <span>Interfaces</span>
-                                   <span class="fa fa-angle-down"></span>
-                               </div>
-                               <ul class="links collapse "
-                                       id="interfaces-links"
-                   >
-                                       <li class="link">
-                                           <a href="interfaces/CacheLayerInterface.html" >CacheLayerInterface</a>
-                                       </li>
-                                       <li class="link">
-                                           <a href="interfaces/CacheLayerItem.html" >CacheLayerItem</a>
-                                       </li>
-                               </ul>
-                           </li>
-                   
-                   
-                           <li class="chapter">
-                               <div class="simple menu-toggler" data-toggle="collapse"
-                                       data-target="#miscellaneous-links"
-                   >
-                                   <span class="fa fa-cubes"></span>
-                                   <span>Miscellaneous</span>
-                                   <span class="fa fa-angle-down"></span>
-                               </div>
-                               <ul class="links collapse "
-                                       id="miscellaneous-links"
-                   >
-                                       <li class="link">
-                                         <a href="miscellaneous/variables.html" data-type="entity-link" >Variables</a>
-                                       </li>
-                               </ul>
-                           </li>
-                   
-                   
-                           <li class="chapter">
-                               <a data-type="chapter-link" href="coverage.html" ><span class="fa fa-tasks"></span>Documentation coverage</a>
-                           </li>
-                   
-                   
-                       </ul>
-                   
-                   </nav>
-               </div>
-               <div class="content overview">
-                   <div class="content-data">
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> EXAMPLE_CACHE_LAYER_NAME = <span class="hljs-string">'example-layer'</span>;
+
+<span class="hljs-meta">@Component</span>({
+  selector: <span class="hljs-string">'app-example'</span>,
+  templateUrl: <span class="hljs-string">'./example.component.html'</span>,
+  styleUrls: [<span class="hljs-string">'./example.component.scss'</span>]
+})
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> ExampleComponent <span class="hljs-keyword">implements</span> OnInit {
+
+  exampleLayer: CacheLayer&lt;CacheLayerItem&lt;Item&gt;&gt;;
+  exampleLayerItems: BehaviorSubject&lt;CacheLayerItem&lt;Item&gt;[]&gt;;
+  subscription: Subscription;
+
+  <span class="hljs-keyword">constructor</span>(<span class="hljs-params">
+    <span class="hljs-keyword">private</span> cacheService: CacheService
+  </span>) {}
+
+  ngOnInit() {
+    <span class="hljs-comment">// Here we define our cache layer name, this method returns instance of class CacheLayer&lt;CacheLayerItem&lt;Item&gt;&gt;</span>
+    <span class="hljs-keyword">this</span>.exampleLayer = <span class="hljs-keyword">this</span>.cacheService.createLayer&lt;Item&gt;({
+      name: EXAMPLE_CACHE_LAYER_NAME
+    });
+
+    <span class="hljs-comment">// inside this.exampleCache you can find object named items returns BehaviorSubject&lt;CacheLayerItem&lt;Item&gt;[]&gt; object type</span>
+    <span class="hljs-keyword">this</span>.exampleLayerItems = <span class="hljs-keyword">this</span>.exampleLayer.items
+
+    <span class="hljs-comment">// Correct implementation of subscribing to collection of layer items and work inside component with it:</span>
+    <span class="hljs-comment">// Recommended way to work with cacheLayer collection items is to create another observable asObservable and use items this way</span>
+    <span class="hljs-comment">// Anyway it is better to let angular view model to handle subscription itself ( cartItems | async)</span>
+    <span class="hljs-comment">// To work with collection this way you can use collection Instance returned from getLayer above (this.cacheLayer) (Examples Below)</span>
+
+    <span class="hljs-keyword">this</span>.subscription = <span class="hljs-keyword">this</span>.exampleLayerItems.asObservable()
+      .subscribe(<span class="hljs-function"><span class="hljs-params">items</span> =&gt;</span> {
+
+      });
+
+    <span class="hljs-comment">// If you try to unsubscribe from this.cacheItems when you leave component state ngOnDestroy(),</span>
+    <span class="hljs-comment">// you will loose observable stream from the cache layer and the result will be error ***Check NOTES below***</span>
+    <span class="hljs-comment">// Another method is to take values single time only per component initialization</span>
+
+    <span class="hljs-keyword">this</span>.exampleLayerItems
+      .take(<span class="hljs-number">1</span>)
+      .subscribe(<span class="hljs-function"><span class="hljs-params">itemCollection</span> =&gt;</span> itemCollection
+        .forEach(<span class="hljs-function"><span class="hljs-params">item</span> =&gt;</span> {
+          <span class="hljs-comment">// Because we define interface for this items we have the following autosuggestion from the IDE</span>
+          <span class="hljs-keyword">const</span> itemName = item.data.name;
+        })
+      );
+
+    <span class="hljs-comment">// Put item to current cache defined above</span>
+    <span class="hljs-comment">// When there is a new item added to collection cache automatically emits new results to this.exampleLayerItems BehaviorSubject object type</span>
+
+    <span class="hljs-keyword">this</span>.createItem({
+      key:<span class="hljs-string">'example-key'</span>,
+      data:{
+        name:<span class="hljs-string">'pesho'</span>
+      }
+    });
+
+    <span class="hljs-comment">// Get cached data from added item above will return {exampleData:'example-string'}</span>
+    <span class="hljs-keyword">const</span> exampleData = <span class="hljs-keyword">this</span>.getItem(<span class="hljs-string">'example-key'</span>);
+
+    <span class="hljs-comment">// Remove item from current layer</span>
+    <span class="hljs-keyword">this</span>.removeItem(<span class="hljs-string">'example-key'</span>);
+
+  }
+
+  createItem(data: <span class="hljs-built_in">any</span>) {
+    <span class="hljs-keyword">this</span>.exampleLayer.putItem(data);
+  }
+
+  getItem(key: <span class="hljs-built_in">string</span>) {
+    <span class="hljs-keyword">this</span>.exampleLayer.getItem(key);
+  }
+
+  removeItem(key: <span class="hljs-built_in">string</span>) {
+    <span class="hljs-keyword">this</span>.exampleLayer.removeItem(key);
+  }
+
+}
+</code></pre>
+				<h5 id="get-our-new-created-cache-from-component-which-is-somewhere-inside-our-application">Get our new created cache from component which is somewhere inside our application</h5>
+				<pre><code class="language-typescript">
+<span class="hljs-keyword">import</span> {Injectable} <span class="hljs-keyword">from</span> <span class="hljs-string">'@angular/core'</span>;
+<span class="hljs-keyword">import</span> {CacheService, CacheLayer} <span class="hljs-keyword">from</span> <span class="hljs-string">'ngx-cache-layer'</span>;
+<span class="hljs-keyword">import</span> {EXAMPLE_CACHE_LAYER_NAME, Item} <span class="hljs-keyword">from</span> <span class="hljs-string">'./example.provider'</span>;
+
+<span class="hljs-meta">@Injectable</span>()
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> YourClass {
+    cacheLayer: CacheLayer&lt;CacheLayerItem&lt;Item&gt;&gt;;
+    <span class="hljs-keyword">constructor</span>(<span class="hljs-params"><span class="hljs-keyword">private</span>:cacheService:CacheService</span>){
+      <span class="hljs-keyword">this</span>.cacheLayer = cacheService.getLayer&lt;Item&gt;(EXAMPLE_CACHE_LAYER_NAME);
+      <span class="hljs-comment">// Now work with this collection the same as example above;</span>
+    }
+}</code></pre>
+				<h5 id="remove-cache-layer-we-created-from-other-service-or-component-">Remove cache layer we created from other service or component.</h5>
+				<pre><code class="language-typescript">
+<span class="hljs-keyword">import</span> {Injectable} <span class="hljs-keyword">from</span> <span class="hljs-string">'@angular/core'</span>;
+<span class="hljs-keyword">import</span> {CacheService} <span class="hljs-keyword">from</span> <span class="hljs-string">'ngx-cache-layer'</span>;
+<span class="hljs-keyword">import</span> {EXAMPLE_CACHE_LAYER_NzAME} <span class="hljs-keyword">from</span> <span class="hljs-string">'./example.provider'</span>;
+
+<span class="hljs-meta">@Injectable</span>()
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> YourClass {
+    <span class="hljs-keyword">constructor</span>(<span class="hljs-params"><span class="hljs-keyword">private</span>:cacheService:CacheService</span>) {
+      cacheService.removeLayer(EXAMPLE_CACHE_LAYER_NAME);
+    }
+}</code></pre>
+				<h3 id="complete-add-to-card-example-">COMPLETE  ADD TO CARD EXAMPLE:</h3>
+				<h5 id="create-cartprovider-which-will-help-us-to-reduce-logic-inside-component">Create CartProvider which will help us to reduce logic inside component</h5>
+				<h5 id="important-when-you-use-provider-and-define-custom-settings-you-need-to-use-provider-cache-layer-instance-">IMPORTANT When you use provider and define custom settings you need to use provider cache layer instance!</h5>
+				<h5 id="if-you-use-cacheservice-getlayer-with-the-same-cache-name-it-may-lead-to-not-initialize-current-defined-config-when-we-createlayer-with-specific-config-not-global">If you use CacheService.getLayer() with the same cache name it may lead to not initialize current defined config when we createLayer with specific config not global</h5>
+				<h5 id="without-provider-you-can-use-it-as-usual-with-getlayer-and-createlayer-it-will-be-safe-but-it-will-take-global-configuration-instead-">Without provider you can use it as usual with getLayer() and createLayer() it will be safe but it will take Global Configuration instead.</h5>
+				<pre><code class="language-typescript">
+<span class="hljs-keyword">import</span> {Injectable} <span class="hljs-keyword">from</span> <span class="hljs-string">"@angular/core"</span>;
+<span class="hljs-keyword">import</span> {CacheService, CacheLayer, CacheLayerItem, CacheServiceConfigInterface} <span class="hljs-keyword">from</span> <span class="hljs-string">"ngx-cache-layer"</span>;
+<span class="hljs-keyword">import</span> {Product} <span class="hljs-keyword">from</span> <span class="hljs-string">"../core/config/queries/product/product.interface"</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> CART_CACHE_LAYER_NAME = <span class="hljs-string">'cart'</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> Product {
+  id: <span class="hljs-built_in">string</span>;
+  name: <span class="hljs-built_in">string</span>;
+  title: <span class="hljs-built_in">string</span>;
+  price: <span class="hljs-built_in">string</span>;
+  quantity: <span class="hljs-built_in">number</span>;
+  completed: <span class="hljs-built_in">boolean</span>;
+  categoryId: <span class="hljs-built_in">number</span>;
+}
+
+<span class="hljs-meta">@Injectable</span>()
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> CartProvider {
+
+  cacheLayer: CacheLayer&lt;CacheLayerItem&lt;Product&gt;&gt;;
+  items: BehaviorSubject&lt;CacheLayerItem&lt;Product&gt;[]&gt;;
+
+  <span class="hljs-keyword">constructor</span>(<span class="hljs-params"><span class="hljs-keyword">private</span> cacheService: CacheService</span>) {
+    <span class="hljs-keyword">this</span>.cacheLayer = <span class="hljs-keyword">this</span>.cacheService.createLayer&lt;Product&gt;(&lt;CacheLayerInterface&gt;{
+      name: CART_CACHE_LAYER_NAME,
+      config: &lt;CacheServiceConfigInterface&gt;{
+        localStorage: <span class="hljs-literal">true</span>,
+        maxAge: <span class="hljs-number">10000</span>,
+        cacheFlushInterval: <span class="hljs-number">10000</span>,
+        deleteOnExpire: <span class="hljs-string">'aggressive'</span>
+      }
+    });
+    <span class="hljs-keyword">this</span>.items = <span class="hljs-keyword">this</span>.cacheLayer.items;
+  }
+
+  putToCart(product: Product) {
+    <span class="hljs-keyword">this</span>.cacheLayer.putItem({
+      key:product.id,
+      data: product
+    });
+  }
+
+  removeFromCart(product: Product) {
+    <span class="hljs-keyword">this</span>.cacheLayer.removeItem(product.id);
+  }
+
+}
+</code></pre>
+				<h5 id="now-lets-define-our-component-and-inject-cartprovider">Now lets define our component and inject CartProvider</h5>
+				<pre><code class="language-typescript">
+<span class="hljs-keyword">import</span> {Component, OnInit} <span class="hljs-keyword">from</span> <span class="hljs-string">'@angular/core'</span>;
+
+<span class="hljs-meta">@Component</span>({
+  selector: <span class="hljs-string">'app-cart'</span>,
+  templateUrl: <span class="hljs-string">'./cart.component.html'</span>,
+  styleUrls: [<span class="hljs-string">'./cart.component.scss'</span>]
+})
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> CartComponent <span class="hljs-keyword">implements</span> OnInit {
+
+  cartItems: BehaviorSubject&lt;CacheLayerItem&lt;Product&gt;[]&gt;;
+  cacheLayer: CacheLayer&lt;CacheLayerItem&lt;Product&gt;&gt;;
+
+  <span class="hljs-keyword">constructor</span>(<span class="hljs-params"><span class="hljs-keyword">private</span> cartProvider: CartProvider</span>) {}
+
+  ngOnInit() {}
+
+  removeItem(product: Product) {
+    <span class="hljs-keyword">this</span>.cartProvider.removeFromCard(product)
+  }
+
+  updateItem(product: Product) {
+    <span class="hljs-keyword">this</span>.cartProvider.putToCart(product);
+  }
+
+}</code></pre>
+				<h5 id="how-to-consume-items-inside-html">How to consume items inside html</h5>
+				<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> *<span class="hljs-attr">ngFor</span>=<span class="hljs-string">"let product of (cartProvider.items | async)"</span>&gt;</span>
+    {{item.key}} // is cache identity
+    {{item.data.id}} // Cached data from current item from card layer Observable
+    <span class="hljs-tag">&lt;<span class="hljs-name">--</span> <span class="hljs-attr">removeItemKey</span> <span class="hljs-attr">in</span> <span class="hljs-attr">my</span> <span class="hljs-attr">case</span> <span class="hljs-attr">item.id</span> <span class="hljs-attr">is</span> <span class="hljs-attr">unique</span> <span class="hljs-attr">so</span> <span class="hljs-attr">i</span> <span class="hljs-attr">should</span> <span class="hljs-attr">remove</span> <span class="hljs-attr">item</span> <span class="hljs-attr">id</span> <span class="hljs-attr">--</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> (<span class="hljs-attr">click</span>)=<span class="hljs-string">"removeItem(product)"</span>&gt;</span>Remove item<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></code></pre>
+				<br>
+				<h3 id="how-to-define-globalconfiguration">How to define GlobalConfiguration</h3>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> {BrowserModule} <span class="hljs-keyword">from</span> <span class="hljs-string">'@angular/platform-browser'</span>;
+<span class="hljs-keyword">import</span> {NgModule} <span class="hljs-keyword">from</span> <span class="hljs-string">'@angular/core'</span>;
+<span class="hljs-keyword">import</span> {AppComponent} <span class="hljs-keyword">from</span> <span class="hljs-string">'./app.component'</span>;
+
+<span class="hljs-comment">// Import ngx-cache-layer</span>
+<span class="hljs-keyword">import</span> {CacheModule, CacheConfigInterface} <span class="hljs-keyword">from</span> <span class="hljs-string">'ngx-cache-layer'</span>;
+
+<span class="hljs-comment">// Define global configuration</span>
+<span class="hljs-comment">// You can set localStorage to true it will cache every layers like a localStorage item</span>
+<span class="hljs-comment">// By default localStorage is set to false</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> CACHE_DI_CONFIG = &lt;CacheConfigInterface&gt;{
+    localStorage: <span class="hljs-literal">true</span>,
+    maxAge: <span class="hljs-number">15</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>, <span class="hljs-comment">// Items added to this cache expire after 15 minutes</span>
+    cacheFlushInterval: <span class="hljs-number">60</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>, <span class="hljs-comment">// This cache will clear itself every hour</span>
+    deleteOnExpire: <span class="hljs-string">'aggressive'</span> <span class="hljs-comment">// Items will be deleted from this cache when they expire</span>
+}
+
+<span class="hljs-meta">@NgModule</span>({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    <span class="hljs-comment">// Import CacheModule with CACHE_DI_CONFIG;</span>
+    CacheModule.forRoot(CACHE_DI_CONFIG)
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> AppModule { }</code></pre>
+				<br>
+				<h3 id="service-methods">Service methods</h3>
+				<h5 id="create-cache-layer">Create cache layer</h5>
+				<pre><code class="language-typescript">CacheService.createLayer&lt;<span class="hljs-built_in">any</span>&gt;({name: <span class="hljs-string">'layer-name'</span>, settings?: CacheLayerInterface})</code></pre>
+				<p><code>Optional you can define custom settings for every layer that you create just insert CacheLayerInterface from ngx-cache-layer like example for global config above</code></p>
+				<p>Returns: <code>Instance of CacheLayer class</code>
+				Optional: <code>settings interface CacheLayerInterface</code></p>
+				<h5 id="get-layer-from-cache">Get layer from cache</h5>
+				<pre><code class="language-typescript">CacheService.getLayer&lt;<span class="hljs-built_in">any</span>&gt;(<span class="hljs-string">'layer-name'</span>);</code></pre>
+				<p>Returns: <code>Instance of CacheLayer class</code></p>
+				<h5 id="remove-layer-from-cache">Remove layer from cache</h5>
+				<pre><code class="language-typescript">CacheService.removeLayer(<span class="hljs-string">'layer-name'</span>);</code></pre>
+				<p>Returns: <code>void</code></p>
+				<pre><code class="language-typescript">CacheLayer.createCacheParams({key: <span class="hljs-string">'endpoint-key'</span>, params: {exampleParam: <span class="hljs-string">'test'</span>}});</code></pre>
+				<h5 id="create-cache-with-parameters-static-public-method-of-cachelayer-class">Create Cache with parameters static public method of CacheLayer Class</h5>
+				<h6 id="usage-when-you-have-api-endpoints-with-custom-parameters-and-you-need-to-cache-result-returned-from-response">Usage: when you have api endpoints with custom parameters and you need to cache result returned from response</h6>
+				<p>Complete cache for endpoint with 8 rows more code without it :)</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">const</span> endpointCache = <span class="hljs-keyword">this</span>.cacheService.getLayer(<span class="hljs-string">'endpoint-cache'</span>);
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getUserById</span>(<span class="hljs-params">id: <span class="hljs-built_in">number</span></span>) </span>{
+  <span class="hljs-keyword">return</span> Observable.create(<span class="hljs-function"><span class="hljs-params">observer</span> =&gt;</span> {
+    <span class="hljs-keyword">const</span> ENDPOINT = <span class="hljs-string">`/user/<span class="hljs-subst">${id}</span>`</span>;
+    <span class="hljs-keyword">const</span> PARAMS = {
+      client_credentials: <span class="hljs-literal">true</span>,
+    };
+    <span class="hljs-keyword">const</span> cacheAddress = CacheLayer.createCacheParams({ key: ENDPOINT, params: PARAMS });
+    <span class="hljs-keyword">if</span> (endpointCache.getItem(cacheAddress)) {
+      <span class="hljs-keyword">return</span> observer.next(endpointCache.getItem(cacheAddress));
+    }
+    <span class="hljs-comment">// endpointCache.putItem method like getItem returns instance of cached item so we can safely return to the observer above</span>
+    <span class="hljs-keyword">this</span>.http.post(ENDPOINT, PARAMS)
+    .map(<span class="hljs-function"><span class="hljs-params">user</span> =&gt;</span>
+        observer.next(endpointCache.putItem({ key: cacheAddress, data: user.json() }))
+    )
+    .subscribe()
+  });
+}</code></pre>
+				<br>
+				<h3 id="cache-layer-instance-methods">Cache Layer Instance methods</h3>
+				<pre><code class="language-typescript"><span class="hljs-keyword">const</span> cache = CacheService.getLayer&lt;<span class="hljs-built_in">any</span>&gt;(<span class="hljs-string">'layer-name'</span>);</code></pre>
+				<h5 id="put-item-to-cache">Put item to cache</h5>
+				<pre><code class="language-typescript">cache.putItem({key:<span class="hljs-string">'example-key'</span>, data:{exampleData:<span class="hljs-string">''</span>}});</code></pre>
+				<h5 id="get-item-from-cache">Get item from cache</h5>
+				<pre><code class="language-typescript">cache.getItem(<span class="hljs-string">'example-key'</span>);</code></pre>
+				<h5 id="get-item-from-cache-as-observable-it-will-emit-every-value-changed-for-that-specific-key">Get item from cache as observable it will emit every value changed for that specific key</h5>
+				<pre><code class="language-typescript">cache.getItemObservable(<span class="hljs-string">'example-key'</span>);</code></pre>
+				<h5 id="remove-item-from-cache">Remove item from cache</h5>
+				<pre><code class="language-typescript">cache.removeItem(<span class="hljs-string">'example-key'</span>);</code></pre>
+				<br>
+				<h1 id="notes-">NOTES:</h1>
+				<br>
+				<h1 id="first">FIRST</h1>
+				<h4 id="to-avoid-memory-leaks-it-is-really-important-to-subscribe-only-once-when-you-initialize-items-from-cache-">To avoid memory leaks it is really important to subscribe ONLY ONCE when you initialize items from cache,</h4>
+				<h4 id="or-use-examples-bellow-to-iterate-over-items-from-collection-and-correct-unsubscribe-from-them-">or use examples bellow to iterate over items from collection and correct unsubscribe from them.</h4>
+				<h4 id="the-example-below-is-correct-implementation-how-it-will-work-without-any-problems-">The example below is correct implementation how it will work without any problems!</h4>
+				<h4 id="inside-html-when-you-use-cartitems-async-async-pipe-the-view-handles-this-automatically-">Inside html when you use ( cartItems | async ) async pipe the view handles this automatically.`</h4>
+				<pre><code class="language-typescript">
+  ngOnInit() {
+    <span class="hljs-keyword">this</span>.cacheLayer = <span class="hljs-keyword">this</span>.cache.getLayer&lt;Product&gt;(CART_CACHE_LAYER_NAME);
+    <span class="hljs-keyword">this</span>.cartItems = <span class="hljs-keyword">this</span>.cacheLayer.items;
 
 
-<h3>Overview</h3>
-            <div class="text-center">
-                <div id="module-graph-svg">
-                    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
- "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.40.1 (20161225.0304)
- -->
-<!-- Title: dependencies Pages: 1 -->
-<svg width="504pt" height="70pt"
- viewBox="0.00 0.00 504.00 70.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 66)">
-<title>dependencies</title>
-<polygon fill="#ffffff" stroke="transparent" points="-4,4 -4,-66 500,-66 500,4 -4,4"/>
-<text text-anchor="start" x="227.0091" y="-42.4" font-family="sans-serif" font-weight="bold" font-size="14.00" fill="#000000">Legend</text>
-<polygon fill="#ffffb3" stroke="transparent" points="14,-10 14,-30 34,-30 34,-10 14,-10"/>
-<text text-anchor="start" x="37.629" y="-15.4" font-family="sans-serif" font-size="14.00" fill="#000000"> &#160;Declarations</text>
-<polygon fill="#8dd3c7" stroke="transparent" points="127,-10 127,-30 147,-30 147,-10 127,-10"/>
-<text text-anchor="start" x="150.7251" y="-15.4" font-family="sans-serif" font-size="14.00" fill="#000000"> &#160;Module</text>
-<polygon fill="#80b1d3" stroke="transparent" points="213,-10 213,-30 233,-30 233,-10 213,-10"/>
-<text text-anchor="start" x="236.7812" y="-15.4" font-family="sans-serif" font-size="14.00" fill="#000000"> &#160;Bootstrap</text>
-<polygon fill="#fdb462" stroke="transparent" points="310,-10 310,-30 330,-30 330,-10 310,-10"/>
-<text text-anchor="start" x="333.6732" y="-15.4" font-family="sans-serif" font-size="14.00" fill="#000000"> &#160;Providers</text>
-<polygon fill="#fb8072" stroke="transparent" points="406,-10 406,-30 426,-30 426,-10 406,-10"/>
-<text text-anchor="start" x="429.7258" y="-15.4" font-family="sans-serif" font-size="14.00" fill="#000000"> &#160;Exports</text>
-</g>
-</svg>
+    <span class="hljs-comment">// CORRECT EXAMPLE(BestWay) you need to unsubscribe when you leave component!</span>
 
-                </div>
-                <div class="btn-group">
-                    <button id="zoom-in" class="btn btn-default btn-sm">Zoom in</button>
-                    <button id="reset" class="btn btn-default btn-sm">Reset</button>
-                    <button id="zoom-out" class="btn btn-default btn-sm">Zoom out</button>
-                </div>
-            </div>
-<div class="container-fluid overview">
-    <div class="row">
-            <div class="col-sm-3">
-                <div class="card text-center">
-                    <div class="card-block">
-                        <h4 class="card-title"><span class="fa fa-archive"></span></h4>
-                        <p class="card-text">
-                            <a href="./modules.html">1 module</a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-3">
-                <div class="card text-center">
-                    <div class="card-block">
-                        <h4 class="card-title"><span class="fa fa-file-code-o"></span></h4>
-                        <p class="card-text">3 classes</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-3">
-                <div class="card text-center">
-                    <div class="card-block">
-                        <h4 class="card-title"><span class="fa fa-info"></span></h4>
-                        <p class="card-text">2 interfaces</p>
-                    </div>
-                </div>
-            </div>
-    </div>
+    <span class="hljs-keyword">this</span>.subscription = <span class="hljs-keyword">this</span>.cartItems.asObservable()
+      .subscribe(<span class="hljs-function"><span class="hljs-params">items</span> =&gt;</span> {
+        <span class="hljs-comment">// Do something</span>
+      });
+
+    <span class="hljs-comment">// ANOTHER CORRECT EXAMPLE (this method will subscribe only once and you cannot get new results if there are any new)</span>
+    <span class="hljs-keyword">this</span>.cartItems.take(<span class="hljs-number">1</span>).subscribe(<span class="hljs-function"><span class="hljs-params">collection</span> =&gt;</span> {
+      <span class="hljs-comment">// Do something with collection here and initialize only once inside component</span>
+    });
+
+    <span class="hljs-comment">// WRONG EXAMPLE</span>
+    <span class="hljs-keyword">this</span>.cartItems.subscribe(<span class="hljs-function"><span class="hljs-params">collection</span> =&gt;</span> {
+    <span class="hljs-comment">// don't do anything with collection this way or you will lead subscribing many times to the same collection</span>
+    });
+  }
+
+  ngOnDestroy() {
+    <span class="hljs-keyword">this</span>.subscription.unsubscribe();
+  }</code></pre>
+				<br>
+				<h1 id="second">SECOND</h1>
+				<h4 id="don-t-call-unsubscribe-directly-on-collection-because-you-will-loose-reactive-binding-to-collection-and-you-will-lead-to-following-error">Don&#39;t call unsubscribe directly on collection because you will loose reactive binding to collection and you will lead to following error</h4>
+				<h4 id="if-you-subscribe-once-like-example-above-you-will-have-no-problems-at-all-">If you subscribe once, like example above you will have no problems at all!</h4>
+				<p><code>&quot;object unsubscribed&quot; name: &quot;ObjectUnsubscribedError&quot; ngDebugContext:DebugContext_ {view: {…}, nodeIndex: 27, nodeDef: {…}, elDef: {…}, elView: {…}}ngErrorLogger:ƒ ()stack:&quot;ObjectUnsubscribedError: object unsubscribed</code></p>
+				<h2 id="license">License</h2>
+				<p>MIT © <a href="mailto:kristiqn.tachev@gmail.com">Kristian Tachev(Stradivario)</a></p>
+				<p><code></code></p>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_index_.html">"index"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_ngx_cache_layer_instance_.html">"ngx-<wbr>cache-<wbr>layer.instance"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_ngx_cache_layer_interfaces_.html">"ngx-<wbr>cache-<wbr>layer.interfaces"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_ngx_cache_layer_service_.html">"ngx-<wbr>cache-<wbr>layer.service"</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
 </div>
-<script src="js/libs/svg-pan-zoom.min.js"></script>
-<script src="js/svg-pan-zoom.controls.js"></script>
-
-
-
-
-
-
-
-
-
-
-
-                   </div><div class="search-results">
-    <div class="has-results">
-        <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
-        <ul class="search-results-list"></ul>
-    </div>
-    <div class="no-results">
-        <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
-    </div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
 </div>
-</div>
-           </div>
-       </div>
-
-       <script src="js/libs/bootstrap-native.js"></script>
-
-       <script src="js/libs/es6-shim.min.js"></script>
-       <script src="js/libs/EventDispatcher.js"></script>
-       <script src="js/libs/promise.min.js"></script>
-       <script src="js/libs/zepto.min.js"></script>
-
-       <script src="js/compodoc.js"></script>
-
-       <script>var COMPODOC_CURRENT_PAGE_DEPTH = ;</script>
-
-       <script src="js/search/search.js"></script>
-       <script src="js/search/lunr.min.js"></script>
-       <script src="js/search/search-lunr.js"></script>
-
-       <script src="js/tabs.js"></script>
-       <script src="js/menu.js"></script>
-       <script src="js/libs/prism.js"></script>
-       <script src="js/sourceCode.js"></script>
-       <script src="js/search/search_index.js"></script>
-
-    </body>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+</body>
 </html>

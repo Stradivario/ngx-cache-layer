@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "module": "amd",
+    "target": "es5",
+    "baseUrl": ".",
+    "stripInternal": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "rootDir": "./src",
+    "lib": [
+      "es2015",
+      "dom"
+    ],
+    "skipLibCheck": true,
+    "types": []
+  },
+  "angularCompilerOptions": {
+    "annotateForClosureCompiler": true,
+    "strictMetadataEmit": true,
+    "skipTemplateCodegen": true,
+    "flatModuleOutFile": "ngx-cache-layer.js",
+    "flatModuleId": "ngx-cache-layer"
+  },
+  "files": [
+    "./src/index.ts"
+  ]
+}
