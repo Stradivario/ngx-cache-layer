@@ -10,7 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-define(["require", "exports", "@angular/core", "rxjs", "./ngx-cache-layer.instance", "./ngx-cache-layer.interfaces", "rxjs/operators"], function (require, exports, core_1, rxjs_1, ngx_cache_layer_instance_1, ngx_cache_layer_interfaces_1, operators_1) {
+define(["require", "exports", "@angular/core", "rxjs", "./cache.instance", "./cache.interfaces", "rxjs/operators"], function (require, exports, core_1, rxjs_1, cache_instance_1, cache_interfaces_1, operators_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var INTERNAL_PROCEDURE_CACHE_NAME = 'cache_layers';
@@ -44,7 +44,7 @@ define(["require", "exports", "@angular/core", "rxjs", "./ngx-cache-layer.instan
             return JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
         };
         CacheService.createCacheInstance = function (cacheLayer) {
-            return new ngx_cache_layer_instance_1.CacheLayerInstance(cacheLayer);
+            return new cache_instance_1.CacheLayerInstance(cacheLayer);
         };
         CacheService.isLocalStorageUsable = function () {
             var error = [];
@@ -71,7 +71,7 @@ define(["require", "exports", "@angular/core", "rxjs", "./ngx-cache-layer.instan
                 return this.map.get(layer.name);
             }
             layer.items = layer.items || [];
-            layer.config = layer.config || this.config || ngx_cache_layer_interfaces_1.CACHE_MODULE_DI_CONFIG;
+            layer.config = layer.config || this.config || cache_interfaces_1.CACHE_MODULE_DI_CONFIG;
             var cacheLayer = CacheService.createCacheInstance(layer);
             if (layer.config.localStorage && CacheService.isLocalStorageUsable()) {
                 // tslint:disable-next-line:max-line-length
@@ -136,8 +136,8 @@ define(["require", "exports", "@angular/core", "rxjs", "./ngx-cache-layer.instan
             }));
         };
         CacheService = __decorate([
-            __param(0, core_1.Inject(ngx_cache_layer_interfaces_1.CACHE_MODULE_CONFIG)),
-            __metadata("design:paramtypes", [ngx_cache_layer_interfaces_1.CacheServiceConfigInterface])
+            __param(0, core_1.Inject(cache_interfaces_1.CACHE_MODULE_CONFIG)),
+            __metadata("design:paramtypes", [cache_interfaces_1.CacheServiceConfigInterface])
         ], CacheService);
         return CacheService;
     }());

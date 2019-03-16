@@ -1,16 +1,16 @@
 # @rxdi/cache
 
-![Build Status](http://gitlab.youvolio.com/open-source/rxdi/cache/badges/branch/build.svg)
+![Build Status](http://gitlab.youvolio.com/open-source/ngx-cache-layer/badges/branch/build.svg)
 
 #### @StrongTyped @EasyAPI Created on Angular@2+
 #### @Cache layer with capability to write in LocalStorage
 
-##### More detailed documentation you can find [here](https://stradivario.github.io/rxdi/cache/)
+##### More detailed documentation you can find [here](https://stradivario.github.io/ngx-cache-layer/)
 
-##### For questions/issues you can write ticket [here](http://gitlab.youvolio.com/open-source/rxdi/cache/issues)
+##### For questions/issues you can write ticket [here](http://gitlab.youvolio.com/open-source/ngx-cache-layer/issues)
 
 ##### Animation explanation:
-![Alt Text](https://github.com/rxdi/cache/raw/master/docs/animation/index.gif)
+![Alt Text](https://github.com/Stradivario/ngx-cache-layer/raw/master/docs/animation/index.gif)
 
 ## Installation and basic examples:
 ##### To install this library, run:

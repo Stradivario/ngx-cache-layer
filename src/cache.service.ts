@@ -1,12 +1,12 @@
 import { Inject } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { CacheLayerInstance } from './ngx-cache-layer.instance';
+import { CacheLayerInstance } from './cache.instance';
 import {
   CacheLayerInterface,
   CacheServiceConfigInterface,
   CacheLayerItem, CACHE_MODULE_CONFIG,
   CACHE_MODULE_DI_CONFIG
-} from './ngx-cache-layer.interfaces';
+} from './cache.interfaces';
 
 import { take, map, timeoutWith, skip } from 'rxjs/operators';
 

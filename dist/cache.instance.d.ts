@@ -1,6 +1,6 @@
-import { CacheLayerInterface, CacheServiceConfigInterface } from './ngx-cache-layer.interfaces';
+import { CacheLayerInterface, CacheServiceConfigInterface } from './cache.interfaces';
 import { Observable, BehaviorSubject } from 'rxjs';
-export declare class CacheLayer<T = {}> {
+export declare class CacheLayerInstance<T = {}> {
     items: BehaviorSubject<Array<T>>;
     name: string;
     config: CacheServiceConfigInterface;
@@ -17,4 +17,5 @@ export declare class CacheLayer<T = {}> {
     removeItem(key: string): void;
     getItemObservable(key: string): Observable<T>;
     flushCache(): Observable<boolean>;
+    fetch(http: string, init?: RequestInit, cache?: boolean): Promise<any>;
 }

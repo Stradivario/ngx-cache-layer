@@ -1,4 +1,4 @@
-import { CacheLayerInterface, CacheServiceConfigInterface } from './ngx-cache-layer.interfaces';
+import { CacheLayerInterface, CacheServiceConfigInterface } from './cache.interfaces';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { filter, map, timeoutWith, skip } from 'rxjs/operators';
 

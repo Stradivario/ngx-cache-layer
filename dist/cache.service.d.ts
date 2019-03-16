@@ -1,6 +1,6 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import { CacheLayerInstance } from './ngx-cache-layer.instance';
-import { CacheLayerInterface, CacheServiceConfigInterface, CacheLayerItem } from './ngx-cache-layer.interfaces';
+import { CacheLayerInstance } from './cache.instance';
+import { CacheLayerInterface, CacheServiceConfigInterface, CacheLayerItem } from './cache.interfaces';
 export declare class CacheService {
     private config;
     cachedLayers: BehaviorSubject<CacheLayerInstance<CacheLayerItem<any>>[]>;

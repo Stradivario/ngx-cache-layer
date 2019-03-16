@@ -1,6 +1,6 @@
-import { NgModule, ModuleWithProviders, InjectionToken } from '@angular/core';
-import { CacheService } from './ngx-cache-layer.service';
-import { CacheServiceConfigInterface, CACHE_MODULE_CONFIG, CACHE_MODULE_DI_CONFIG } from './ngx-cache-layer.interfaces';
+import { NgModule, ModuleWithProviders } from '@angular/core';
+import { CacheService } from './cache.service';
+import { CacheServiceConfigInterface, CACHE_MODULE_CONFIG, CACHE_MODULE_DI_CONFIG } from './cache.interfaces';
 
 @NgModule({
   providers: [CacheService]
@@ -17,7 +17,7 @@ export class CacheModule {
   }
 }
 
-export * from './ngx-cache-layer.service';
-export * from './ngx-cache-layer.instance';
-export * from './ngx-cache-layer.interfaces';
+export * from './cache.service';
+export * from './cache.instance';
+export * from './cache.interfaces';
 

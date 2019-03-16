@@ -1,8 +1,8 @@
 import { ModuleWithProviders } from '@angular/core';
-import { CacheServiceConfigInterface } from './ngx-cache-layer.interfaces';
+import { CacheServiceConfigInterface } from './cache.interfaces';
 export declare class CacheModule {
     static forRoot(config?: CacheServiceConfigInterface): ModuleWithProviders;
 }
-export * from './ngx-cache-layer.service';
-export * from './ngx-cache-layer.instance';
-export * from './ngx-cache-layer.interfaces';
+export * from './cache.service';
+export * from './cache.instance';
+export * from './cache.interfaces';
