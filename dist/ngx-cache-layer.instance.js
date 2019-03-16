@@ -158,7 +158,7 @@ define(["require", "exports", "rxjs", "rxjs/operators"], function (require, expo
                     switch (_a.label) {
                         case 0:
                             if (this.config.localStorage && this.getItem(http) && cache) {
-                                return [2 /*return*/, this.getItem(http)];
+                                return [2 /*return*/, this.getItem(http)['data']];
                             }
                             return [4 /*yield*/, fetch(http)];
                         case 1: return [4 /*yield*/, (_a.sent()).json()];
