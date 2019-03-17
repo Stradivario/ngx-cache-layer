@@ -25,7 +25,7 @@ export class CacheService {
   public cachedLayers: BehaviorSubject<CacheLayerInstance<CacheLayerItem<any>>[]> = new BehaviorSubject([]);
   private map: Map<any, any> = new Map();
 
-  public static getLayersFromLS(): Array<string> {
+  public static getsFromLS(): Array<string> {
     return JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
   }
 
@@ -36,7 +36,7 @@ export class CacheService {
         layers.forEach(layer => {
           const cachedLayer = JSON.parse(localStorage.getItem(layer));
           if (cachedLayer) {
-            this.createLayer(cachedLayer);
+            this.create(cachedLayer);
           }
         });
       } else {
@@ -61,15 +61,15 @@ export class CacheService {
     return error.length ? false : true;
   }
 
-  public getLayer<T>(name: string): CacheLayerInstance<CacheLayerItem<T>> {
+  public get<T>(name: string): CacheLayerInstance<CacheLayerItem<T>> {
     const exists = this.map.has(name);
     if (!exists) {
-      return this.createLayer<T>({ name });
+      return this.create<T>({ name });
     }
     return this.map.get(name);
   }
 
-  public createLayer<T>(layer: CacheLayerInterface): CacheLayerInstance<CacheLayerItem<T>> {
+  public create<T>(layer: CacheLayerInterface): CacheLayerInstance<CacheLayerItem<T>> {
     const exists = this.map.has(layer.name);
     if (exists) {
       return this.map.get(layer.name);
@@ -79,7 +79,7 @@ export class CacheService {
     const cacheLayer = CacheService.createCacheInstance<T>(layer);
     if (layer.config.localStorage && CacheService.isLocalStorageUsable()) {
       // tslint:disable-next-line:max-line-length
-      localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify([...CacheService.getLayersFromLS().filter(l => l !== cacheLayer.name), cacheLayer.name]));
+      localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify([...CacheService.getsFromLS().filter(l => l !== cacheLayer.name), cacheLayer.name]));
       localStorage.setItem(cacheLayer.name, JSON.stringify(layer));
     }
     this.map.set(cacheLayer.name, cacheLayer);
@@ -107,25 +107,25 @@ export class CacheService {
       pipe(
         timeoutWith(layerInstance.config.cacheFlushInterval || this.config.cacheFlushInterval, of(1)),
         skip(1)
-      ).subscribe(() => this.removeLayer(layerInstance));
+      ).subscribe(() => this.remove(layerInstance));
   }
 
-  public removeLayer<T>(layerInstance: CacheLayerInstance<CacheLayerItem<T>>): void {
+  public remove<T>(layerInstance: CacheLayerInstance<CacheLayerItem<T>>): void {
     this.map.delete(layerInstance.name);
     if (this.config.localStorage) {
       localStorage.removeItem(layerInstance.name);
       // tslint:disable-next-line:max-line-length
-      localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getLayersFromLS().filter(layer => layer !== layerInstance.name)));
+      localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getsFromLS().filter(layer => layer !== layerInstance.name)));
     }
     this.cachedLayers.next([...this.cachedLayers.getValue().filter(layer => layer.name !== layerInstance.name)]);
   }
 
   public transferItems(name: string, newCacheLayers: CacheLayerInterface[]): CacheLayerInstance<CacheLayerItem<any>>[] {
-    const oldLayer = this.getLayer(name);
+    const oldLayer = this.get(name);
     const newLayers = [];
     newCacheLayers.forEach(layerName => {
-      const newLayer = this.createLayer(layerName);
-      oldLayer.items.getValue().forEach(item => newLayer.putItem(item));
+      const newLayer = this.create(layerName);
+      oldLayer.items.getValue().forEach(item => newLayer.put(item));
       newLayers.push(newLayer);
     });
     return newLayers;
@@ -138,11 +138,11 @@ export class CacheService {
       take(1),
       map(layers => {
         oldLayersNames = layers.map(l => l.name);
-        layers.forEach(layer => this.removeLayer(layer));
+        layers.forEach(layer => this.remove(layer));
         if (force) {
           localStorage.removeItem(INTERNAL_PROCEDURE_CACHE_NAME);
         } else {
-          oldLayersNames.forEach((l) => this.createLayer({ name: l }));
+          oldLayersNames.forEach((l) => this.create({ name: l }));
         }
         return true;
       })

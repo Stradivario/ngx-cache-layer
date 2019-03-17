@@ -12,30 +12,30 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var core_1 = require("@angular/core");
-var rxjs_1 = require("rxjs");
-var cache_instance_1 = require("./cache.instance");
-var cache_interfaces_1 = require("./cache.interfaces");
-var operators_1 = require("rxjs/operators");
-var INTERNAL_PROCEDURE_CACHE_NAME = 'cache_layers';
-var FRIENDLY_ERROR_MESSAGES = {
+var CacheService_1;
+const core_1 = require("@angular/core");
+const rxjs_1 = require("rxjs");
+const cache_instance_1 = require("./cache.instance");
+const cache_interfaces_1 = require("./cache.interfaces");
+const operators_1 = require("rxjs/operators");
+const INTERNAL_PROCEDURE_CACHE_NAME = 'cache_layers';
+const FRIENDLY_ERROR_MESSAGES = {
     TRY_TO_UNSUBSCRIBE: 'Someone try to unsubscribe from collection directly... agghhh.. read docs! Blame: ',
     // tslint:disable-next-line:max-line-length
     LOCAL_STORAGE_DISABLED: 'LocalStorage is disabled switching to regular in-memory storage.Please relate issue if you think it is enabled and there is a problem with the library itself.'
 };
-var CacheService = /** @class */ (function () {
-    function CacheService(config) {
-        var _this = this;
+let CacheService = CacheService_1 = class CacheService {
+    constructor(config) {
         this.config = config;
         this.cachedLayers = new rxjs_1.BehaviorSubject([]);
         this.map = new Map();
         if (this.config.localStorage && CacheService_1.isLocalStorageUsable()) {
-            var layers = JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
+            const layers = JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
             if (layers) {
-                layers.forEach(function (layer) {
-                    var cachedLayer = JSON.parse(localStorage.getItem(layer));
+                layers.forEach(layer => {
+                    const cachedLayer = JSON.parse(localStorage.getItem(layer));
                     if (cachedLayer) {
-                        _this.createLayer(cachedLayer);
+                        this.create(cachedLayer);
                     }
                 });
             }
@@ -44,15 +44,14 @@ var CacheService = /** @class */ (function () {
             }
         }
     }
-    CacheService_1 = CacheService;
-    CacheService.getLayersFromLS = function () {
+    static getsFromLS() {
         return JSON.parse(localStorage.getItem(INTERNAL_PROCEDURE_CACHE_NAME));
-    };
-    CacheService.createCacheInstance = function (cacheLayer) {
+    }
+    static createCacheInstance(cacheLayer) {
         return new cache_instance_1.CacheLayerInstance(cacheLayer);
-    };
-    CacheService.isLocalStorageUsable = function () {
-        var error = [];
+    }
+    static isLocalStorageUsable() {
+        const error = [];
         try {
             localStorage.setItem('test-key', JSON.stringify({ key: 'test-object' }));
             localStorage.removeItem('test-key');
@@ -62,90 +61,85 @@ var CacheService = /** @class */ (function () {
             console.log(FRIENDLY_ERROR_MESSAGES.LOCAL_STORAGE_DISABLED);
         }
         return error.length ? false : true;
-    };
-    CacheService.prototype.getLayer = function (name) {
-        var exists = this.map.has(name);
+    }
+    get(name) {
+        const exists = this.map.has(name);
         if (!exists) {
-            return this.createLayer({ name: name });
+            return this.create({ name });
         }
         return this.map.get(name);
-    };
-    CacheService.prototype.createLayer = function (layer) {
-        var exists = this.map.has(layer.name);
+    }
+    create(layer) {
+        const exists = this.map.has(layer.name);
         if (exists) {
             return this.map.get(layer.name);
         }
         layer.items = layer.items || [];
         layer.config = layer.config || this.config || cache_interfaces_1.CACHE_MODULE_DI_CONFIG;
-        var cacheLayer = CacheService_1.createCacheInstance(layer);
+        const cacheLayer = CacheService_1.createCacheInstance(layer);
         if (layer.config.localStorage && CacheService_1.isLocalStorageUsable()) {
             // tslint:disable-next-line:max-line-length
-            localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService_1.getLayersFromLS().filter(function (l) { return l !== cacheLayer.name; }).concat([cacheLayer.name])));
+            localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify([...CacheService_1.getsFromLS().filter(l => l !== cacheLayer.name), cacheLayer.name]));
             localStorage.setItem(cacheLayer.name, JSON.stringify(layer));
         }
         this.map.set(cacheLayer.name, cacheLayer);
-        this.cachedLayers.next(this.cachedLayers.getValue().concat([cacheLayer]));
+        this.cachedLayers.next([...this.cachedLayers.getValue(), cacheLayer]);
         this.LayerHook(cacheLayer);
         return cacheLayer;
-    };
-    CacheService.prototype.LayerHook = function (layerInstance) {
+    }
+    LayerHook(layerInstance) {
         this.protectLayerFromInvaders(layerInstance);
         if (layerInstance.config.cacheFlushInterval || this.config.cacheFlushInterval) {
             this.OnExpire(layerInstance);
         }
-    };
-    CacheService.prototype.protectLayerFromInvaders = function (cacheLayer) {
+    }
+    protectLayerFromInvaders(cacheLayer) {
         cacheLayer.items.constructor.prototype.unsubsribeFromLayer = cacheLayer.items.constructor.prototype.unsubscribe;
-        cacheLayer.items.constructor.prototype.unsubscribe = function () {
+        cacheLayer.items.constructor.prototype.unsubscribe = () => {
             console.error(FRIENDLY_ERROR_MESSAGES.TRY_TO_UNSUBSCRIBE + cacheLayer.name);
         };
-    };
-    CacheService.prototype.OnExpire = function (layerInstance) {
-        var _this = this;
-        new rxjs_1.Observable(function (observer) { return observer.next(); }).
-            pipe(operators_1.timeoutWith(layerInstance.config.cacheFlushInterval || this.config.cacheFlushInterval, rxjs_1.of(1)), operators_1.skip(1)).subscribe(function () { return _this.removeLayer(layerInstance); });
-    };
-    CacheService.prototype.removeLayer = function (layerInstance) {
+    }
+    OnExpire(layerInstance) {
+        new rxjs_1.Observable(observer => observer.next()).
+            pipe(operators_1.timeoutWith(layerInstance.config.cacheFlushInterval || this.config.cacheFlushInterval, rxjs_1.of(1)), operators_1.skip(1)).subscribe(() => this.remove(layerInstance));
+    }
+    remove(layerInstance) {
         this.map.delete(layerInstance.name);
         if (this.config.localStorage) {
             localStorage.removeItem(layerInstance.name);
             // tslint:disable-next-line:max-line-length
-            localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService_1.getLayersFromLS().filter(function (layer) { return layer !== layerInstance.name; })));
+            localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService_1.getsFromLS().filter(layer => layer !== layerInstance.name)));
         }
-        this.cachedLayers.next(this.cachedLayers.getValue().filter(function (layer) { return layer.name !== layerInstance.name; }).slice());
-    };
-    CacheService.prototype.transferItems = function (name, newCacheLayers) {
-        var _this = this;
-        var oldLayer = this.getLayer(name);
-        var newLayers = [];
-        newCacheLayers.forEach(function (layerName) {
-            var newLayer = _this.createLayer(layerName);
-            oldLayer.items.getValue().forEach(function (item) { return newLayer.putItem(item); });
+        this.cachedLayers.next([...this.cachedLayers.getValue().filter(layer => layer.name !== layerInstance.name)]);
+    }
+    transferItems(name, newCacheLayers) {
+        const oldLayer = this.get(name);
+        const newLayers = [];
+        newCacheLayers.forEach(layerName => {
+            const newLayer = this.create(layerName);
+            oldLayer.items.getValue().forEach(item => newLayer.put(item));
             newLayers.push(newLayer);
         });
         return newLayers;
-    };
-    CacheService.prototype.flushCache = function (force) {
-        var _this = this;
-        var oldLayersNames;
-        return this.cachedLayers.pipe(operators_1.take(1), operators_1.map(function (layers) {
-            oldLayersNames = layers.map(function (l) { return l.name; });
-            layers.forEach(function (layer) { return _this.removeLayer(layer); });
+    }
+    flushCache(force) {
+        let oldLayersNames;
+        return this.cachedLayers.pipe(operators_1.take(1), operators_1.map(layers => {
+            oldLayersNames = layers.map(l => l.name);
+            layers.forEach(layer => this.remove(layer));
             if (force) {
                 localStorage.removeItem(INTERNAL_PROCEDURE_CACHE_NAME);
             }
             else {
-                oldLayersNames.forEach(function (l) { return _this.createLayer({ name: l }); });
+                oldLayersNames.forEach((l) => this.create({ name: l }));
             }
             return true;
         }));
-    };
-    var CacheService_1;
-    CacheService = CacheService_1 = __decorate([
-        core_1.Injectable(),
-        __param(0, core_1.Inject(cache_interfaces_1.CACHE_MODULE_CONFIG)),
-        __metadata("design:paramtypes", [cache_interfaces_1.CacheServiceConfigInterface])
-    ], CacheService);
-    return CacheService;
-}());
+    }
+};
+CacheService = CacheService_1 = __decorate([
+    core_1.Injectable(),
+    __param(0, core_1.Inject(cache_interfaces_1.CACHE_MODULE_CONFIG)),
+    __metadata("design:paramtypes", [cache_interfaces_1.CacheServiceConfigInterface])
+], CacheService);
 exports.CacheService = CacheService;

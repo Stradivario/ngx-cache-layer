@@ -89,7 +89,7 @@ export class ExampleComponent implements OnInit {
     // Correct implementation of subscribing to collection of layer items and work inside component with it:
     // Recommended way to work with cacheLayer collection items is to create another observable asObservable and use items this way
     // Anyway it is better to let angular view model to handle subscription itself ( cartItems | async)
-    // To work with collection this way you can use collection Instance returned from getLayer above (this.cacheLayer) (Examples Below)
+    // To work with collection this way you can use collection Instance returned from get above (this.cacheLayer) (Examples Below)
 
     this.subscription = this.exampleLayerItems.asObservable()
       .subscribe(items => {
@@ -120,23 +120,23 @@ export class ExampleComponent implements OnInit {
     });
 
     // Get cached data from added item above will return {exampleData:'example-string'}
-    const exampleData = this.getItem('example-key');
+    const exampleData = this.get('example-key');
 
     // Remove item from current layer
-    this.removeItem('example-key');
+    this.remove('example-key');
 
   }
 
   createItem(data: any) {
-    this.exampleLayer.putItem(data);
+    this.exampleLayer.put(data);
   }
 
-  getItem(key: string) {
-    this.exampleLayer.getItem(key);
+  get(key: string) {
+    this.exampleLayer.get(key);
   }
 
-  removeItem(key: string) {
-    this.exampleLayer.removeItem(key);
+  remove(key: string) {
+    this.exampleLayer.remove(key);
   }
 
 }
@@ -154,7 +154,7 @@ import {EXAMPLE_CACHE_LAYER_NAME, Item} from './example.provider';
 export class YourClass {
     cacheLayer: CacheLayer<CacheLayerItem<Item>>;
     constructor(private:cacheService:CacheService){
-      this.cacheLayer = cacheService.getLayer<Item>(EXAMPLE_CACHE_LAYER_NAME);
+      this.cacheLayer = cacheService.get<Item>(EXAMPLE_CACHE_LAYER_NAME);
       // Now work with this collection the same as example above;
     }
 }
@@ -181,8 +181,8 @@ export class YourClass {
 
 ##### Create CartProvider which will help us to reduce logic inside component
 ##### IMPORTANT When you use provider and define custom settings you need to use provider cache layer instance!
-##### If you use CacheService.getLayer() with the same cache name it may lead to not initialize current defined config when we createLayer with specific config not global
-##### Without provider you can use it as usual with getLayer() and createLayer() it will be safe but it will take Global Configuration instead.
+##### If you use CacheService.get() with the same cache name it may lead to not initialize current defined config when we createLayer with specific config not global
+##### Without provider you can use it as usual with get() and createLayer() it will be safe but it will take Global Configuration instead.
 
 ```typescript
 
@@ -222,14 +222,14 @@ export class CartProvider {
   }
 
   putToCart(product: Product) {
-    this.cacheLayer.putItem({
+    this.cacheLayer.put({
       key:product.id,
       data: product
     });
   }
 
   removeFromCart(product: Product) {
-    this.cacheLayer.removeItem(product.id);
+    this.cacheLayer.remove(product.id);
   }
 
 }
@@ -255,7 +255,7 @@ export class CartComponent implements OnInit {
 
   ngOnInit() {}
 
-  removeItem(product: Product) {
+  remove(product: Product) {
     this.cartProvider.removeFromCard(product)
   }
 
@@ -272,8 +272,8 @@ export class CartComponent implements OnInit {
 <div *ngFor="let product of (cartProvider.items | async)">
 	{{item.key}} // is cache identity
     {{item.data.id}} // Cached data from current item from card layer Observable
-    <-- removeItemKey in my case item.id is unique so i should remove item id -->
-    <button (click)="removeItem(product)">Remove item</button>
+    <-- removeKey in my case item.id is unique so i should remove item id -->
+    <button (click)="remove(product)">Remove item</button>
 </div>
 ```
 
@@ -332,7 +332,7 @@ Optional: `settings interface CacheLayerInterface`
 ##### Get layer from cache
 
 ```typescript
-CacheService.getLayer<any>('layer-name');
+CacheService.get<any>('layer-name');
 ```
 Returns: `Instance of CacheLayer class`
 
@@ -352,7 +352,7 @@ CacheLayer.createCacheParams({key: 'endpoint-key', params: {exampleParam: 'test'
 Complete cache for endpoint with 8 rows more code without it :)
 
 ```typescript
-const endpointCache = this.cacheService.getLayer('endpoint-cache');
+const endpointCache = this.cacheService.get('endpoint-cache');
 
 function getUserById(id: number) {
   return Observable.create(observer => {
@@ -361,13 +361,13 @@ function getUserById(id: number) {
       client_credentials: true,
     };
     const cacheAddress = CacheLayer.createCacheParams({ key: ENDPOINT, params: PARAMS });
-    if (endpointCache.getItem(cacheAddress)) {
-      return observer.next(endpointCache.getItem(cacheAddress));
+    if (endpointCache.get(cacheAddress)) {
+      return observer.next(endpointCache.get(cacheAddress));
     }
-    // endpointCache.putItem method like getItem returns instance of cached item so we can safely return to the observer above
+    // endpointCache.put method like get returns instance of cached item so we can safely return to the observer above
 	this.http.post(ENDPOINT, PARAMS)
 	.map(user =>
-		observer.next(endpointCache.putItem({ key: cacheAddress, data: user.json() }))
+		observer.next(endpointCache.put({ key: cacheAddress, data: user.json() }))
 	)
 	.subscribe()
   });
@@ -379,37 +379,43 @@ function getUserById(id: number) {
 ### Cache Layer Instance methods
 
 ```typescript
-const cache = CacheService.getLayer<any>('layer-name');
+const cache = CacheService.get<T>('layer-name');
 ```
 
 ##### Put item to cache
 
 ```typescript
-cache.putItem({key:'example-key', data:{exampleData:''}});
+cache.put({ key:'example-key', data: { exampleData:'' } });
 ```
 
 ##### Get item from cache
 
 ```typescript
-cache.getItem('example-key');
+cache.get('example-key');
 ```
 
 ##### Get item from cache as observable it will emit every value changed for that specific key
 
 ```typescript
-cache.getItemObservable('example-key');
+cache.asObservable('example-key');
 ```
 
 ##### Remove item from cache
 
 ```typescript
-cache.removeItem('example-key');
+cache.remove('example-key');
+```
+
+##### Get items as observable (will emit value in the moment when it is populated)
+
+```typescript
+cache.items.asObservable();
 ```
 
 ##### Cache all data from the request. It uses native `fetch` inside browser and will cache particular request to collection
 
 ```typescript
-cache.fetch('https://api.github.com/repos/rxdi/core/releases');
+cache.fetch<T>('https://api.github.com/repos/rxdi/core/releases');
 ```
 
 <br>
@@ -429,7 +435,7 @@ cache.fetch('https://api.github.com/repos/rxdi/core/releases');
 ```typescript
 
   ngOnInit() {
-    this.cacheLayer = this.cache.getLayer<Product>(CART_CACHE_LAYER_NAME);
+    this.cacheLayer = this.cache.get<Product>(CART_CACHE_LAYER_NAME);
     this.cartItems = this.cacheLayer.items;
 
 

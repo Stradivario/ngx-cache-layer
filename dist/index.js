@@ -9,30 +9,26 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 Object.defineProperty(exports, "__esModule", { value: true });
-var core_1 = require("@angular/core");
-var cache_service_1 = require("./cache.service");
-var cache_interfaces_1 = require("./cache.interfaces");
-var CacheModule = /** @class */ (function () {
-    function CacheModule() {
-    }
-    CacheModule_1 = CacheModule;
-    CacheModule.forRoot = function (config) {
+var CacheModule_1;
+const core_1 = require("@angular/core");
+const cache_service_1 = require("./cache.service");
+const cache_interfaces_1 = require("./cache.interfaces");
+let CacheModule = CacheModule_1 = class CacheModule {
+    static forRoot(config) {
         return {
             ngModule: CacheModule_1,
             providers: [
-                { provide: cache_interfaces_1.CACHE_MODULE_CONFIG, useFactory: function () { return config || cache_interfaces_1.CACHE_MODULE_DI_CONFIG; } },
+                { provide: cache_interfaces_1.CACHE_MODULE_CONFIG, useFactory: () => config || cache_interfaces_1.CACHE_MODULE_DI_CONFIG },
                 cache_service_1.CacheService
             ]
         };
-    };
-    var CacheModule_1;
-    CacheModule = CacheModule_1 = __decorate([
-        core_1.NgModule({
-            providers: [cache_service_1.CacheService]
-        })
-    ], CacheModule);
-    return CacheModule;
-}());
+    }
+};
+CacheModule = CacheModule_1 = __decorate([
+    core_1.NgModule({
+        providers: [cache_service_1.CacheService]
+    })
+], CacheModule);
 exports.CacheModule = CacheModule;
 __export(require("./cache.service"));
 __export(require("./cache.instance"));

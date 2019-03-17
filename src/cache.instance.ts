@@ -24,9 +24,6 @@ export class CacheLayerInstance<T = {}> {
     }
   }
 
-  public get(name): T {
-    return this.map.get(name);
-  }
 
   constructor(layer: CacheLayerInterface) {
     this.name = layer.name;
@@ -53,26 +50,26 @@ export class CacheLayerInstance<T = {}> {
     layer.items.forEach(item => this.onExpire(item['key']));
   }
 
-  private putItemHook(layerItem): void {
+  private putHook(layerItem): void {
     if (this.config.maxAge) {
       // tslint:disable-next-line:no-string-literal
       this.onExpire(layerItem['key']);
     }
   }
 
-  public getItem(key: string): T {
+  public get(key: string): T {
     if (this.map.has(key)) {
-      return this.get(key);
+      return this.map.get(key);
     } else {
       return null;
     }
   }
 
-  public putItem(layerItem: T): T {
+  public put(layerItem: T): T {
     // tslint:disable-next-line:no-string-literal
     this.map.set(layerItem['key'], layerItem);
     // tslint:disable-next-line:no-string-literal
-    const item = this.get(layerItem['key']);
+    const item = this.map.get(layerItem['key']);
     // tslint:disable-next-line:no-string-literal
     const filteredItems = this.items.getValue().filter(i => i['key'] !== layerItem['key']);
     if (this.config.localStorage) {
@@ -84,7 +81,7 @@ export class CacheLayerInstance<T = {}> {
     }
 
     this.items.next([...filteredItems, item]);
-    this.putItemHook(layerItem);
+    this.putHook(layerItem);
     return layerItem;
   }
 
@@ -111,7 +108,7 @@ export class CacheLayerInstance<T = {}> {
     this.items.next(newLayerItems);
   }
 
-  public getItemObservable(key: string): Observable<T> {
+  public asObservable(key: string): Observable<T> {
     if (this.map.has(key)) {
       console.error(`Key: ${key} ${FRIENDLY_ERROR_MESSAGES.MISSING_OBSERVABLE_ITEM}`);
     }
@@ -132,13 +129,14 @@ export class CacheLayerInstance<T = {}> {
       );
   }
 
-  async fetch(http: string, init?: RequestInit, cache = true) {
-    if (this.config.localStorage && this.getItem(http) && cache) {
-      return this.getItem(http)['data'];
+  async fetch<K>(http: string, init?: RequestInit, cache = true): Promise<K> {
+    if (this.config.localStorage && this.get(http) && cache) {
+      // tslint:disable-next-line:no-string-literal
+      return this.get(http)['data'];
     }
-    const data = await (await fetch(http)).json();
+    const data: K = await (await fetch(http)).json();
     if (cache) {
-      this.putItem(<any>{ key: http, data: data })
+      this.put(({ key: http, data }) as any);
     }
     return data;
   }
