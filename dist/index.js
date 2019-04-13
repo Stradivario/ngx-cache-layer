@@ -18,7 +18,7 @@ let CacheModule = CacheModule_1 = class CacheModule {
         return {
             ngModule: CacheModule_1,
             providers: [
-                { provide: cache_interfaces_1.CACHE_MODULE_CONFIG, useFactory: () => config || cache_interfaces_1.CACHE_MODULE_DI_CONFIG },
+                { provide: cache_interfaces_1.CACHE_MODULE_CONFIG, useValue: config || cache_interfaces_1.CACHE_MODULE_DI_CONFIG },
                 cache_service_1.CacheService
             ]
         };

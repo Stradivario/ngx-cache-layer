@@ -19,6 +19,7 @@ class CacheLayerInstance {
         this.map = new Map();
         this.name = layer.name;
         this.config = layer.config;
+        this.createdAt = layer.createdAt;
         if (this.config.localStorage) {
             // tslint:disable-next-line:no-string-literal
             layer.items.forEach(item => this.map.set(item['key'], item));
@@ -44,7 +45,7 @@ class CacheLayerInstance {
         }
     }
     initHook(layer) {
-        if (this.config.maxAge) {
+        if (this.config.cacheFlushInterval) {
             this.onExpireAll(layer);
         }
     }
@@ -53,7 +54,7 @@ class CacheLayerInstance {
         layer.items.forEach(item => this.onExpire(item['key']));
     }
     putHook(layerItem) {
-        if (this.config.maxAge) {
+        if (this.config.cacheFlushInterval) {
             // tslint:disable-next-line:no-string-literal
             this.onExpire(layerItem['key']);
         }
@@ -75,6 +76,7 @@ class CacheLayerInstance {
         const filteredItems = this.items.getValue().filter(i => i['key'] !== layerItem['key']);
         if (this.config.localStorage) {
             localStorage.setItem(this.name, JSON.stringify({
+                createdAt: this.createdAt,
                 config: this.config,
                 name: this.name,
                 items: [...filteredItems, item]
@@ -86,7 +88,7 @@ class CacheLayerInstance {
     }
     onExpire(key) {
         new rxjs_1.Observable(observer => observer.next())
-            .pipe(operators_1.timeoutWith(this.config.maxAge, rxjs_1.of(1)), operators_1.skip(1)).subscribe(() => this.removeItem(key));
+            .pipe(operators_1.timeoutWith(this.config.cacheFlushInterval, rxjs_1.of(1)), operators_1.skip(1)).subscribe(() => this.removeItem(key));
     }
     removeItem(key) {
         // tslint:disable-next-line:no-string-literal
@@ -124,7 +126,7 @@ class CacheLayerInstance {
             }
             const data = yield (yield fetch(http)).json();
             if (cache) {
-                this.put(({ key: http, data }));
+                this.put({ key: http, data });
             }
             return data;
         });

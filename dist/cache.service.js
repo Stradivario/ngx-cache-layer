@@ -63,8 +63,7 @@ let CacheService = CacheService_1 = class CacheService {
         return error.length ? false : true;
     }
     get(name) {
-        const exists = this.map.has(name);
-        if (!exists) {
+        if (!this.map.has(name)) {
             return this.create({ name });
         }
         return this.map.get(name);
@@ -75,6 +74,7 @@ let CacheService = CacheService_1 = class CacheService {
             return this.map.get(layer.name);
         }
         layer.items = layer.items || [];
+        layer.createdAt = layer.createdAt || Date.now();
         layer.config = layer.config || this.config || cache_interfaces_1.CACHE_MODULE_DI_CONFIG;
         const cacheLayer = CacheService_1.createCacheInstance(layer);
         if (layer.config.localStorage && CacheService_1.isLocalStorageUsable()) {
@@ -89,7 +89,12 @@ let CacheService = CacheService_1 = class CacheService {
     }
     LayerHook(layerInstance) {
         this.protectLayerFromInvaders(layerInstance);
-        if (layerInstance.config.cacheFlushInterval || this.config.cacheFlushInterval) {
+        const flushInterval = layerInstance.config.cacheFlushInterval || this.config.cacheFlushInterval;
+        const timeElapsed = Date.now() - layerInstance.createdAt;
+        if (timeElapsed > flushInterval) {
+            this.remove(layerInstance);
+        }
+        else if (flushInterval) {
             this.OnExpire(layerInstance);
         }
     }
@@ -104,13 +109,15 @@ let CacheService = CacheService_1 = class CacheService {
             pipe(operators_1.timeoutWith(layerInstance.config.cacheFlushInterval || this.config.cacheFlushInterval, rxjs_1.of(1)), operators_1.skip(1)).subscribe(() => this.remove(layerInstance));
     }
     remove(layerInstance) {
-        this.map.delete(layerInstance.name);
         if (this.config.localStorage) {
             localStorage.removeItem(layerInstance.name);
-            // tslint:disable-next-line:max-line-length
-            localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService_1.getsFromLS().filter(layer => layer !== layerInstance.name)));
+            const leftLocalStorageLayers = CacheService_1.getsFromLS().filter(layer => layer !== layerInstance.name);
+            localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(leftLocalStorageLayers));
         }
-        this.cachedLayers.next([...this.cachedLayers.getValue().filter(layer => layer.name !== layerInstance.name)]);
+        layerInstance.flushCache().pipe(operators_1.take(1)).subscribe(() => {
+            this.cachedLayers.next([...this.cachedLayers.getValue().filter(layer => layer.name !== layerInstance.name)]);
+            this.map.delete(layerInstance.name);
+        });
     }
     transferItems(name, newCacheLayers) {
         const oldLayer = this.get(name);

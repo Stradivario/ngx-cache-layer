@@ -4,6 +4,7 @@ export declare class CacheLayerInstance<T = {}> {
     items: BehaviorSubject<Array<T>>;
     name: string;
     config: CacheServiceConfigInterface;
+    createdAt: number;
     private map;
     static createCacheParams(config: any): void;
     constructor(layer: CacheLayerInterface);
@@ -11,7 +12,7 @@ export declare class CacheLayerInstance<T = {}> {
     private onExpireAll;
     private putHook;
     get(key: string): T;
-    put(layerItem: T): T;
+    put(layerItem: any): T;
     private onExpire;
     removeItem(key: string): void;
     asObservable(key: string): Observable<T>;

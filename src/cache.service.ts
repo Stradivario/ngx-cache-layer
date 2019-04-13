@@ -62,8 +62,7 @@ export class CacheService {
   }
 
   public get<T>(name: string): CacheLayerInstance<CacheLayerItem<T>> {
-    const exists = this.map.has(name);
-    if (!exists) {
+    if (!this.map.has(name)) {
       return this.create<T>({ name });
     }
     return this.map.get(name);
@@ -75,6 +74,7 @@ export class CacheService {
       return this.map.get(layer.name);
     }
     layer.items = layer.items || [];
+    layer.createdAt = layer.createdAt || Date.now();
     layer.config = layer.config || this.config || CACHE_MODULE_DI_CONFIG;
     const cacheLayer = CacheService.createCacheInstance<T>(layer);
     if (layer.config.localStorage && CacheService.isLocalStorageUsable()) {
@@ -90,7 +90,11 @@ export class CacheService {
 
   private LayerHook<T>(layerInstance: CacheLayerInstance<CacheLayerItem<T>>): void {
     this.protectLayerFromInvaders<T>(layerInstance);
-    if (layerInstance.config.cacheFlushInterval || this.config.cacheFlushInterval) {
+    const flushInterval = layerInstance.config.cacheFlushInterval || this.config.cacheFlushInterval;
+    const timeElapsed = Date.now() - layerInstance.createdAt;
+    if (timeElapsed > flushInterval) {
+      this.remove(layerInstance);
+    } else if (flushInterval) {
       this.OnExpire(layerInstance);
     }
   }
@@ -111,13 +115,15 @@ export class CacheService {
   }
 
   public remove<T>(layerInstance: CacheLayerInstance<CacheLayerItem<T>>): void {
-    this.map.delete(layerInstance.name);
     if (this.config.localStorage) {
       localStorage.removeItem(layerInstance.name);
-      // tslint:disable-next-line:max-line-length
-      localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(CacheService.getsFromLS().filter(layer => layer !== layerInstance.name)));
+      const leftLocalStorageLayers = CacheService.getsFromLS().filter(layer => layer !== layerInstance.name);
+      localStorage.setItem(INTERNAL_PROCEDURE_CACHE_NAME, JSON.stringify(leftLocalStorageLayers));
     }
-    this.cachedLayers.next([...this.cachedLayers.getValue().filter(layer => layer.name !== layerInstance.name)]);
+    layerInstance.flushCache().pipe(take(1)).subscribe(() => {
+      this.cachedLayers.next([...this.cachedLayers.getValue().filter(layer => layer.name !== layerInstance.name)]);
+      this.map.delete(layerInstance.name);
+    });
   }
 
   public transferItems(name: string, newCacheLayers: CacheLayerInterface[]): CacheLayerInstance<CacheLayerItem<any>>[] {
@@ -130,7 +136,6 @@ export class CacheService {
     });
     return newLayers;
   }
-
 
   public flushCache(force?: boolean): Observable<boolean> {
     let oldLayersNames: string[];

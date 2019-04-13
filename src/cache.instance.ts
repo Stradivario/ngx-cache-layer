@@ -11,6 +11,7 @@ export class CacheLayerInstance<T = {}> {
   public items: BehaviorSubject<Array<T>> = new BehaviorSubject([]);
   public name: string;
   public config: CacheServiceConfigInterface;
+  public createdAt: number;
   private map: Map<any, any> = new Map();
   static createCacheParams(config) {
     if (config.params.constructor === Object) {
@@ -28,6 +29,7 @@ export class CacheLayerInstance<T = {}> {
   constructor(layer: CacheLayerInterface) {
     this.name = layer.name;
     this.config = layer.config;
+    this.createdAt = layer.createdAt;
     if (this.config.localStorage) {
       // tslint:disable-next-line:no-string-literal
       layer.items.forEach(item => this.map.set(item['key'], item));
@@ -40,7 +42,7 @@ export class CacheLayerInstance<T = {}> {
   }
 
   private initHook(layer) {
-    if (this.config.maxAge) {
+    if (this.config.cacheFlushInterval) {
       this.onExpireAll(layer);
     }
   }
@@ -51,7 +53,7 @@ export class CacheLayerInstance<T = {}> {
   }
 
   private putHook(layerItem): void {
-    if (this.config.maxAge) {
+    if (this.config.cacheFlushInterval) {
       // tslint:disable-next-line:no-string-literal
       this.onExpire(layerItem['key']);
     }
@@ -65,7 +67,7 @@ export class CacheLayerInstance<T = {}> {
     }
   }
 
-  public put(layerItem: T): T {
+  public put(layerItem): T {
     // tslint:disable-next-line:no-string-literal
     this.map.set(layerItem['key'], layerItem);
     // tslint:disable-next-line:no-string-literal
@@ -74,6 +76,7 @@ export class CacheLayerInstance<T = {}> {
     const filteredItems = this.items.getValue().filter(i => i['key'] !== layerItem['key']);
     if (this.config.localStorage) {
       localStorage.setItem(this.name, JSON.stringify({
+        createdAt: this.createdAt,
         config: this.config,
         name: this.name,
         items: [...filteredItems, item]
@@ -88,7 +91,7 @@ export class CacheLayerInstance<T = {}> {
   private onExpire(key: string): void {
     new Observable(observer => observer.next())
       .pipe(
-        timeoutWith(this.config.maxAge, of(1)),
+        timeoutWith(this.config.cacheFlushInterval, of(1)),
         skip(1)
       ).subscribe(() => this.removeItem(key));
   }
@@ -136,7 +139,7 @@ export class CacheLayerInstance<T = {}> {
     }
     const data: K = await (await fetch(http)).json();
     if (cache) {
-      this.put(({ key: http, data }) as any);
+      this.put({ key: http, data });
     }
     return data;
   }

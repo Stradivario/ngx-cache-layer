@@ -8,8 +8,8 @@ export interface CacheLayerItem<T> {
 export class CacheServiceConfigInterface {
   deleteOnExpire?: 'aggressive' | string;
   cacheFlushInterval?: number | null = 60 * 60 * 1000;
-  maxAge?: number | null = 15 * 60 * 1000;
   localStorage?: boolean;
+  createdAt?: string;
 }
 
 export interface CacheLayerInterface {
@@ -17,6 +17,7 @@ export interface CacheLayerInterface {
   config?: CacheServiceConfigInterface;
   items?: any;
   key?: string;
+  createdAt?: number;
 }
 
 
@@ -24,6 +25,5 @@ export const CACHE_MODULE_CONFIG = new InjectionToken<CacheServiceConfigInterfac
 
 export const CACHE_MODULE_DI_CONFIG: CacheServiceConfigInterface = {
   deleteOnExpire: 'aggressive',
-  cacheFlushInterval: 60 * 60 * 1000,
-  maxAge: 15 * 60 * 1000
+  cacheFlushInterval: 60 * 60 * 1000
 };
