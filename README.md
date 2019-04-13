@@ -7,7 +7,7 @@
 
 ##### More detailed documentation you can find [here](https://stradivario.github.io/ngx-cache-layer/)
 
-##### For questions/issues you can write ticket [here](http://gitlab.youvolio.com/open-source/ngx-cache-layer/issues)
+##### For questions/issues you can write ticket [here](https://github.com/rxdi/cache)
 
 ##### Animation explanation:
 ![Alt Text](https://github.com/Stradivario/ngx-cache-layer/raw/master/docs/animation/index.gif)
@@ -79,7 +79,7 @@ export class ExampleComponent implements OnInit {
 
   ngOnInit() {
     // Here we define our cache layer name, this method returns instance of class CacheLayer<CacheLayerItem<Item>>
-    this.exampleLayer = this.cacheService.createLayer<Item>({
+    this.exampleLayer = this.cacheService.create<Item>({
       name: EXAMPLE_CACHE_LAYER_NAME
     });
 
@@ -101,7 +101,9 @@ export class ExampleComponent implements OnInit {
     // Another method is to take values single time only per component initialization
 
     this.exampleLayerItems
-      .take(1)
+      .pipe(
+        take(1)
+      )
       .subscribe(itemCollection => itemCollection
         .forEach(item => {
           // Because we define interface for this items we have the following autosuggestion from the IDE
@@ -172,7 +174,7 @@ import {EXAMPLE_CACHE_LAYER_NzAME} from './example.provider';
 @Injectable()
 export class YourClass {
     constructor(private:cacheService:CacheService) {
-      cacheService.removeLayer(EXAMPLE_CACHE_LAYER_NAME);
+      cacheService.remove(EXAMPLE_CACHE_LAYER_NAME);
     }
 }
 ```
@@ -322,7 +324,7 @@ export class AppModule { }
 ##### Create cache layer
 
 ```typescript
-CacheService.createLayer<any>({name: 'layer-name', settings?: CacheLayerInterface})
+CacheService.create<any>({name: 'layer-name', settings?: CacheLayerInterface})
 ```
 `Optional you can define custom settings for every layer that you create just insert CacheLayerInterface from rxdi/cache like example for global config above`
 
@@ -339,7 +341,7 @@ Returns: `Instance of CacheLayer class`
 ##### Remove layer from cache
 
 ```typescript
-CacheService.removeLayer('layer-name');
+CacheService.remove('layer-name');
 ```
 Returns: `void`
 
@@ -447,7 +449,7 @@ cache.fetch<T>('https://api.github.com/repos/rxdi/core/releases');
 	  });
 
 	// ANOTHER CORRECT EXAMPLE (this method will subscribe only once and you cannot get new results if there are any new)
-	this.cartItems.take(1).subscribe(collection => {
+	this.cartItems.pipe(take(1)).subscribe(collection => {
 	  // Do something with collection here and initialize only once inside component
 	});
 
